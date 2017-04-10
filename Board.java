@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.util.Queue;
 
 public class Board {
     private Pawn[] ring = new Pawn[17*4];
@@ -30,14 +31,17 @@ public class Board {
         homes.put("red", new Home("red"));
     }
 
-
     public class Home {
         private String color;
-        private int pieces;
+        private Queue<Pawn> home;
 
         public Home(String color) {
            this.color = color;
-           pieces = 4;
+
+           home = new Queue<Pawn>();
+           for (int i = 0; i < 4; i++) {
+               home.add(new Pawn(i, color));
+           }
         }
     }
 

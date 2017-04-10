@@ -5,6 +5,6 @@ class Pawn {
   Pawn (int id, String color) {
     this.id=id;
     this.color=color;
-    this.location = location;
+    this.location=-1;
   }
 }

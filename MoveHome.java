@@ -1,5 +1,5 @@
 // represents a move that starts on one of the home rows
-class MoveHome implements Move {
+public class MoveHome implements Move {
   Pawn pawn;
   int start;
   int distance;
