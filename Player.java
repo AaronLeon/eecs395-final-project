@@ -8,8 +8,5 @@ interface Player {
 
   // inform the player that they have suffered
   // a doubles penalty
-  void DoublesPenalty();
-
-  // called when a player cheats
-  void cheat();
+  void doublesPenalty();
 }

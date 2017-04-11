@@ -1,10 +1,12 @@
 public class SimplePlayer implements Player {
     private String color;
-    private int consecutiveDoubles = 0;
     private Pawn[] pawns = new Pawn[4];
 
-    public SimplePlayer() {
-        //TODO: Not implemented yet 
+    public SimplePlayer(String c) {
+        color = c;
+        for (int i = 0; i < pawns.length; i++) {
+            pawns[i] = new Pawn(i, c);
+        }
     }
 
     public void startGame(String color) {
@@ -12,17 +14,7 @@ public class SimplePlayer implements Player {
     }
 
     public Move doMove(Board brd, int[] dice) {
-        //TODO: Not implemented yet 
-        if (dice[0] == dice[1]) {
-            consecutiveDoubles++;
-        }
-        else {
-            consecutiveDoubles = 0;
-        }
-
-        if (consecutiveDoubles == 3) {
-            doublesPenalty(); 
-        }
+        //TODO: Not implemented yet
         return null;
     }
 

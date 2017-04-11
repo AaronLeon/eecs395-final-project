@@ -54,12 +54,11 @@ public class Parcheesi implements Game {
         int consecutiveDoubles = 0;
         int i = 0;
         while (!gameover) {
+            if (players[i] == null) { continue; }
             Player player = players[i];
             consecutiveDoubles = 0;
-            boolean doubleRoll = false;
 
             if (dice[0] == dice[1]) {
-                doubleRoll = true;
                 dice[2] = 7 - dice[0];
                 dice[3] = dice[2];
 
@@ -67,7 +66,7 @@ public class Parcheesi implements Game {
             }
 
             if (consecutiveDoubles > 2) {
-                // cheated
+
             }
 
             while (!allDiceUsed(dice)) {
@@ -83,12 +82,21 @@ public class Parcheesi implements Game {
         }
     }
 
+    public void doublesPenalty(Player p) {
+
+    }
+
+    public void cheat(int i) {
+        players[i] = null;
+    }
+
     public boolean movesPossible(int[] dice, Board board) {
         return true;
     }
 
     public boolean movedBlockade(Board brd1, Board brd2) {
         // Scan board for blockade in brd1 and brd2 and check if their pawn id is equal
+
         return false;
     }
 
