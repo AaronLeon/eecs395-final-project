@@ -9,6 +9,10 @@ public class Board {
     public HashMap<String, Runway> runways = new HashMap();
     private int safeLocations[] = {0, 5, 12, 17, 22, 29, 34, 39, 46, 51, 56, 63};
 
+    public boolean isBlockade(int pos) {
+        return ring[pos][0] != null && ring[pos][1] != null;
+    }
+
     public Board() {
         homeLocations.put("blue", 5);
         homeLocations.put("yellow", 22);

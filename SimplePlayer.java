@@ -21,7 +21,7 @@ public class SimplePlayer implements Player {
         //TODO: Not implemented yet 
     }
 
-    public Move doMove(Board brd, int[] dice) {
+    public Move[] doMove(Board brd, int[] dice) {
         //TODO: Not implemented yet
         return null;
     }

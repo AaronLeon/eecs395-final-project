@@ -6,6 +6,7 @@
 // * Triple doubles penalty
 
 import java.lang.Math;
+import java.util.LinkedList;
 
 import static java.util.Arrays.sort;
 
@@ -55,7 +56,7 @@ public class Parcheesi implements Game {
 
     // Changes board state with provided move.
     // Returns bonus dice roll. 0 if no bonus dice
-    public int processMove(Move m) {
+    public int processMoves(Move[] m) {
         return -1;
     }
 
@@ -108,8 +109,8 @@ public class Parcheesi implements Game {
                     }
                     continue;
                 } else {
-                    Move m = player.doMove(board, dice);
-                    processMove(m);
+                    Move[] m = player.doMove(board, dice);
+                    processMoves(m);
                     //process move should make changes to players[i]
                     //at the end we compare stored player with players[i]
                 }
@@ -190,17 +191,13 @@ public class Parcheesi implements Game {
 
             } else if (((SimplePlayer) p).getPawns()[i].runway == true) {
                 String color = ((SimplePlayer) p).getColor();
-
                 //refactor
                 for (int j = 0; j < dice.length; j++) {
                     if (board.runways.get(color).empty(i)) {
                         return false;
                     }
                 }
-
-
             } else {
-
                 for (int j = 0; j < dice.length; j++) {
                     MoveMain testMove = new MoveMain(((SimplePlayer) p).getPawns()[i], dice[j]);
                     if (!isBlocked(testMove)) {
@@ -214,34 +211,17 @@ public class Parcheesi implements Game {
         return false;
     }
 
-    public boolean movedBlockade(Player before, Player after) {
-        // Scan board for blockade in brd1 and brd2 and check if their pawn id is equal
-        Pawn[] beforePawns = ((SimplePlayer) before).getPawns();
-        Pawn[] afterPawns = ((SimplePlayer) after).getPawns();
-
-        int[][] blockades = new int[2][2];
-        int count = 0;
-        for (int i = 0; i < beforePawns.length; i++) {
-            for (int j = i; j < beforePawns.length; j++) {
-                if (beforePawns[i].location == beforePawns[j].location) {
-                    blockades[count][0] = i;
-                    blockades[count][1] = j;
-                    count++;
-                }
+    public boolean movedBlockade(Board brd1, Board brd2, LinkedList<Move> moves) {
+        for (Move m: moves) {
+            // Can only move blockades in the main ring...
+            // Blockades do not exist in runway since other pawns cannot be in your runway
+            if (!(m instanceof MoveMain)) {
+                continue;
             }
-        }
 
-        for (int i = 0; i < beforePawns.length; i++) {
-            for (int j = i; j < beforePawns.length; j++) {
-                if (beforePawns[i].location == beforePawns[j].location) {
-                    return i == blockades[0][0] && j == blockades[0][1]
-                            || i == blockades[0][1] && j == blockades[0][0]
-                            || i == blockades[1][0] && j == blockades[1][1]
-                            || i == blockades[1][1] && j == blockades[1][0];
-                }
-            }
+            int start = ((MoveMain) m).start;
+            brd1.isBlockade(start);
         }
-        return false;
     }
 
     public boolean allDiceUsed(int[] dice) {
