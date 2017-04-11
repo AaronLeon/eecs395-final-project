@@ -5,9 +5,9 @@ class MoveMain implements Move {
   int start;
   int distance;
 
-  MoveMain(Pawn pawn, int start, int distance) {
+  MoveMain(Pawn pawn, int distance) {
     this.pawn=pawn;
-    this.start=start;
+    this.start=pawn.location;
     this.distance=distance;
   }
 }

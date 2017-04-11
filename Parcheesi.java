@@ -21,15 +21,14 @@ public class Parcheesi implements Game {
 
     public boolean isBlocked(MoveMain m) {
         String color = m.pawn.color;
-        int runway_loc=(int)board.runwayLocations.get(color);
+        int runway_loc = (int) board.runwayLocations.get(color);
         for (int i = 1; i < m.distance; i++) {
-            if(m.start+i>runway_loc){
+            if (m.start + i > runway_loc) {
                 //check if runway is empty
-                if(board.runways.get(color).blocked(m.start+i-runway_loc)){
+                if (board.runways.get(color).blocked(m.start + i - runway_loc)) {
                     return true;
                 }
-            }
-            else if (board.ring[m.start + i][0] != null && board.ring[m.start + i][1] != null) {
+            } else if (board.ring[m.start + i][0] != null && board.ring[m.start + i][1] != null) {
                 return true;
             }
         }
@@ -159,6 +158,12 @@ public class Parcheesi implements Game {
     }
 
     public boolean sum5(int[] dice) {
+        if (dice[0] + dice[1] == 5) {
+            return true;
+        }
+        if (dice[0] == 5 || dice[1] == 5 || dice[2] == 5 || dice[3] == 5) {
+            return true;
+        }
         return false;
     }
 
@@ -169,23 +174,28 @@ public class Parcheesi implements Game {
             if (((SimplePlayer) p).getPawns()[i].home == true) {
                 return sum5(dice);
                 //check if integers in dice can sum to 5
+
             } else if (((SimplePlayer) p).getPawns()[i].runway == true) {
                 String color = ((SimplePlayer) p).getColor();
+
                 for (int j = 0; j < dice.length; j++) {
                     if (board.runways.get(color).empty(i)) {
                         return false;
                     }
                 }
-                //moveHome
+
+
             } else {
 
-
+                for (int j = 0; j < dice.length; j++) {
+                    MoveMain testMove = new MoveMain(((SimplePlayer) p).getPawns()[i], dice[j]);
+                    if (!isBlocked(testMove)) {
+                        return true;
+                    }
+                }
                 //iterate over rolls in dice,
                 //moveMain
             }
-            // generate move case wise:
-
-            // check if move isBlockaded
         }
         return false;
     }
