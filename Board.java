@@ -5,8 +5,8 @@ public class Board {
     public static Pawn[][] ring = new Pawn[17*4][2];
     public HashMap homeLocations = new HashMap<String, Integer>();
     public HashMap runwayLocations = new HashMap<String, Integer>();
-    HashMap<String, Home> homes = new HashMap();
-    HashMap<String, Runway> runways = new HashMap();
+    public HashMap<String, Home> homes = new HashMap();
+    public HashMap<String, Runway> runways = new HashMap();
     private int safeLocations[] = {0, 5, 12, 17, 22, 29, 34, 39, 46, 51, 56, 63};
 
     public Board() {
@@ -48,11 +48,18 @@ public class Board {
     public class Runway {
         private String color;
         private int pieces;
-        private Pawn[] runway = new Pawn[7];
+        private Pawn[][] runway = new Pawn[7][2];
 
         public Runway(String color) {
             this.color = color;
             pieces = 0;
+        }
+        public boolean empty(int i){
+            return runway[i][0]==null && runway[i][1]==null;
+        }
+
+        public boolean blocked(int i){
+            return runway[i][0]!=null && runway[i][1]!=null;
         }
     }
 }

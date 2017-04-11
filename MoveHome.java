@@ -9,5 +9,9 @@ public class MoveHome implements Move {
     this.start=start;
     this.distance=distance;
   }
+
+  public void makeMove(){
+    return;
+  }
 }
 
