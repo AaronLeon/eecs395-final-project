@@ -6,5 +6,7 @@ class Pawn {
     this.id=id;
     this.color=color;
     this.location=-1;
+    this.home=true;
+    this.runway=false;
   }
 }

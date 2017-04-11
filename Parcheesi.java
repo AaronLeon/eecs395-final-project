@@ -153,12 +153,19 @@ public class Parcheesi implements Game {
     public boolean movesPossible(Player p, int[] dice, Board board) {
         //iterate over pawns in player p,
         for (int i=0;i<4;i++){
-            //iterate over rolls in dice,
+            if (p.pawns[i].home==true){
+                //check if integers in dice can sum to 5
+
+
+            } else if (p.pawns[i].runway==true){
+                //moveHome
+            }
+            else{
+                //iterate over rolls in dice,
+                //moveMain
+            }
             for(int j = 0;j<dice.length;j++){
                 // generate move case wise:
-                // enterPiece
-                // moveMain
-                // moveHome
 
                 // check if move isBlockated
 
