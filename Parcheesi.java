@@ -21,10 +21,11 @@ public class Parcheesi implements Game {
 
     public boolean isBlocked(MoveMain m) {
         String color = m.pawn.color;
+        int home_loc = (int) board.homeLocations.get(color);
         int runway_loc = (int) board.runwayLocations.get(color);
         for (int i = 1; i < m.distance; i++) {
-            if (m.start + i > runway_loc) {
-                //check if runway is empty
+            if ((m.start + i > runway_loc) && m.start+i<home_loc) {
+                //check if runway is blocked
                 if (board.runways.get(color).blocked(m.start + i - runway_loc)) {
                     return true;
                 }
@@ -122,15 +123,26 @@ public class Parcheesi implements Game {
         }
     }
 
+    public void send_home(Player p, int i){
+        //sends ith pawn home, i is its id/location in the arr
+        Pawn curr = ((SimplePlayer) p).getPawns()[i];
+        curr.location=-1;
+        curr.home=true;
+        curr.runway=false;
+        ((SimplePlayer) p).getPawns()[i]=curr;
+        //sends ith pawn home
+    }
+
     public void doublesPenalty(Player p) {
-        int furthestPawn = 0;
+        //index of the furthest pawn
+        int furthestPawn = -1;
         String color = ((SimplePlayer) p).getColor();
         int home_index = (int) board.homeLocations.get(color);
         int dist = 0;
         int furthestDistance = -1;
         for (int i = 0; i < 4; i++) {
             Pawn curr = ((SimplePlayer) p).getPawns()[i];
-            if (curr.location == -1) {
+            if (curr.home == true || curr.runway==true) {
                 continue;
             } else {
                 //piece not at home
@@ -149,6 +161,7 @@ public class Parcheesi implements Game {
                 }
             }
         }
+        send_home(p,furthestPawn);
     }
 
     public void cheat(int i) {
@@ -178,6 +191,7 @@ public class Parcheesi implements Game {
             } else if (((SimplePlayer) p).getPawns()[i].runway == true) {
                 String color = ((SimplePlayer) p).getColor();
 
+                //refactor
                 for (int j = 0; j < dice.length; j++) {
                     if (board.runways.get(color).empty(i)) {
                         return false;
