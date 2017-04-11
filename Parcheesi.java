@@ -11,8 +11,7 @@ public class Parcheesi implements Game {
     private Board board;
     private int registered=0;
     private Player[] players = new Player[4];
-    colors=["blue","yellow","green","red"];
-
+    private String[] colors = {"blue","yellow","green","red"};
 
     public Parcheesi() {
         board = new Board();
@@ -57,9 +56,8 @@ public class Parcheesi implements Game {
         if(registered==4){
             return;
         } else {
-            Player newPlayer=newPlayer();
-            newPlayer.startGame(colors[registered])
-            players[registered]=newPlayer;
+            p.startGame(colors[registered]);
+            players[registered]=p;
             registered++;
         }
     }
@@ -71,6 +69,7 @@ public class Parcheesi implements Game {
         int consecutiveDoubles = 0;
         int i = 0;
         boolean rolledDouble=false;
+        boolean doubleTurn=false;
         while (!gameover) {
             if (players[i] == null) { continue; }
             Player player = players[i];
@@ -83,7 +82,7 @@ public class Parcheesi implements Game {
             }
 
             if (consecutiveDoubles > 2) {
-                player[i].doublesPenalty();
+                players[i].doublesPenalty();
             }
 
             while (!allDiceUsed(dice)) {
@@ -117,12 +116,12 @@ public class Parcheesi implements Game {
 
     public void doublesPenalty(Player p) {
         int furthestPawn=0;
-        String color = p.color;
-        int home_index=board.homeLocations[color];
+        String color = ((SimplePlayer)p).getColor();
+        int home_index = (int)board.homeLocations.get(color);
         int dist=0;
         int furthestDistance=-1;
         for (int i = 0; i < 4; i++){
-            Pawn curr = p.pawns[i];
+            Pawn curr = ((SimplePlayer)p).getPawns()[i];
             if (curr.location==-1){
                 continue;
             } else{
@@ -153,11 +152,11 @@ public class Parcheesi implements Game {
     public boolean movesPossible(Player p, int[] dice, Board board) {
         //iterate over pawns in player p,
         for (int i=0;i<4;i++){
-            if (p.pawns[i].home==true){
+            if (((SimplePlayer)p).getPawns()[i].home==true){
                 //check if integers in dice can sum to 5
 
 
-            } else if (p.pawns[i].runway==true){
+            } else if (((SimplePlayer)p).getPawns()[i].runway==true){
                 //moveHome
             }
             else{
@@ -177,7 +176,31 @@ public class Parcheesi implements Game {
 
     public boolean movedBlockade(Player before, Player after) {
         // Scan board for blockade in brd1 and brd2 and check if their pawn id is equal
+        Pawn[] beforePawns = ((SimplePlayer)before).getPawns();
+        Pawn[] afterPawns = ((SimplePlayer)after).getPawns();
 
+        int[][] blockades = new int[2][2];
+        int count = 0;
+        for (int i = 0; i < beforePawns.length; i++) {
+            for (int j = i; j < beforePawns.length; j++) {
+                if (beforePawns[i].location == beforePawns[j].location) {
+                    blockades[count][0] = i;
+                    blockades[count][1] = j;
+                    count++;
+                }
+            }
+        }
+
+        for (int i = 0; i < beforePawns.length; i++) {
+            for (int j = i; j < beforePawns.length; j++) {
+                if (beforePawns[i].location == beforePawns[j].location) {
+                    return i == blockades[0][0] && j == blockades[0][1]
+                            || i == blockades[0][1] && j == blockades[0][0]
+                            || i == blockades[1][0] && j == blockades[1][1]
+                            || i == blockades[1][1] && j == blockades[1][0];
+                }
+            }
+        }
         return false;
     }
 

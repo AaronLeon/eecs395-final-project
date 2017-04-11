@@ -9,6 +9,14 @@ public class SimplePlayer implements Player {
         }
     }
 
+    public String getColor() {
+        return color;
+    }
+
+    public Pawn[] getPawns() {
+        return pawns;
+    }
+
     public void startGame(String color) {
         //TODO: Not implemented yet 
     }

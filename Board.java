@@ -3,8 +3,8 @@ import java.util.LinkedList;
 
 public class Board {
     public static Pawn[][] ring = new Pawn[17*4][2];
-    private HashMap homeLocations = new HashMap<String, Integer>();
-    private HashMap runwayLocations = new HashMap<String, Integer>();
+    public HashMap homeLocations = new HashMap<String, Integer>();
+    public HashMap runwayLocations = new HashMap<String, Integer>();
     HashMap<String, Home> homes = new HashMap();
     HashMap<String, Runway> runways = new HashMap();
     private int safeLocations[] = {0, 5, 12, 17, 22, 29, 34, 39, 46, 51, 56, 63};
