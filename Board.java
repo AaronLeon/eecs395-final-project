@@ -1,12 +1,12 @@
 import java.util.HashMap;
-import java.util.Queue;
+import java.util.LinkedList;
 
 public class Board {
-    private Pawn[] ring = new Pawn[17*4];
-    private HashMap<String, Integer> homeLocations = new HashMap();
-    private HashMap<String, Integer> runwayLocations = new HashMap();
-    private HashMap<String, Home> homes = new HashMap();
-    private HashMap<String, Runway> runways = new HashMap();
+    public static Pawn[][] ring = new Pawn[17*4][2];
+    private HashMap homeLocations = new HashMap<String, Integer>();
+    private HashMap runwayLocations = new HashMap<String, Integer>();
+    HashMap<String, Home> homes = new HashMap();
+    HashMap<String, Runway> runways = new HashMap();
     private int safeLocations[] = {0, 5, 12, 17, 22, 29, 34, 39, 46, 51, 56, 63};
 
     public Board() {
@@ -33,12 +33,12 @@ public class Board {
 
     public class Home {
         private String color;
-        private Queue<Pawn> home;
+        private LinkedList<Pawn> home;
 
         public Home(String color) {
            this.color = color;
 
-           home = new Queue<Pawn>();
+           home = new LinkedList<>();
            for (int i = 0; i < 4; i++) {
                home.add(new Pawn(i, color));
            }
