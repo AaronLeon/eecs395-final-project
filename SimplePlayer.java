@@ -1,6 +1,7 @@
 public class SimplePlayer implements Player {
     private String color;
     private int consecutiveDoubles = 0;
+    private Pawn[] pawns = new Pawn[4];
 
     public SimplePlayer() {
         //TODO: Not implemented yet 
