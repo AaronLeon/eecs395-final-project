@@ -1,8 +1,8 @@
-public class SimplePlayer implements Player {
+public class SPlayer implements Player {
     private String color;
     private Pawn[] pawns = new Pawn[4];
 
-    public SimplePlayer(String c) {
+    public SPlayer(String c) {
         color = c;
         for (int i = 0; i < pawns.length; i++) {
             pawns[i] = new Pawn(i, c);

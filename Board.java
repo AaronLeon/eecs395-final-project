@@ -2,15 +2,15 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 public class Board {
-    public static Pawn[][] ring = new Pawn[17*4][2];
-    public HashMap homeLocations = new HashMap<String, Integer>();
-    public HashMap runwayLocations = new HashMap<String, Integer>();
-    public HashMap<String, Home> homes = new HashMap();
-    public HashMap<String, Runway> runways = new HashMap();
+    Pair<Pawn, Pawn>[] ring = new Pair[17*4];
+    HashMap<String, Integer> homeLocations = new HashMap<>();
+    HashMap<String, Integer> runwayLocations = new HashMap<>();
+    HashMap<String, Home> homes = new HashMap<>();
+    HashMap<String, Runway> runways = new HashMap<>();
     private int safeLocations[] = {0, 5, 12, 17, 22, 29, 34, 39, 46, 51, 56, 63};
 
     public boolean isBlockade(int pos) {
-        return ring[pos][0] != null && ring[pos][1] != null;
+        return ring[pos].first != null && ring[pos].second != null;
     }
 
     public Board() {

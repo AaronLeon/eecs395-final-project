@@ -1,12 +1,8 @@
-// Main rules:
-// * Use all dice roll (if possible)
-// * Can't run into blockade
-// * Bop 
-// * Can only exit home if you roll a 5 or sum of 5
-// * Triple doubles penalty
-
+/* *
+ * Parcheesi
+ * The Parcheesi class represents the game engine
+ */
 import java.lang.Math;
-import java.util.LinkedList;
 
 import static java.util.Arrays.sort;
 
@@ -20,6 +16,7 @@ public class Parcheesi implements Game {
         board = new Board();
     }
 
+    // For a given move, checks if move runs into blockade
     public boolean isBlocked(MoveMain m) {
         String color = m.pawn.color;
         int home_loc = (int) board.homeLocations.get(color);
@@ -30,7 +27,7 @@ public class Parcheesi implements Game {
                 if (board.runways.get(color).blocked(m.start + i - runway_loc)) {
                     return true;
                 }
-            } else if (board.ring[m.start + i][0] != null && board.ring[m.start + i][1] != null) {
+            } else if (board.ring[m.start + i].first != null && board.ring[m.start + i].second != null) {
                 return true;
             }
         }
@@ -56,14 +53,15 @@ public class Parcheesi implements Game {
 
     // Changes board state with provided move.
     // Returns bonus dice roll. 0 if no bonus dice
-    public int processMoves(Move[] m) {
-        return -1;
+    public Pair<Board, Integer> processMoves(Board brd, Move m) {
+        if (m instanceof MoveMain) {
+            Pawn p = brd.ring[((MoveMain) m).start].;
+        }
+        return new Pair<Board,Integer>(brd, 1);
     }
 
     public void register(Player p) {
-        if (registered == 4) {
-            return;
-        } else {
+        if (registered < 4) {
             p.startGame(colors[registered]);
             players[registered] = p;
             registered++;
@@ -109,43 +107,44 @@ public class Parcheesi implements Game {
                     }
                     continue;
                 } else {
-                    Move[] m = player.doMove(board, dice);
-                    processMoves(m);
-                    //process move should make changes to players[i]
-                    //at the end we compare stored player with players[i]
+                    Move[] moves = player.doMove(board, dice);
+                    Board nextBoard = null;
+                    for (Move m: moves) {
+                        Pair<Board, Integer> result = processMoves(board, m);
+                        nextBoard = result.first;
+                    }
+                    if (movedBlockadeTogether(board, nextBoard, moves, players[i])) {
+                        cheat(i);
+                    }
                 }
             }
 
-            if (movedBlockade(player, players[i])) {
-                cheat(i);
-            }
+
 
             i = (++i) % 4;
         }
     }
 
-    public void send_home(Player p, int i){
+    public void sendHome(Player p, int i){
         //sends ith pawn home, i is its id/location in the arr
-        Pawn curr = ((SimplePlayer) p).getPawns()[i];
+        Pawn curr = ((SPlayer) p).getPawns()[i];
         curr.location=-1;
         curr.home=true;
         curr.runway=false;
-        ((SimplePlayer) p).getPawns()[i]=curr;
+        ((SPlayer) p).getPawns()[i]=curr;
         //sends ith pawn home
     }
 
     public void doublesPenalty(Player p) {
         //index of the furthest pawn
         int furthestPawn = -1;
-        String color = ((SimplePlayer) p).getColor();
-        int home_index = (int) board.homeLocations.get(color);
+        String color = ((SPlayer) p).getColor();
+        int home_index = board.homeLocations.get(color);
         int dist = 0;
         int furthestDistance = -1;
         for (int i = 0; i < 4; i++) {
-            Pawn curr = ((SimplePlayer) p).getPawns()[i];
-            if (curr.home == true || curr.runway==true) {
-                continue;
-            } else {
+            Pawn curr = ((SPlayer) p).getPawns()[i];
+            if (!curr.home && !curr.runway) {
                 //piece not at home
                 dist = curr.location - home_index;
                 if (curr.location > home_index) {
@@ -162,7 +161,7 @@ public class Parcheesi implements Game {
                 }
             }
         }
-        send_home(p,furthestPawn);
+        sendHome(p,furthestPawn);
     }
 
     public void cheat(int i) {
@@ -171,7 +170,7 @@ public class Parcheesi implements Game {
         players[i] = null;
     }
 
-    public boolean sum5(int[] dice) {
+    public boolean canEnter(int[] dice) {
         if (dice[0] + dice[1] == 5) {
             return true;
         }
@@ -185,12 +184,12 @@ public class Parcheesi implements Game {
         sort(dice);
         //iterate over pawns in player p,
         for (int i = 0; i < 4; i++) {
-            if (((SimplePlayer) p).getPawns()[i].home == true) {
-                return sum5(dice);
+            if (((SPlayer) p).getPawns()[i].home) {
+                return canEnter(dice);
                 //check if integers in dice can sum to 5
 
-            } else if (((SimplePlayer) p).getPawns()[i].runway == true) {
-                String color = ((SimplePlayer) p).getColor();
+            } else if (((SPlayer) p).getPawns()[i].runway) {
+                String color = ((SPlayer) p).getColor();
                 //refactor
                 for (int j = 0; j < dice.length; j++) {
                     if (board.runways.get(color).empty(i)) {
@@ -199,7 +198,7 @@ public class Parcheesi implements Game {
                 }
             } else {
                 for (int j = 0; j < dice.length; j++) {
-                    MoveMain testMove = new MoveMain(((SimplePlayer) p).getPawns()[i], dice[j]);
+                    MoveMain testMove = new MoveMain(((SPlayer) p).getPawns()[i], dice[j]);
                     if (!isBlocked(testMove)) {
                         return true;
                     }
@@ -211,17 +210,39 @@ public class Parcheesi implements Game {
         return false;
     }
 
-    public boolean movedBlockade(Board brd1, Board brd2, LinkedList<Move> moves) {
-        for (Move m: moves) {
-            // Can only move blockades in the main ring...
-            // Blockades do not exist in runway since other pawns cannot be in your runway
-            if (!(m instanceof MoveMain)) {
+    /*
+     * Checks to see if any blockades have moved together by comparing
+     * board states from before and after a set of moves
+     */
+    public boolean movedBlockadeTogether(Board board1, Board board2, Move[] moves, Player player) {
+        // List of blockades that formed across all moves in a turn
+        Pair<Pair,Pair> blockades = new Pair<>();
+
+        for (Pawn p: ((SPlayer) player).getPawns()) {
+            if (board2.isBlockade(p.location)) {
+                if (blockades.first == null) {
+                    blockades.first = board2.ring[p.location];
+                }
+                else if (!blockades.first.equals(board1.ring[p.location])) {
+                    blockades.second = board.ring[p.location];
+                }
+            }
+        }
+
+        for (Move move: moves) {
+            if (move instanceof MoveMain) {
                 continue;
             }
 
-            int start = ((MoveMain) m).start;
-            brd1.isBlockade(start);
+            int startPos = ((MoveMain) move).start;
+            if (board1.isBlockade(startPos)
+                    && board1.ring[startPos].first.color == ((SPlayer)player).getColor()
+                    && (blockades.first.equals(board1.ring[startPos])
+                        || blockades.second.equals(board1.ring[startPos]))) {
+                return true;
+            }
         }
+        return false;
     }
 
     public boolean allDiceUsed(int[] dice) {
@@ -231,5 +252,9 @@ public class Parcheesi implements Game {
             }
         }
         return true;
+    }
+
+    public static void main(String[] argv) {
+        Parcheesi p = new Parcheesi();
     }
 }
