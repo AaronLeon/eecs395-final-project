@@ -73,11 +73,7 @@ public class Board {
     public boolean add(int location, String color, int id) {
         //bops if needed
         boolean clear1 = ring[location].first == null;
-        boolean clear2 = ring[location].second == null;
-
-        if (clear1 && clear2) {
-            ring[location].first = new Pawn(id, color);
-        } else if (!clear1) {
+        if (!clear1) {
             ring[location].second = new Pawn(id, color);
         } else {
             ring[location].first = new Pawn(id, color);
@@ -104,7 +100,8 @@ public class Board {
     public class Runway {
         String color;
         int pieces;
-        Pair[] runway = new Pair[7];
+        Pair[] runway = new Pair[6];
+        Pawn [] endZone= new Pawn[4];
 
         public Runway(String color) {
             this.color = color;

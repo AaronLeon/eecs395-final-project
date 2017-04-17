@@ -2,12 +2,10 @@
 // (but does not have to end up there)
 class MoveMain implements Move {
   Pawn pawn;
-  int start;
   int distance;
 
-  MoveMain(Pawn pawn, int start, int distance) {
+  MoveMain(Pawn pawn, int distance) {
     this.pawn=pawn;
-    this.start=start;
     this.distance=distance;
   }
 }
