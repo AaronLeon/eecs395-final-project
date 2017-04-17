@@ -6,9 +6,6 @@ public class SPlayer implements Player {
 
     public SPlayer(String c) {
         color = c;
-        for (int i = 0; i < pawns.length; i++) {
-            pawns[i] = new Pawn(i, c);
-        }
     }
 
     public String getColor() {
@@ -21,6 +18,9 @@ public class SPlayer implements Player {
 
     public void startGame(String newColor) {
         color=newColor;
+        for (int i = 0; i < pawns.length; i++) {
+            pawns[i] = new Pawn(i, newColor);
+        }
         //TODO: Not implemented yet 
     }
 
@@ -34,6 +34,17 @@ public class SPlayer implements Player {
         return moves;
     }
 
+
+
+    public boolean allOut(){
+        for(int i = 0; i < pawns.length; i++){
+            if(pawns[i].home==true){
+                return false;
+            }
+        }
+        return true;
+    }
+
     public EnterPiece tryEnterPiece(int i){
         if (pawns[i].home==false){
             return null;
@@ -41,10 +52,12 @@ public class SPlayer implements Player {
         if (dice[0]+dice[1]==5){
             dice[0]=0;
             dice[1]=0;
+            //update pawns array
             return new EnterPiece(pawns[i]);
         } else if (dice[2]+dice[3]==5){
             dice[2]=0;
             dice[3]=0;
+            //update pawns array
             return new EnterPiece(pawns[i]);
         }
         return null;

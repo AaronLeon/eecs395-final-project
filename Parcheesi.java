@@ -13,6 +13,7 @@ public class Parcheesi implements Game {
     private int registered = 0;
     private Player[] players = new Player[4];
     private String[] colors = {"blue", "yellow", "green", "red"};
+    int turn = 0;
 
     public Parcheesi() {
         board = new Board();
@@ -56,14 +57,36 @@ public class Parcheesi implements Game {
     // Changes board state with provided move.
     // Returns bonus dice roll. 0 if no bonus dice
     public Pair<Board, Integer> processMoves(Board brd, Move m) {
+        boolean success=true;
         if (m instanceof MoveMain) {
+            boolean bopped=false;
+            MoveMain move=(MoveMain)m;
+            String color=move.pawn.color;
+            if (!isBlocked(move)){
+                int location = move.pawn.location;
+                success = success && brd.remove(location,color,move.pawn.id);
+                //check if it will move past its runway
+                if(location+move.distance > brd.runwayLocations.get(color)){
+                } else {
+                    boolean bopped=brd.willBop(location,color);
+                    success = success && brd.add(location,color,move.pawn.id);
+                }
+            } else {
+                cheat(turn);
+            }
+
             //if we bop, return 20 bonus
         } else if (m instanceof  EnterPiece){
+            String color = colors[turn];
+            //enter the piece
             //
         } else if (m instanceof MoveHome){
             //if we get to end of home, return 10 bonus
         }
         //should never be called
+        if(!success){
+            cheat(turn);
+        }
         return new Pair<Board,Integer>(brd, 0);
     }
 
@@ -80,28 +103,29 @@ public class Parcheesi implements Game {
         int[] dice = rollDice();
         boolean gameover = false;
         int consecutiveDoubles = 0;
-        int i = 0;
         boolean rolledDouble = false;
         boolean doubleTurn = false;
         while (!gameover) {
-            if (players[i] == null) {
+            if (players[turn] == null) {
                 continue;
             }
-            Player player = players[i];
+            SPlayer player = (SPlayer)players[turn];
             //we store a copy of player
             consecutiveDoubles = 0;
 
-            if (dice[0] == dice[1]) {
+            if (dice[0] == dice[1] && player.allOut()) {
+                //we need to check if everything is out of the board for the player
+
                 doubleTurn = true;
                 consecutiveDoubles++;
             }
 
             if (consecutiveDoubles > 2) {
-                players[i].doublesPenalty();
+                players[turn].doublesPenalty();
             }
 
             while (!allDiceUsed(dice)) {
-                if (!movesPossible(players[i], dice, board)) {
+                if (!movesPossible(players[turn], dice, board)) {
                     if (rolledDouble) {
                         dice = rollDice();
                         if (dice[0] == dice[1]) {
@@ -121,13 +145,13 @@ public class Parcheesi implements Game {
                         Pair<Board, Integer> result = processMoves(board, m);
                         nextBoard = result.first;
                     }
-                    if (movedBlockadeTogether(board, nextBoard, moves, players[i])) {
-                        cheat(i);
+                    if (movedBlockadeTogether(board, nextBoard, moves, players[turn])) {
+                        cheat(turn);
                     }
                 }
             }
 
-            i = (++i) % 4;
+            turn = (++turn) % 4;
         }
     }
 
@@ -146,6 +170,8 @@ public class Parcheesi implements Game {
         curr.home=true;
         curr.runway=false;
         ((SPlayer) p).getPawns()[i]=curr;
+        //update this on board as well
+        //@TODO
         //sends ith pawn home
     }
 
