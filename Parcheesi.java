@@ -2,6 +2,8 @@
  * Parcheesi
  * The Parcheesi class represents the game engine
  */
+import com.sun.tools.javac.comp.Enter;
+
 import java.lang.Math;
 
 import static java.util.Arrays.sort;
@@ -125,9 +127,15 @@ public class Parcheesi implements Game {
                 }
             }
 
-
-
             i = (++i) % 4;
+        }
+    }
+
+    public int[] consumeDice(int[] dice, Move m) {
+        int[] res = dice;
+
+        if (m instanceof EnterPiece) {
+
         }
     }
 
@@ -260,6 +268,13 @@ public class Parcheesi implements Game {
     }
 
     public static void main(String[] argv) {
-        Parcheesi p = new Parcheesi();
+        Parcheesi game = new Parcheesi();
+
+        Pawn p1 = new Pawn(0, "red");
+        game.board.ring[0].first = p1;
+        MoveMain m1 = new MoveMain(p1, 3);
+        game.processMoves(game.board, m1);
+        assert game.board.ring[3].equals(p1) : "Pawn should move 3 spaces";
+
     }
 }
