@@ -116,6 +116,7 @@ public class Parcheesi implements Game {
                 copy.location=brd.homeLocations.get(color);
                 players[turn].setPawn(copy.id,copy);
                 brd.add(copy.location,copy.color,copy.id);
+                return new Pair(brd,0);
             }
         }
 
@@ -130,13 +131,15 @@ public class Parcheesi implements Game {
                 int destination=move.distance+move.pawn.location;
                 brd.runways.get(colors[turn]).remove(move.pawn.location,move.pawn.color,move.pawn.id);
                 brd.runways.get(colors[turn]).add(destination,move.pawn.color,move.pawn.id);
+                if (destination==7){
+                    return new Pair(brd,10);
+                } else {
+                    return new Pair(brd,0);
+                }
             }
         }
         //should never be called
-        if(!success){
-            cheat(turn);
-        }
-        return new Pair<Board,Integer>(brd, 0);
+        return new Pair(brd, 0);
     }
 
     public void register(Player p) {
