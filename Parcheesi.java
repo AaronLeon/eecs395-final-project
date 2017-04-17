@@ -9,10 +9,10 @@ import java.lang.Math;
 import static java.util.Arrays.sort;
 
 public class Parcheesi implements Game {
-    private Board board;
-    private int registered = 0;
-    private Player[] players = new Player[4];
-    private String[] colors = {"blue", "yellow", "green", "red"};
+    Board board;
+    int registered = 0;
+    Player[] players = new Player[4];
+    String[] colors = {"blue", "yellow", "green", "red"};
     int turn = 0;
 
     public Parcheesi() {
@@ -169,8 +169,31 @@ public class Parcheesi implements Game {
         int[] res = dice;
 
         if (m instanceof EnterPiece) {
-
+            if (dice[0] + dice[1] == 5) {
+                dice[0] = dice[1] = 0;
+            } else if (dice[0] == 5) {
+                res[0] = 0;
+            }
+            else if (dice[1] == 5) {
+                res[1] = 0;
+            }
+        } else if (m instanceof MoveMain) {
+            for (int i = 0; i < dice.length; i++) {
+                if (dice[i] == ((MoveMain) m).distance) {
+                    res[i] = 0;
+                    return res;
+                }
+            }
+        } else if (m instanceof MoveHome) {
+            for (int i = 0; i < dice.length; i++) {
+                if (dice[i] == ((MoveHome) m).distance) {
+                    res[i] = 0;
+                    return res;
+                }
+            }
         }
+
+        return dice;
     }
 
     public void sendHome(Player p, int i){
@@ -301,16 +324,5 @@ public class Parcheesi implements Game {
             }
         }
         return true;
-    }
-
-    public static void main(String[] argv) {
-        Parcheesi game = new Parcheesi();
-
-        Pawn p1 = new Pawn(0, "red");
-        game.board.ring[0].first = p1;
-        MoveMain m1 = new MoveMain(p1, 3);
-        game.processMoves(game.board, m1);
-        assert game.board.ring[3].equals(p1) : "Pawn should move 3 spaces";
-
     }
 }

@@ -88,35 +88,34 @@ public class Board {
 
 
     public class Home {
-        private String color;
-        private LinkedList<Pawn> home;
+        String color;
+        LinkedList<Pawn> pawns;
 
         public Home(String color) {
             this.color = color;
 
-            home = new LinkedList<>();
+            pawns = new LinkedList<>();
             for (int i = 0; i < 4; i++) {
-                home.add(new Pawn(i, color));
+                pawns.add(new Pawn(i, color));
             }
         }
     }
 
     public class Runway {
-        private String color;
-        private int pieces;
-        private Pawn[][] runway = new Pawn[7][2];
+        String color;
+        int pieces;
+        Pair[] runway = new Pair[7];
 
         public Runway(String color) {
             this.color = color;
             pieces = 0;
         }
-
-        public boolean empty(int i) {
-            return runway[i][0] == null && runway[i][1] == null;
+        public boolean empty(int i){
+            return runway[i].isEmpty();
         }
 
-        public boolean blocked(int i) {
-            return runway[i][0] != null && runway[i][1] != null;
+        public boolean blocked(int i){
+            return runway[i].first != null && runway[i].second != null;
         }
     }
 }
