@@ -39,25 +39,51 @@ public class Board {
     public boolean remove(int location, String color, int id) {
         if (ring[location].first.color == color && ring[location].first.id == id) {
             ring[location].first = null;
+            return true;
         } else if (ring[location].second.color == color && ring[location].second.id == id) {
             ring[location].second = null;
+            return true;
         }
-        return;
+        return false;
 
     }
 
     public boolean willBop(int location, String color) {
+        //assume no blockade
+        boolean clear1=false;
+        boolean clear2=false;
+        if(ring[location].first==null || ring[location].first.color==color){
+            clear1=true;
+        }
+        if(ring[location].second==null || ring[location].second.color==color){
+            clear2=true;
+        }
+        return clear1&&clear2;
         //checks if inserting color at loc will bop
     }
 
     public boolean add(int location, String color, int id) {
-        if (ring[location].first == null) {
-            //
-        } else if (ring[location].second == null) {
+        //bops if needed
+        boolean clear1=ring[location].first==null;
+        boolean clear2=ring[location].second==null;
+
+        if (clear1&&clear2) {
+            ring[location].first=new Pawn(id,color);
             //
         }
+        else if (!clear1){
+            ring[location].second=new Pawn(id,color);
+            if (ring[location].first.color!=color){
+                //bop
+            }
+            //bop 2
+        } else {
 
-        return;
+            ring[location].first=new Pawn(id,color);
+            //bop 1
+        }
+
+        return false;
     }
 }
 
@@ -92,5 +118,4 @@ public class Runway {
     public boolean blocked(int i) {
         return runway[i][0] != null && runway[i][1] != null;
     }
-}
 }

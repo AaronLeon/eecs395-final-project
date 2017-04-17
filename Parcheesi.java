@@ -68,13 +68,16 @@ public class Parcheesi implements Game {
                 //check if it will move past its runway
                 if(location+move.distance > brd.runwayLocations.get(color)){
                 } else {
-                    boolean bopped=brd.willBop(location,color);
+                    bopped=brd.willBop(location,color);
                     success = success && brd.add(location,color,move.pawn.id);
+                    //brd.add bops
                 }
             } else {
                 cheat(turn);
             }
-
+            if(bopped){
+                return new Pair(brd,20);
+            }
             //if we bop, return 20 bonus
         } else if (m instanceof  EnterPiece){
             String color = colors[turn];
