@@ -121,7 +121,16 @@ public class Parcheesi implements Game {
 
 
         else if (m instanceof MoveHome){
-            //if we get to end of home, return 10 bonus
+
+            MoveHome move = (MoveHome)m;
+            if (move.pawn.runway==false || (move.distance+move.pawn.location>7)){
+                cheat(turn);
+                return null;
+            } else {
+                int destination=move.distance+move.pawn.location;
+                brd.runways.get(colors[turn]).remove(move.pawn.location,move.pawn.color,move.pawn.id);
+                brd.runways.get(colors[turn]).add(destination,move.pawn.color,move.pawn.id);
+            }
         }
         //should never be called
         if(!success){
