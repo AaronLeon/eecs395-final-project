@@ -24,6 +24,9 @@ public class SPlayer implements Player {
         //TODO: Not implemented yet 
     }
 
+    public void setPawn(int i,Pawn p){
+        pawns[i]=p;
+    }
     public Move[] doMove(Board brd, int[] rolls) {
         moves=new Move[4];//clears old moves
         dice=rolls;

@@ -11,7 +11,7 @@ import static java.util.Arrays.sort;
 public class Parcheesi implements Game {
     Board board;
     int registered = 0;
-    Player[] players = new Player[4];
+    SPlayer[] players = new SPlayer[4];
     String[] colors = {"blue", "yellow", "green", "red"};
     int turn = 0;
 
@@ -65,29 +65,62 @@ public class Parcheesi implements Game {
             String color=move.pawn.color;
             if (!isBlocked(move)){
                 location = move.pawn.location;
-                success = success && brd.remove(location,color,move.pawn.id);
                 if(location+move.distance > brd.runwayLocations.get(color) && location+move.distance<brd.homeLocations.get(color)){
-                    int home_loc = (int) board.homeLocations.get(color);
-                    int runway_loc = (int) board.runwayLocations.get(color);
-                    //@todo add to runway
+                    Pawn copy = move.pawn;
+                    copy.location=0;
+                    copy.runway=true;
+                    success = success && brd.remove(location,color,move.pawn.id);
+                    int distance = location+move.distance-brd.runwayLocations.get(color)-1;
+                    success = success && brd.runways.get(color).add(0,color,copy.id);
+                    MoveHome newMove = new MoveHome(copy,copy.location,distance);
+
+                    if(!success){
+                        cheat(turn);
+                    }
+
+                    return processMoves(brd,newMove);
                 } else {
+
+                    success = success && brd.remove(location,color,move.pawn.id);
                     bopTarget=brd.bopLoc(location+move.distance,color);
                     success = success && brd.add(location,color,move.pawn.id);
+
+                    if(bopTarget>=0){
+                        Pawn copy = brd.removeIndex(location,bopTarget);
+                        for (int i = 0;i<4;i++){
+                            if(copy.color==colors[i]){
+                                players[i].setPawn(copy.id,copy);
+                            }
+                        }
+                        return new Pair(brd,20);
+                    }
                     //brd.add bops
                 }
             } else {
+                //is blocked
                 cheat(turn);
                 return null;
             }
-            if(bopTarget>=0){
-                brd.removeIndex(location,bopTarget);
-                return new Pair(brd,20);
-            }
-        } else if (m instanceof  EnterPiece){
+        }
+
+
+        else if (m instanceof  EnterPiece){
             String color = colors[turn];
-            //enter the piece
-            //
-        } else if (m instanceof MoveHome){
+            EnterPiece move = (EnterPiece)  m;
+            if(move.pawn.home==false||brd.blocked(brd.homeLocations.get(color))){
+                cheat(turn);
+                return null;
+            } else {
+                Pawn copy=move.pawn;
+                copy.home=false;
+                copy.location=brd.homeLocations.get(color);
+                players[turn].setPawn(copy.id,copy);
+                brd.add(copy.location,copy.color,copy.id);
+            }
+        }
+
+
+        else if (m instanceof MoveHome){
             //if we get to end of home, return 10 bonus
         }
         //should never be called
@@ -100,7 +133,7 @@ public class Parcheesi implements Game {
     public void register(Player p) {
         if (registered < 4) {
             p.startGame(colors[registered]);
-            players[registered] = p;
+            players[registered] = (SPlayer)p;
             registered++;
         }
     }

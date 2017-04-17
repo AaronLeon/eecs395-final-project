@@ -5,7 +5,6 @@ public class Board {
     Pair<Pawn, Pawn>[] ring = new Pair[17 * 4];
     HashMap<String, Integer> homeLocations = new HashMap<>();
     HashMap<String, Integer> runwayLocations = new HashMap<>();
-    HashMap<String, Home> homes = new HashMap<>();
     HashMap<String, Runway> runways = new HashMap<>();
     private int safeLocations[] = {0, 5, 12, 17, 22, 29, 34, 39, 46, 51, 56, 63};
 
@@ -29,11 +28,12 @@ public class Board {
         runways.put("green", new Runway("green"));
         runways.put("red", new Runway("red"));
 
-        homes.put("blue", new Home("blue"));
-        homes.put("yellow", new Home("yellow"));
-        homes.put("green", new Home("green"));
-        homes.put("red", new Home("red"));
     }
+
+    public boolean blocked(int i) {
+        return ring[i].first != null && ring[i].second != null;
+    }
+
 
     public boolean remove(int location, String color, int id) {
         if (ring[location].first.color == color && ring[location].first.id == id) {
@@ -62,56 +62,88 @@ public class Board {
         //checks if inserting color at loc will bop
     }
 
-    public void removeIndex(int location, int index) {
+    public Pawn removeIndex(int location, int index) {
+        Pawn copy = new Pawn(-1, null);
         if (index == 0) {
+            copy.color = ring[location].first.color;
             ring[location].first = null;
         } else if (index == 1) {
+            copy.color = ring[location].second.color;
             ring[location].second = null;
         }
+        return copy;
     }
 
     public boolean add(int location, String color, int id) {
         //bops if needed
         boolean clear1 = ring[location].first == null;
-        if (!clear1) {
-            ring[location].second = new Pawn(id, color);
-        } else {
+        boolean clear2 = ring[location].second == null;
+        if (clear1) {
             ring[location].first = new Pawn(id, color);
+            return true;
+        } else if (clear2) {
+            ring[location].second = new Pawn(id, color);
+            return true;
         }
-
         return false;
     }
 
 
-    public class Home {
-        String color;
-        LinkedList<Pawn> pawns;
-
-        public Home(String color) {
-            this.color = color;
-
-            pawns = new LinkedList<>();
-            for (int i = 0; i < 4; i++) {
-                pawns.add(new Pawn(i, color));
-            }
-        }
-    }
-
     public class Runway {
         String color;
         int pieces;
-        Pair[] runway = new Pair[6];
-        Pawn [] endZone= new Pawn[4];
+        Pair<Pawn, Pawn>[] runway = new Pair[6];
+        Pawn[] endZone = new Pawn[4];
 
         public Runway(String color) {
             this.color = color;
             pieces = 0;
         }
-        public boolean empty(int i){
+
+
+
+        public boolean remove(int location, String color, int id) {
+            if (runway[location].first.color == color && runway[location].first.id == id) {
+                runway[location].first = null;
+                return true;
+            } else if (runway[location].second.color == color && runway[location].second.id == id) {
+                runway[location].second = null;
+                return true;
+            }
+            return false;
+        }
+
+        public boolean add(int location, String color, int id) {
+            if (location == 7) {
+                for (int i = 0; i < 4; i++) {
+                    if (endZone[i] == null) {
+                        endZone[i] = new Pawn(id, color);
+                    }
+                }
+                return true;
+            }
+            //add to endzone
+            else {
+                boolean clear1 = runway[location].first == null;
+                boolean clear2 = runway[location].second == null;
+                if (clear1) {
+                    runway[location].first = new Pawn(id, color);
+                    return true;
+                } else if (clear2) {
+                    runway[location].second = new Pawn(id, color);
+                    return true;
+                }
+                return false;
+
+
+            }
+        }
+
+        public boolean empty(int i) {
             return runway[i].isEmpty();
         }
 
-        public boolean blocked(int i){
+        public boolean blocked(int i) {
             return runway[i].first != null && runway[i].second != null;
         }
     }
