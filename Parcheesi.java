@@ -55,9 +55,14 @@ public class Parcheesi implements Game {
     // Returns bonus dice roll. 0 if no bonus dice
     public Pair<Board, Integer> processMoves(Board brd, Move m) {
         if (m instanceof MoveMain) {
-            Pawn p = brd.ring[((MoveMain) m).start].;
+            //if we bop, return 20 bonus
+        } else if (m instanceof  EnterPiece){
+            //
+        } else if (m instanceof MoveHome){
+            //if we get to end of home, return 10 bonus
         }
-        return new Pair<Board,Integer>(brd, 1);
+        //should never be called
+        return new Pair<Board,Integer>(brd, 0);
     }
 
     public void register(Player p) {
