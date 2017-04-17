@@ -45,6 +45,10 @@ public class SPlayer implements Player {
         return true;
     }
 
+    public MoveHome tryMoveHome(int i){
+        return null;
+    }
+
     public EnterPiece tryEnterPiece(int i){
         if (pawns[i].home==false){
             return null;

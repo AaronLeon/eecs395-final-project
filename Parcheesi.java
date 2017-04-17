@@ -59,26 +59,33 @@ public class Parcheesi implements Game {
     public Pair<Board, Integer> processMoves(Board brd, Move m) {
         boolean success=true;
         if (m instanceof MoveMain) {
-            boolean bopped=false;
+            int bopped=-2;
+            int location=-2;
             MoveMain move=(MoveMain)m;
             String color=move.pawn.color;
             if (!isBlocked(move)){
-                int location = move.pawn.location;
+                location = move.pawn.location;
                 success = success && brd.remove(location,color,move.pawn.id);
                 //check if it will move past its runway
-                if(location+move.distance > brd.runwayLocations.get(color)){
+                //            if ((m.start + i > runway_loc) && m.start+i<home_loc) {
+
+                if(location+move.distance > brd.runwayLocations.get(color) && location+move.distance<brd.homeLocations.get(color)){
+                    int home_loc = (int) board.homeLocations.get(color);
+                    int runway_loc = (int) board.runwayLocations.get(color);
+                    //@todo add to runway
                 } else {
-                    bopped=brd.willBop(location,color);
+                    bopped=brd.bopLoc(location,color);
                     success = success && brd.add(location,color,move.pawn.id);
                     //brd.add bops
                 }
             } else {
                 cheat(turn);
+                return null;
             }
-            if(bopped){
+            if(bopped>=0){
+                brd.removeIndex(location,bopped);
                 return new Pair(brd,20);
             }
-            //if we bop, return 20 bonus
         } else if (m instanceof  EnterPiece){
             String color = colors[turn];
             //enter the piece

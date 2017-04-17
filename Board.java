@@ -8,7 +8,6 @@ public class Board {
     HashMap<String, Home> homes = new HashMap<>();
     HashMap<String, Runway> runways = new HashMap<>();
     private int safeLocations[] = {0, 5, 12, 17, 22, 29, 34, 39, 46, 51, 56, 63};
-    private int loca;
 
     public boolean isBlockade(int pos) {
         return ring[pos].first != null && ring[pos].second != null;
@@ -48,18 +47,27 @@ public class Board {
 
     }
 
-    public boolean willBop(int location, String color) {
+    public int bopLoc(int location, String color) {
         //assume no blockade
-        boolean clear1=false;
-        boolean clear2=false;
-        if(ring[location].first==null || ring[location].first.color==color){
-            clear1=true;
+        boolean clear1=ring[location].first==null;
+        boolean clear2=ring[location].second==null;
+
+        if(clear1&& ring[location].second.color!=color){
+            return 1;
         }
-        if(ring[location].second==null || ring[location].second.color==color){
-            clear2=true;
+        if(clear2&& ring[location].first.color!=color){
+            return 0;
         }
-        return clear1&&clear2;
+        return -1;
         //checks if inserting color at loc will bop
+    }
+
+    public void removeIndex(int location, int index){
+        if(index==0){
+            ring[location].first=null;
+        } else if (index==1) {
+            ring[location].second=null;
+        }
     }
 
     public boolean add(int location, String color, int id) {
@@ -69,18 +77,12 @@ public class Board {
 
         if (clear1&&clear2) {
             ring[location].first=new Pawn(id,color);
-            //
         }
         else if (!clear1){
             ring[location].second=new Pawn(id,color);
-            if (ring[location].first.color!=color){
-                //bop
             }
-            //bop 2
-        } else {
-
+        else {
             ring[location].first=new Pawn(id,color);
-            //bop 1
         }
 
         return false;
