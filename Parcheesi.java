@@ -115,6 +115,7 @@ public class Parcheesi implements Game {
                     Move[] moves = player.doMove(board, dice);
                     Board nextBoard = null;
                     for (Move m: moves) {
+
                         Pair<Board, Integer> result = processMoves(board, m);
                         nextBoard = result.first;
                     }
@@ -192,7 +193,6 @@ public class Parcheesi implements Game {
             if (((SPlayer) p).getPawns()[i].home) {
                 return canEnter(dice);
                 //check if integers in dice can sum to 5
-
             } else if (((SPlayer) p).getPawns()[i].runway) {
                 String color = ((SPlayer) p).getColor();
                 //refactor
