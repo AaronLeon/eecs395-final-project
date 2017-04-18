@@ -7,7 +7,7 @@ import java.lang.Math;
 import static java.util.Arrays.sort;
 
 public class Parcheesi implements Game {
-    Board board;
+    Board board = new Board();
     int registered = 0;
     SPlayer[] players = new SPlayer[4];
     String[] colors = {"blue", "yellow", "green", "red"};
@@ -156,7 +156,7 @@ public class Parcheesi implements Game {
                 }
                 Pawn copy=move.pawn;
                 copy.home=false;
-                copy.location=brd.homeLocations.get(color);
+                copy.location=brd.homeLocations.get(copy.color);
                 players[turn].setPawn(copy.id,copy);
                 brd.add(copy.location,copy.color,copy.id);
                 if (bopped){
@@ -328,8 +328,9 @@ public class Parcheesi implements Game {
     }
 
     public void cheat(int i) {
-        //also remove player's pieces from the board
-        //write a for loop
+        for (int j=0;j<4;j++){
+            sendHome(players[i],j);
+        }
         cheated[i]=true;
         players[i] = null;
     }

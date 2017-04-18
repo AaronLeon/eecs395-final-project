@@ -23,26 +23,35 @@ public class    ParcheesiTest {
     @Test
     public void processEnterPieceTest() {
         Parcheesi game = new Parcheesi();
+        SPlayer player1 = new SPlayer("blue");
+        SPlayer player2 = new SPlayer("yellow");
+        SPlayer player3 = new SPlayer("red");
+        SPlayer player4 = new SPlayer("green");
 
-        Pawn p1 = new Pawn(0, "blue");
-        Pawn p2 = new Pawn(0, "yellow");
-        Pawn p3 = new Pawn(0, "green");
-        Pawn p4 = new Pawn(0, "red");
+        game.register(player1);
+        game.register(player2);
+        game.register(player3);
+        game.register(player4);
 
-        EnterPiece m1 = new EnterPiece(p1);
-        EnterPiece m2 = new EnterPiece(p2);
-        EnterPiece m3 = new EnterPiece(p3);
-        EnterPiece m4 = new EnterPiece(p4);
+        EnterPiece m1 = new EnterPiece(player1.getPawns()[0]);
+        EnterPiece m2 = new EnterPiece(player2.getPawns()[0]);
+        EnterPiece m3 = new EnterPiece(player3.getPawns()[0]);
+        EnterPiece m4 = new EnterPiece(player4.getPawns()[0]);
 
-        game.processMoves(game.board, m1);
-        game.processMoves(game.board, m2);
-        game.processMoves(game.board, m3);
-        game.processMoves(game.board, m4);
+        game.board = (game.processMoves(game.board, m1)).first;
+        game.turn++;
+        game.board = (game.processMoves(game.board, m2)).first;
+        game.turn++;
+        game.board = (game.processMoves(game.board, m3)).first;
+        game.turn++;
+        game.board = (game.processMoves(game.board, m4)).first;
+        game.turn++;
 
-        Assert.assertTrue(game.board.ring[5].first.equals(p1));
-        Assert.assertTrue(game.board.ring[22].first.equals(p2));
-        Assert.assertTrue(game.board.ring[39].first.equals(p3));
-        Assert.assertTrue(game.board.ring[56].first.equals(p4));
+
+        Assert.assertTrue(game.board.ring[5].first.equals(player1.getPawns()[0]));
+        Assert.assertTrue(game.board.ring[22].first.equals(player2.getPawns()[0]));
+        Assert.assertTrue(game.board.ring[39].first.equals(player3.getPawns()[0]));
+        Assert.assertTrue(game.board.ring[56].first.equals(player4.getPawns()[0]));
     }
 
     @Test

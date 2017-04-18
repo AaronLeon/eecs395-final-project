@@ -5,7 +5,7 @@ public class SPlayer implements Player {
     private Move[] moves = new Move[4];
 
     public SPlayer(String c) {
-        color = c;
+        startGame(c);
     }
 
     public String getColor() {

@@ -13,6 +13,9 @@ public class Board {
     }
 
     public Board() {
+        for (int i=0;i<17*4;i++){
+            ring[i]=new Pair();
+        }
         homeLocations.put("blue", 5);
         homeLocations.put("yellow", 22);
         homeLocations.put("green", 39);
@@ -93,9 +96,13 @@ public class Board {
         boolean clear2 = ring[location].second == null;
         if (clear1) {
             ring[location].first = new Pawn(id, color);
+            ring[location].first.home=false;
+            ring[location].first.location=location;
             return true;
         } else if (clear2) {
-            ring[location].second = new Pawn(id, color);
+            ring[location].second = new Pawn(id, color);;
+            ring[location].first.home=false;
+            ring[location].first.location=location;
             return true;
         }
         return false;
