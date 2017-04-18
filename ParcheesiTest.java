@@ -159,7 +159,7 @@ public class    ParcheesiTest {
         Pawn p1 = new Pawn(0, "red");
         Pawn p2 = new Pawn(1, "red");
         Pawn p3 = new Pawn(0, "green");
-        Pawn p4 = new Pawn(1, "green")
+        Pawn p4 = new Pawn(1, "green");
 
         game.board.ring[0].first = p1;
         game.board.ring[1].first = p2;
@@ -433,7 +433,7 @@ public class    ParcheesiTest {
         game.board.ring[3].second = blockade2;
         game.board.ring[0].first = p1;
 
-        int[] dice = {4, 6}
+        int[] dice = {4, 6};
         boolean movesPossible = game.movesPossible(game.players[0], dice, game.board);
 
         Assert.assertFalse("No moves left due to blockade", movesPossible);
@@ -499,7 +499,7 @@ public class    ParcheesiTest {
         Pair<Board, Integer> result = game.processMoves(game.board, m1);
         int[] dice = {0, 0, 0, result.second};
 
-        boolean movesPossible = game.movesPossible(0, dice, game.board);
+        boolean movesPossible = game.movesPossible(game.players[0], dice, game.board);
 
         Assert.assertFalse("No moves possible with bop bonus due to blockade", movesPossible);
     }
@@ -520,11 +520,11 @@ public class    ParcheesiTest {
         game.board.ring[5].first = blockade1;
         game.board.ring[5].second = blockade2;
 
-        MoveHome m1 = new MoveHome(p1, 3);
+        MoveHome m1 = new MoveHome(p1, 3, 3);
         Pair<Board, Integer> result = game.processMoves(game.board, m1);
         int[] dice = {0, 0, 0, result.second};
 
-        boolean movesPossible = game.movesPossible(0, dice, game.board);
+        boolean movesPossible = game.movesPossible(game.players[0], dice, game.board);
 
         Assert.assertFalse("No moves possible with bop bonus due to blockade", movesPossible);
     }
