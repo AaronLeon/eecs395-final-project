@@ -159,7 +159,7 @@ public class    ParcheesiTest {
         Pawn p1 = new Pawn(0, "red");
         Pawn p2 = new Pawn(1, "red");
         Pawn p3 = new Pawn(0, "green");
-        Pawn p4 = new Pawn(1, "green");
+        Pawn p4 = new Pawn(1, "green")
 
         game.board.ring[0].first = p1;
         game.board.ring[1].first = p2;
@@ -417,11 +417,6 @@ public class    ParcheesiTest {
      * Complete Move
      */
 
-    //can only take the first die, due to blockade
-    //can only take the second die, due to blockade
-    //bop, but don't take the 20
-    //move home, but don't take the 10
-    //can only move one die, since moving both would mean moving a blockade together
     @Test
     public void cannotIgnoreDieRoll() {
 
@@ -429,46 +424,129 @@ public class    ParcheesiTest {
 
     @Test
     public void noMovesLeftDueToBlockadeTest() {
+        Parcheesi game = new Parcheesi();
+        Pawn blockade1 = new Pawn(0, "green");
+        Pawn blockade2 = new Pawn(1, "green");
+        Pawn p1 = new Pawn(0, "red");
 
+        game.board.ring[3].first = blockade1;
+        game.board.ring[3].second = blockade2;
+        game.board.ring[0].first = p1;
+
+        int[] dice = {4, 6}
+        boolean movesPossible = game.movesPossible(game.players[0], dice, game.board);
+
+        Assert.assertFalse("No moves left due to blockade", movesPossible);
     }
 
     @Test
     public void canOnlyUseFirstDiceDueToBlockadeTest() {
+        Parcheesi game = new Parcheesi();
 
+        Pawn p1 = new Pawn(0, "red");
+        Pawn blockade1 = new Pawn(1, "green");
+        Pawn blockade2 = new Pawn(2, "green");
+
+        game.board.ring[0].first = p1;
+        game.board.ring[4].first = blockade1;
+        game.board.ring[4].second = blockade2;
+
+        MoveMain m1 = new MoveMain(p1, 3);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
+        int[] dice = {2, 5, 0, 0};
+
+        boolean movesPossible = game.movesPossible(game.players[0], dice, game.board);
+
+        Assert.assertTrue("One move possible with due to blockade", movesPossible);
     }
 
     @Test
     public void canOnlyUseSecondDiceDueToBlockadeTest() {
+        Parcheesi game = new Parcheesi();
 
+        Pawn p1 = new Pawn(0, "red");
+        Pawn blockade1 = new Pawn(1, "green");
+        Pawn blockade2 = new Pawn(2, "green");
+
+        game.board.ring[0].first = p1;
+        game.board.ring[4].first = blockade1;
+        game.board.ring[4].second = blockade2;
+
+        MoveMain m1 = new MoveMain(p1, 3);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
+        int[] dice = {5, 2, 0, 0};
+
+        boolean movesPossible = game.movesPossible(game.players[0], dice, game.board);
+
+        Assert.assertTrue("One move possible with due to blockade", movesPossible);
     }
 
     @Test
     public void cannotUseBopBonusTest() {
+        Parcheesi game = new Parcheesi();
 
+        Pawn p1 = new Pawn(0, "red");
+        Pawn p2 = new Pawn(0, "green");
+        Pawn blockade1 = new Pawn(1, "green");
+        Pawn blockade2 = new Pawn(2, "green");
+
+        game.board.ring[0].first = p1;
+        game.board.ring[3].first = p2;
+        game.board.ring[5].first = blockade1;
+        game.board.ring[5].second = blockade2;
+
+        MoveMain m1 = new MoveMain(p1, 3);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
+        int[] dice = {0, 0, 0, result.second};
+
+        boolean movesPossible = game.movesPossible(0, dice, game.board);
+
+        Assert.assertFalse("No moves possible with bop bonus due to blockade", movesPossible);
     }
 
     @Test
     public void cannotUseHomeBonusTest() {
+        Parcheesi game = new Parcheesi();
 
+        Pawn p1 = new Pawn(0, "red");
+        Pawn p2 = new Pawn(1, "red");
+        Pawn blockade1 = new Pawn(0, "green");
+        Pawn blockade2 = new Pawn(1, "green");
+
+
+
+        game.board.runways.get("red").runway[0].first = p1;
+        game.board.ring[3].first = p2;
+        game.board.ring[5].first = blockade1;
+        game.board.ring[5].second = blockade2;
+
+        MoveHome m1 = new MoveHome(p1, 3);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
+        int[] dice = {0, 0, 0, result.second};
+
+        boolean movesPossible = game.movesPossible(0, dice, game.board);
+
+        Assert.assertFalse("No moves possible with bop bonus due to blockade", movesPossible);
     }
 
     @Test
     public void canOnlyUseOneDiceDueToMovingBlockadeTogetherTest() {
+        Parcheesi game = new Parcheesi();
 
+        Pawn blockade1 = new Pawn(0, "green");
+        Pawn blockade2 = new Pawn(1, "green");
+
+        game.board.ring[4].first = blockade1;
+        game.board.ring[4].second = blockade2;
+
+        MoveMain m1 = new MoveMain(blockade1, 3);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
+        int[] dice = {0, 3, 0, 0};
+
+        boolean movesPossible = game.movesPossible(game.players[0], dice, game.board);
+
+        Assert.assertFalse("One move possible with due to blockade", movesPossible);
     }
-
-    /*
-     * Doubles Penalty
-     */
-
-    @Test
-    public void doublesPenaltyTest() {
-
-    }
-
-    @Test
-    public void doublesPenaltyTestWithNoPiecesOutTest() {
-
-    }
+    
 
 }
