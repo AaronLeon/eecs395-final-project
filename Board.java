@@ -34,6 +34,14 @@ public class Board {
         return ring[i].first != null && ring[i].second != null;
     }
 
+    public Pair<Pawn, Pawn> clearCell(int i){
+        Pair<Pawn, Pawn>set = new Pair();
+        set.first=ring[i].first;
+        set.second=ring[i].second;
+        ring[i]=new Pair();
+        return set;
+    }
+
 
     public boolean remove(int location, String color, int id) {
         if (ring[location].first.color == color && ring[location].first.id == id) {

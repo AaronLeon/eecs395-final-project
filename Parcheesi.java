@@ -125,17 +125,44 @@ public class Parcheesi implements Game {
 
 
         else if (m instanceof  EnterPiece){
+            boolean bopped=false;
             String color = colors[turn];
             EnterPiece move = (EnterPiece)  m;
-            if(move.pawn.home==false||brd.blocked(brd.homeLocations.get(color))){
+            if(move.pawn.home==false){
                 cheat(turn);
                 return null;
             } else {
+                if (brd.blocked(brd.homeLocations.get(color))){
+                    Pair<Pawn,Pawn> gotBopped=brd.clearCell(brd.homeLocations.get(color));
+                    if(gotBopped.first!=null){
+                        bopped=true;
+                        for (int i = 0;i<4;i++){
+                            if(gotBopped.first.color==colors[i]){
+                                gotBopped.first.home=true;
+                                gotBopped.first.location=-1;
+                                players[i].setPawn(gotBopped.first.id,gotBopped.first);
+                            }
+                        }
+                    }
+                    if(gotBopped.second!=null){
+                        bopped=true;
+                        for (int i = 0;i<4;i++){
+                            if(gotBopped.second.color==colors[i]){
+                                gotBopped.second.home=true;
+                                gotBopped.second.location=-1;
+                                players[i].setPawn(gotBopped.second.id,gotBopped.second);
+                            }
+                        }
+                    }
+                }
                 Pawn copy=move.pawn;
                 copy.home=false;
                 copy.location=brd.homeLocations.get(color);
                 players[turn].setPawn(copy.id,copy);
                 brd.add(copy.location,copy.color,copy.id);
+                if (bopped){
+                    return new Pair(brd,20);
+                }
                 return new Pair(brd,0);
             }
         }
