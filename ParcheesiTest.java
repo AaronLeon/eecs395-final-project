@@ -1,9 +1,6 @@
-import com.sun.tools.javac.comp.Enter;
 import org.junit.*;
 
-import java.util.LinkedList;
-
-public class ParcheesiTest {
+public class    ParcheesiTest {
     @BeforeClass
     public static void beforeClass() {
     }
@@ -23,7 +20,8 @@ public class ParcheesiTest {
     /*
      * Basic tests
      */
-    @Test void processEnterPieceTest() {
+    @Test
+    public void processEnterPieceTest() {
         Parcheesi game = new Parcheesi();
 
         Pawn p1 = new Pawn(0, "blue");
@@ -47,7 +45,8 @@ public class ParcheesiTest {
         Assert.assertTrue(game.board.ring[56].first.equals(p4));
     }
 
-    @Test void processMainMoveTest() {
+    @Test
+    public void processMainMoveTest() {
         Parcheesi game = new Parcheesi();
         Pawn p1 = new Pawn(0, "red");
         game.board.ring[0].first = p1;
@@ -59,7 +58,8 @@ public class ParcheesiTest {
         Assert.assertFalse("Pawn should not be in original space in ring", result.first.ring[0].first.equals(p1));
     }
 
-    @Test void processMoveHomeTest() {
+    @Test
+    public void processMoveHomeTest() {
         Parcheesi game = new Parcheesi();
         Pawn p1 = new Pawn(0, "red");
         game.board.runways.get("red").runway[3].first = p1;
@@ -96,7 +96,8 @@ public class ParcheesiTest {
     /*
      * Bopping
      */
-    public void boppingEarnsBonusTest() {
+    @Test
+    public void boppingGivesBonusTest() {
         Parcheesi game = new Parcheesi();
 
         Pawn p1 = new Pawn(0, "red");
@@ -111,6 +112,7 @@ public class ParcheesiTest {
         Assert.assertTrue("Bopping earns 20 bonus", result.second == 20);
     }
 
+    @Test
     public void enterPieceCanBopTest() {
         Parcheesi game = new Parcheesi();
 
@@ -126,7 +128,8 @@ public class ParcheesiTest {
         Assert.assertTrue("Moving piece should replace bopped piece", result.first.ring[3].first.equals(p2));
     }
 
-    public void cannotBopOnSafety() {
+    @Test
+    public void cannotBopOnSafetyTest() {
         Parcheesi game = new Parcheesi();
 
         Pawn p1 = new Pawn(0, "red");
@@ -135,12 +138,39 @@ public class ParcheesiTest {
         game.board.ring[3].first = p1;
 
         EnterPiece m1 = new EnterPiece(p2);
-        Pair<Board, Integer> result = game.processMoves(game.board, m1);g
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
 
         Assert.assertFalse("Piece should not be removed on safety", result.first.ring[3].first.equals(p1));
         Assert.assertTrue("Moving piece should not replace piece at destination", result.first.ring[3].first.equals(p2));
         // Check if cheated
+        Assert.assertNull("Bopping safety should return null (e.g. cheat)", result);
     }
+
+    @Test
+    public void boppingTwoPiecesGivesTwoBonusesTest() {
+        Parcheesi game = new Parcheesi();
+
+        Pawn p1 = new Pawn(0, "red");
+        Pawn p2 = new Pawn(1, "red");
+        Pawn p3 = new Pawn(0, "green");
+        Pawn p4 = new Pawn(1, "green");
+
+        game.board.ring[0].first = p1;
+        game.board.ring[1].first = p2;
+        game.board.ring[3].first = p3;
+        game.board.ring[7].first = p4;
+
+        MoveMain m1 = new MoveMain(p1, 3);
+        MoveMain m2 = new MoveMain(p2, 6);
+        Pair<Board, Integer> result1 = game.processMoves(game.board, m1);
+        Pair<Board, Integer> result2 = game.processMoves(game.board, m2);
+
+        Assert.assertTrue("First bop earns 20 bonus", result1.second == 20);
+        Assert.assertTrue("Second bop earns 20 bonus", result2.second == 20);
+    }
+
+
+
 
     /*
      * Blockades

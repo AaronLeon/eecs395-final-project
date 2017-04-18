@@ -2,7 +2,6 @@
  * Parcheesi
  * The Parcheesi class represents the game engine
  */
-
 import java.lang.Math;
 
 import static java.util.Arrays.sort;
