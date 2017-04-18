@@ -22,8 +22,8 @@ public class Parcheesi implements Game {
     // For a given move, checks if move runs into blockade
     public boolean isBlocked(MoveMain m) {
         String color = m.pawn.color;
-        int home_loc = (int) board.homeLocations.get(color);
-        int runway_loc = (int) board.runwayLocations.get(color);
+        int home_loc = board.homeLocations.get(color);
+        int runway_loc = board.runwayLocations.get(color);
         for (int i = 1; i < m.distance; i++) {
             if ((m.pawn.location + i > runway_loc) && m.pawn.location+i<home_loc) {
                 //check if runway is blocked
