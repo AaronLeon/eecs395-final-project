@@ -2,7 +2,6 @@
  * Parcheesi
  * The Parcheesi class represents the game engine
  */
-import com.sun.tools.javac.comp.Enter;
 
 import java.lang.Math;
 
@@ -14,6 +13,7 @@ public class Parcheesi implements Game {
     SPlayer[] players = new SPlayer[4];
     String[] colors = {"blue", "yellow", "green", "red"};
     int turn = 0;
+    boolean [] cheated = {false,false,false,false};
 
     public Parcheesi() {
         board = new Board();
@@ -73,26 +73,46 @@ public class Parcheesi implements Game {
                     int distance = location+move.distance-brd.runwayLocations.get(color)-1;
                     success = success && brd.runways.get(color).add(0,color,copy.id);
                     MoveHome newMove = new MoveHome(copy,copy.location,distance);
-
+                    players[turn].setPawn(copy.id,copy);
                     if(!success){
                         cheat(turn);
+                        return null;
                     }
+
+
 
                     return processMoves(brd,newMove);
                 } else {
+                    Pawn copy=move.pawn;
+                    copy.location=location+move.distance;
+                    players[turn].setPawn(move.pawn.id,copy);
 
                     success = success && brd.remove(location,color,move.pawn.id);
                     bopTarget=brd.bopLoc(location+move.distance,color);
                     success = success && brd.add(location,color,move.pawn.id);
 
                     if(bopTarget>=0){
-                        Pawn copy = brd.removeIndex(location,bopTarget);
+                        Pawn boppedCopy = brd.bopTarget(location,bopTarget);
+                        if (boppedCopy==null){
+                            cheat(turn);
+                            return null;
+                        }
+                        boppedCopy.home=true;
+                        boppedCopy.location=-1;
                         for (int i = 0;i<4;i++){
-                            if(copy.color==colors[i]){
-                                players[i].setPawn(copy.id,copy);
+                            if(boppedCopy.color==colors[i]){
+                                players[i].setPawn(boppedCopy.id,boppedCopy);
                             }
                         }
+                        if(!success){
+                            cheat(turn);
+                            return null;
+                        }
                         return new Pair(brd,20);
+                    }
+                    if(!success){
+                        cheat(turn);
+                        return null;
                     }
                     //brd.add bops
                 }
@@ -131,6 +151,8 @@ public class Parcheesi implements Game {
                 int destination=move.distance+move.pawn.location;
                 brd.runways.get(colors[turn]).remove(move.pawn.location,move.pawn.color,move.pawn.id);
                 brd.runways.get(colors[turn]).add(destination,move.pawn.color,move.pawn.id);
+                Pawn moved=new Pawn(move.pawn.id,move.pawn.color);
+                players[turn].setPawn(moved.id,moved);
                 if (destination==7){
                     return new Pair(brd,10);
                 } else {
@@ -282,6 +304,7 @@ public class Parcheesi implements Game {
     public void cheat(int i) {
         //also remove player's pieces from the board
         //write a for loop
+        cheated[i]=true;
         players[i] = null;
     }
 

@@ -62,7 +62,12 @@ public class Board {
         //checks if inserting color at loc will bop
     }
 
-    public Pawn removeIndex(int location, int index) {
+    public Pawn bopTarget(int location, int index) {
+        for(int loc: safeLocations){
+            if(loc==location){
+                return null;
+            }
+        }
         Pawn copy = new Pawn(-1, null);
         if (index == 0) {
             copy.color = ring[location].first.color;
