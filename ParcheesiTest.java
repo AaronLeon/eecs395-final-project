@@ -265,9 +265,9 @@ public class    ParcheesiTest {
         game.board.ring[0].first = p1;
 
         MoveMain m1 = new MoveMain(p1, 3);
-        Pair<Board, Integer> result = game.processMoves("Moving to an opponent's blockade is flagged as cheating", game.board, m1);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
 
-        Assert.assertNull(result);
+        Assert.assertNull("Moving to an opponent's blockade is flagged as cheating", result);
     }
 
     @Test
@@ -547,6 +547,6 @@ public class    ParcheesiTest {
 
         Assert.assertFalse("One move possible with due to blockade", movesPossible);
     }
-    
+
 
 }
