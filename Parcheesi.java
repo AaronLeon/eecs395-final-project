@@ -239,6 +239,9 @@ public class Parcheesi implements Game {
                     continue;
                 } else {
                     Move[] moves = player.doMove(board, dice);
+                    //doMove only returns one move
+                    //otherwise we write a for loop
+                    dice=consumeDice(dice,moves[0]);
                     Board nextBoard = null;
                     for (Move m: moves) {
 
