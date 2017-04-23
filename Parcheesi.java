@@ -12,7 +12,7 @@ public class Parcheesi implements Game {
     SPlayer[] players = new SPlayer[4];
     String[] colors = {"blue", "yellow", "green", "red"};
     int turn = 0;
-    boolean [] cheated = {false,false,false,false};
+    boolean[] cheated = {false,false,false,false};
 
     public Parcheesi() {
         board = new Board();

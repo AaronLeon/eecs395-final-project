@@ -25,11 +25,11 @@ public class SPlayer implements Player {
     }
 
     public void setPawn(int i,Pawn p){
-        pawns[i]=p;
+        pawns[i] = p;
     }
     public Move[] doMove(Board brd, int[] rolls) {
-        moves=new Move[4];//clears old moves
-        dice=rolls;
+        moves = new Move[4];
+        dice = rolls;
 
         //TODO: Not implemented yet
         //check that the move is possible given the die rolls
