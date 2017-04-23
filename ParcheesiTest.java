@@ -1,6 +1,12 @@
 import org.junit.*;
 
 public class    ParcheesiTest {
+    Parcheesi game;
+    SPlayer player1;
+    SPlayer player2;
+    SPlayer player3;
+    SPlayer player4;
+
     @BeforeClass
     public static void beforeClass() {
     }
@@ -11,6 +17,16 @@ public class    ParcheesiTest {
 
     @Before
     public void beforeTest() {
+        game = new Parcheesi();
+        player1 = new SPlayer("blue");
+        player2 = new SPlayer("yellow");
+        player3 = new SPlayer("red");
+        player4 = new SPlayer("green");
+
+        game.register(player1);
+        game.register(player2);
+        game.register(player3);
+        game.register(player4);
     }
 
     @After
@@ -22,16 +38,7 @@ public class    ParcheesiTest {
      */
     @Test
     public void processEnterPieceTest() {
-        Parcheesi game = new Parcheesi();
-        SPlayer player1 = new SPlayer("blue");
-        SPlayer player2 = new SPlayer("yellow");
-        SPlayer player3 = new SPlayer("red");
-        SPlayer player4 = new SPlayer("green");
 
-        game.register(player1);
-        game.register(player2);
-        game.register(player3);
-        game.register(player4);
 
         EnterPiece m1 = new EnterPiece(player1.getPawns()[0]);
         EnterPiece m2 = new EnterPiece(player2.getPawns()[0]);
@@ -56,15 +63,16 @@ public class    ParcheesiTest {
 
     @Test
     public void processMainMoveTest() {
-        Parcheesi game = new Parcheesi();
-        Pawn p1 = new Pawn(0, "red");
-        game.board.ring[0].first = p1;
-        MoveMain m1 = new MoveMain(p1, 0);
 
-        Pair<Board, Integer> result = game.processMoves(game.board, m1);
+        EnterPiece e1 = new EnterPiece(player1.getPawns()[0]);
+        game.board = (game.processMoves(game.board, e1)).first;
+        //make another move
+        MoveMain m1 = new MoveMain(player1.getPawns()[0], 3);
 
-        Assert.assertTrue("Pawn should move 3 spaces in ring", result.first.ring[3].first.equals(p1));
-        Assert.assertFalse("Pawn should not be in original space in ring", result.first.ring[0].first.equals(p1));
+            Pair<Board, Integer> result = game.processMoves(game.board, m1);
+
+        Assert.assertTrue("Pawn should move 3 spaces in ring", result.first.ring[8].first!=null);
+        Assert.assertTrue("Pawn should not be in original space in ring", result.first.ring[5].first==null);
     }
 
     @Test

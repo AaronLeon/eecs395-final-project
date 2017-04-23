@@ -77,6 +77,10 @@ public class Board {
         boolean clear1 = ring[location].first == null;
         boolean clear2 = ring[location].second == null;
 
+        if(clear1&&clear2){
+            return -1;
+        }
+
         if (clear1 && ring[location].second.color != color) {
             return 1;
         }

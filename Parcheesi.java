@@ -88,7 +88,7 @@ public class Parcheesi implements Game {
 
                     success = success && brd.remove(location,color,move.pawn.id);
                     bopTarget=brd.bopLoc(location+move.distance,color);
-                    success = success && brd.add(location,color,move.pawn.id);
+                    success = success && brd.add(copy.location,color,move.pawn.id);
 
                     if(bopTarget>=0){
                         Pawn boppedCopy = brd.bopTarget(location,bopTarget);
