@@ -155,8 +155,7 @@ public class Parcheesi implements Game {
                 //brd.add bops
             }
         }
-        cheat(turn);
-        return null;
+        return new Pair(brd, 0);
     }
 
     public Pair<Board, Integer> processMoveHome(Board brd, Move m) {
@@ -184,9 +183,9 @@ public class Parcheesi implements Game {
         if (m instanceof MoveMain) {
             return processMoveMain(brd, m);
         } else if (m instanceof EnterPiece) {
-            processEnterPiece(brd, m);
+            return processEnterPiece(brd, m);
         } else if (m instanceof MoveHome) {
-            processMoveHome(brd, m);
+            return processMoveHome(brd, m);
         }
         //should never be called
         return new Pair(brd, 0);

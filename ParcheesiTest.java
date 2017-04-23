@@ -69,7 +69,7 @@ public class    ParcheesiTest {
         //make another move
         MoveMain m1 = new MoveMain(player1.getPawns()[0], 3);
 
-            Pair<Board, Integer> result = game.processMoves(game.board, m1);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
 
         Assert.assertTrue("Pawn should move 3 spaces in ring", result.first.ring[8].first!=null);
         Assert.assertTrue("Pawn should not be in original space in ring", result.first.ring[5].first==null);
@@ -79,6 +79,9 @@ public class    ParcheesiTest {
     public void processMoveHomeTest() {
         Parcheesi game = new Parcheesi();
         Pawn p1 = new Pawn(0, "red");
+        p1.runway=true;
+        p1.home=false;
+        p1.location=3;
         game.board.runways.get("red").runway[3].first = p1;
         MoveHome m1 = new MoveHome(p1, 3, 2);
         MoveHome m2 = new MoveHome(p1, 5, 2);

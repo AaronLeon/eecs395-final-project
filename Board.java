@@ -150,6 +150,10 @@ public class Board {
         public Runway(String color) {
             this.color = color;
             pieces = 0;
+
+            for (int i=0;i<6;i++){
+                runway[i]=new Pair();
+            }
         }
 
 
