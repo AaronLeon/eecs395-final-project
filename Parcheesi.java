@@ -119,7 +119,7 @@ public class Parcheesi implements Game {
                     cheat(turn);
                     return null;
                 }
-                return processMoves(brd, newMove);
+                return processMoves(newMove);
             } else {
                 Pawn copy = move.pawn;
                 copy.location = location + move.distance;
@@ -178,17 +178,19 @@ public class Parcheesi implements Game {
     }
 
 
-    public Pair<Board, Integer> processMoves(Board brd, Move m) {
+    public Pair<Board, Integer> processMoves(Move m) {
         boolean success = true;
+        Pair<Board,Integer> retV= new Pair<Board,Integer>();
         if (m instanceof MoveMain) {
-            return processMoveMain(brd, m);
+            retV = processMoveMain(board, m);
         } else if (m instanceof EnterPiece) {
-            return processEnterPiece(brd, m);
+            retV = processEnterPiece(board, m);
         } else if (m instanceof MoveHome) {
-            return processMoveHome(brd, m);
+            retV = processMoveHome(board, m);
         }
+        board=retV.first;
         //should never be called
-        return new Pair(brd, 0);
+        return new Pair(board, retV.second);
     }
 
     public void register(Player p) {
@@ -256,7 +258,7 @@ public class Parcheesi implements Game {
                     Board nextBoard = null;
                     for (Move m : moves) {
 
-                        Pair<Board, Integer> result = processMoves(board, m);
+                        Pair<Board, Integer> result = processMoves(m);
                         nextBoard = result.first;
                         int bonus = result.second;
                         if (bonus>0){
