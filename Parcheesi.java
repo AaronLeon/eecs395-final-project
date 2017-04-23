@@ -2,7 +2,6 @@
  * Parcheesi
  * The Parcheesi class represents the game engine
  */
-import java.lang.Math;
 
 import static java.util.Arrays.sort;
 
@@ -12,7 +11,7 @@ public class Parcheesi implements Game {
     SPlayer[] players = new SPlayer[4];
     String[] colors = {"blue", "yellow", "green", "red"};
     int turn = 0;
-    boolean[] cheated = {false,false,false,false};
+    boolean[] cheated = {false, false, false, false};
 
     public Parcheesi() {
         board = new Board();
@@ -24,7 +23,7 @@ public class Parcheesi implements Game {
         int home_loc = board.homeLocations.get(color);
         int runway_loc = board.runwayLocations.get(color);
         for (int i = 1; i < m.distance; i++) {
-            if ((m.pawn.location + i > runway_loc) && m.pawn.location+i<home_loc) {
+            if ((m.pawn.location + i > runway_loc) && m.pawn.location + i < home_loc) {
                 //check if runway is blocked
                 if (board.runways.get(color).blocked(m.pawn.location + i - runway_loc)) {
                     return true;
@@ -55,136 +54,139 @@ public class Parcheesi implements Game {
 
     // Changes board state with provided move.
     // Returns bonus dice roll. 0 if no bonus dice
+
+    public Pair<Board, Integer> processEnterPiece(Board brd, Move m) {
+        boolean bopped = false;
+        String color = colors[turn];
+        EnterPiece move = (EnterPiece) m;
+        if (move.pawn.home == false) {
+            cheat(turn);
+            return null;
+        } else {
+            if (brd.blocked(brd.homeLocations.get(color))) {
+                Pair<Pawn, Pawn> gotBopped = brd.clearCell(brd.homeLocations.get(color));
+                if (gotBopped.first != null) {
+                    bopped = true;
+                    for (int i = 0; i < 4; i++) {
+                        if (gotBopped.first.color == colors[i]) {
+                            gotBopped.first.home = true;
+                            gotBopped.first.location = -1;
+                            players[i].setPawn(gotBopped.first.id, gotBopped.first);
+                        }
+                    }
+                }
+                if (gotBopped.second != null) {
+                    bopped = true;
+                    for (int i = 0; i < 4; i++) {
+                        if (gotBopped.second.color == colors[i]) {
+                            gotBopped.second.home = true;
+                            gotBopped.second.location = -1;
+                            players[i].setPawn(gotBopped.second.id, gotBopped.second);
+                        }
+                    }
+                }
+            }
+            Pawn copy = move.pawn;
+            copy.home = false;
+            copy.location = brd.homeLocations.get(copy.color);
+            players[turn].setPawn(copy.id, copy);
+            brd.add(copy.location, copy.color, copy.id);
+            if (bopped) {
+                return new Pair(brd, 20);
+            }
+            return new Pair(brd, 0);
+        }
+    }
+
+    public Pair<Board, Integer> processMoveMain(Board brd, Move m) {
+        boolean success = true;
+        int bopTarget;
+        int location;
+        MoveMain move = (MoveMain) m;
+        String color = move.pawn.color;
+        if (!isBlocked(move)) {
+            location = move.pawn.location;
+            if (location + move.distance > brd.runwayLocations.get(color) && location + move.distance < brd.homeLocations.get(color)) {
+                Pawn copy = move.pawn;
+                copy.location = 0;
+                copy.runway = true;
+                success = success && brd.remove(location, color, move.pawn.id);
+                int distance = location + move.distance - brd.runwayLocations.get(color) - 1;
+                success = success && brd.runways.get(color).add(0, color, copy.id);
+                MoveHome newMove = new MoveHome(copy, copy.location, distance);
+                players[turn].setPawn(copy.id, copy);
+                if (!success) {
+                    cheat(turn);
+                    return null;
+                }
+                return processMoves(brd, newMove);
+            } else {
+                Pawn copy = move.pawn;
+                copy.location = location + move.distance;
+                players[turn].setPawn(move.pawn.id, copy);
+
+                success = success && brd.remove(location, color, move.pawn.id);
+                bopTarget = brd.bopLoc(location + move.distance, color);
+                success = success && brd.add(copy.location, color, move.pawn.id);
+
+                if (bopTarget >= 0) {
+                    Pawn boppedCopy = brd.bopTarget(location, bopTarget);
+                    if (boppedCopy == null) {
+                        cheat(turn);
+                        return null;
+                    }
+                    boppedCopy.home = true;
+                    boppedCopy.location = -1;
+                    for (int i = 0; i < 4; i++) {
+                        if (boppedCopy.color == colors[i]) {
+                            players[i].setPawn(boppedCopy.id, boppedCopy);
+                        }
+                    }
+                    if (!success) {
+                        cheat(turn);
+                        return null;
+                    }
+                    return new Pair(brd, 20);
+                }
+                if (!success) {
+                    cheat(turn);
+                    return null;
+                }
+                //brd.add bops
+            }
+        }
+        cheat(turn);
+        return null;
+    }
+
+    public Pair<Board, Integer> processMoveHome(Board brd, Move m) {
+        MoveHome move = (MoveHome) m;
+        if (move.pawn.runway == false || (move.distance + move.pawn.location > 7)) {
+            cheat(turn);
+            return null;
+        } else {
+            int destination = move.distance + move.pawn.location;
+            brd.runways.get(colors[turn]).remove(move.pawn.location, move.pawn.color, move.pawn.id);
+            brd.runways.get(colors[turn]).add(destination, move.pawn.color, move.pawn.id);
+            Pawn moved = new Pawn(move.pawn.id, move.pawn.color);
+            players[turn].setPawn(moved.id, moved);
+            if (destination == 7) {
+                return new Pair(brd, 10);
+            } else {
+                return new Pair(brd, 0);
+            }
+        }
+    }
+
+
     public Pair<Board, Integer> processMoves(Board brd, Move m) {
-        boolean success=true;
+        boolean success = true;
         if (m instanceof MoveMain) {
-            int bopTarget=-1;
-            int location;
-            MoveMain move=(MoveMain)m;
-            String color=move.pawn.color;
-            if (!isBlocked(move)){
-                location = move.pawn.location;
-                if(location+move.distance > brd.runwayLocations.get(color) && location+move.distance<brd.homeLocations.get(color)){
-                    Pawn copy = move.pawn;
-                    copy.location=0;
-                    copy.runway=true;
-                    success = success && brd.remove(location,color,move.pawn.id);
-                    int distance = location+move.distance-brd.runwayLocations.get(color)-1;
-                    success = success && brd.runways.get(color).add(0,color,copy.id);
-                    MoveHome newMove = new MoveHome(copy,copy.location,distance);
-                    players[turn].setPawn(copy.id,copy);
-                    if(!success){
-                        cheat(turn);
-                        return null;
-                    }
-
-
-
-                    return processMoves(brd,newMove);
-                } else {
-                    Pawn copy=move.pawn;
-                    copy.location=location+move.distance;
-                    players[turn].setPawn(move.pawn.id,copy);
-
-                    success = success && brd.remove(location,color,move.pawn.id);
-                    bopTarget=brd.bopLoc(location+move.distance,color);
-                    success = success && brd.add(copy.location,color,move.pawn.id);
-
-                    if(bopTarget>=0){
-                        Pawn boppedCopy = brd.bopTarget(location,bopTarget);
-                        if (boppedCopy==null){
-                            cheat(turn);
-                            return null;
-                        }
-                        boppedCopy.home=true;
-                        boppedCopy.location=-1;
-                        for (int i = 0;i<4;i++){
-                            if(boppedCopy.color==colors[i]){
-                                players[i].setPawn(boppedCopy.id,boppedCopy);
-                            }
-                        }
-                        if(!success){
-                            cheat(turn);
-                            return null;
-                        }
-                        return new Pair(brd,20);
-                    }
-                    if(!success){
-                        cheat(turn);
-                        return null;
-                    }
-                    //brd.add bops
-                }
-            } else {
-                //is blocked
-                cheat(turn);
-                return null;
-            }
-        }
-
-
-        else if (m instanceof  EnterPiece){
-            boolean bopped=false;
-            String color = colors[turn];
-            EnterPiece move = (EnterPiece)  m;
-            if(move.pawn.home==false){
-                cheat(turn);
-                return null;
-            } else {
-                if (brd.blocked(brd.homeLocations.get(color))){
-                    Pair<Pawn,Pawn> gotBopped=brd.clearCell(brd.homeLocations.get(color));
-                    if(gotBopped.first!=null){
-                        bopped=true;
-                        for (int i = 0;i<4;i++){
-                            if(gotBopped.first.color==colors[i]){
-                                gotBopped.first.home=true;
-                                gotBopped.first.location=-1;
-                                players[i].setPawn(gotBopped.first.id,gotBopped.first);
-                            }
-                        }
-                    }
-                    if(gotBopped.second!=null){
-                        bopped=true;
-                        for (int i = 0;i<4;i++){
-                            if(gotBopped.second.color==colors[i]){
-                                gotBopped.second.home=true;
-                                gotBopped.second.location=-1;
-                                players[i].setPawn(gotBopped.second.id,gotBopped.second);
-                            }
-                        }
-                    }
-                }
-                Pawn copy=move.pawn;
-                copy.home=false;
-                copy.location=brd.homeLocations.get(copy.color);
-                players[turn].setPawn(copy.id,copy);
-                brd.add(copy.location,copy.color,copy.id);
-                if (bopped){
-                    return new Pair(brd,20);
-                }
-                return new Pair(brd,0);
-            }
-        }
-
-
-        else if (m instanceof MoveHome){
-
-            MoveHome move = (MoveHome)m;
-            if (move.pawn.runway==false || (move.distance+move.pawn.location>7)){
-                cheat(turn);
-                return null;
-            } else {
-                int destination=move.distance+move.pawn.location;
-                brd.runways.get(colors[turn]).remove(move.pawn.location,move.pawn.color,move.pawn.id);
-                brd.runways.get(colors[turn]).add(destination,move.pawn.color,move.pawn.id);
-                Pawn moved=new Pawn(move.pawn.id,move.pawn.color);
-                players[turn].setPawn(moved.id,moved);
-                if (destination==7){
-                    return new Pair(brd,10);
-                } else {
-                    return new Pair(brd,0);
-                }
-            }
+            return processMoveMain(brd, m);
+        } else if (m instanceof EnterPiece) {
+            processEnterPiece(brd, m);
+        } else if (m instanceof MoveHome) {
+            processMoveHome(brd, m);
         }
         //should never be called
         return new Pair(brd, 0);
@@ -193,7 +195,7 @@ public class Parcheesi implements Game {
     public void register(Player p) {
         if (registered < 4) {
             p.startGame(colors[registered]);
-            players[registered] = (SPlayer)p;
+            players[registered] = (SPlayer) p;
             registered++;
         }
     }
@@ -251,9 +253,9 @@ public class Parcheesi implements Game {
                     Move[] moves = player.doMove(board, dice);
                     //doMove only returns one move
                     //otherwise we write a for loop
-                    dice=consumeDice(dice,moves[0]);
+                    dice = consumeDice(dice, moves[0]);
                     Board nextBoard = null;
-                    for (Move m: moves) {
+                    for (Move m : moves) {
 
                         Pair<Board, Integer> result = processMoves(board, m);
                         nextBoard = result.first;
@@ -286,8 +288,7 @@ public class Parcheesi implements Game {
                 dice[0] = dice[1] = 0;
             } else if (dice[0] == 5) {
                 res[0] = 0;
-            }
-            else if (dice[1] == 5) {
+            } else if (dice[1] == 5) {
                 res[1] = 0;
             }
         } else if (m instanceof MoveMain) {
@@ -309,13 +310,13 @@ public class Parcheesi implements Game {
         return dice;
     }
 
-    public void sendHome(Player p, int i){
+    public void sendHome(Player p, int i) {
         //sends ith pawn home, i is its id/location in the arr
         Pawn curr = ((SPlayer) p).getPawns()[i];
-        curr.location=-1;
-        curr.home=true;
-        curr.runway=false;
-        ((SPlayer) p).getPawns()[i]=curr;
+        curr.location = -1;
+        curr.home = true;
+        curr.runway = false;
+        ((SPlayer) p).getPawns()[i] = curr;
         //update this on board as well
         //@TODO
         //sends ith pawn home
@@ -347,14 +348,14 @@ public class Parcheesi implements Game {
                 }
             }
         }
-        sendHome(p,furthestPawn);
+        sendHome(p, furthestPawn);
     }
 
     public void cheat(int i) {
-        for (int j=0;j<4;j++){
-            sendHome(players[i],j);
+        for (int j = 0; j < 4; j++) {
+            sendHome(players[i], j);
         }
-        cheated[i]=true;
+        cheated[i] = true;
         players[i] = null;
     }
 
@@ -385,7 +386,7 @@ public class Parcheesi implements Game {
                 }
             } else {
                 for (int j = 0; j < dice.length; j++) {
-                    MoveMain testMove = new MoveMain(((SPlayer) p).getPawns()[i],dice[j]);
+                    MoveMain testMove = new MoveMain(((SPlayer) p).getPawns()[i], dice[j]);
                     if (!isBlocked(testMove)) {
                         return true;
                     }
@@ -403,29 +404,28 @@ public class Parcheesi implements Game {
      */
     public boolean movedBlockadeTogether(Board board1, Board board2, Move[] moves, Player player) {
         // List of blockades that formed across all moves in a turn
-        Pair<Pair,Pair> blockades = new Pair<>();
+        Pair<Pair, Pair> blockades = new Pair<>();
 
-        for (Pawn p: ((SPlayer) player).getPawns()) {
+        for (Pawn p : ((SPlayer) player).getPawns()) {
             if (board2.isBlockade(p.location)) {
                 if (blockades.first == null) {
                     blockades.first = board2.ring[p.location];
-                }
-                else if (!blockades.first.equals(board1.ring[p.location])) {
+                } else if (!blockades.first.equals(board1.ring[p.location])) {
                     blockades.second = board.ring[p.location];
                 }
             }
         }
 
-        for (Move move: moves) {
+        for (Move move : moves) {
             if (move instanceof MoveMain) {
                 continue;
             }
 
             int startPos = ((MoveMain) move).pawn.location;
             if (board1.isBlockade(startPos)
-                    && board1.ring[startPos].first.color == ((SPlayer)player).getColor()
+                    && board1.ring[startPos].first.color == ((SPlayer) player).getColor()
                     && (blockades.first.equals(board1.ring[startPos])
-                        || blockades.second.equals(board1.ring[startPos]))) {
+                    || blockades.second.equals(board1.ring[startPos]))) {
                 return true;
             }
         }
