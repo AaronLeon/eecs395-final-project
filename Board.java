@@ -1,5 +1,4 @@
 import java.util.HashMap;
-import java.util.LinkedList;
 
 public class Board {
     Pair<Pawn, Pawn>[] ring = new Pair[17 * 4];
@@ -10,6 +9,13 @@ public class Board {
 
     public boolean isBlockade(int pos) {
         return ring[pos].first != null && ring[pos].second != null;
+    }
+
+    public boolean invariant(int pos){
+        if (ring[pos].first!=null && ring[pos].second!=null){
+            return ring[pos].first.color==ring[pos].second.color;
+        }
+        return true;
     }
 
     public Board() {
@@ -42,6 +48,9 @@ public class Board {
         set.first=ring[i].first;
         set.second=ring[i].second;
         ring[i]=new Pair();
+        if(invariant(i)==false){
+            return null;
+        }
         return set;
     }
 
@@ -54,6 +63,11 @@ public class Board {
             ring[location].second = null;
             return true;
         }
+
+        if(invariant(location)==false){
+            return false;
+        }
+
         return false;
 
     }
@@ -69,6 +83,11 @@ public class Board {
         if (clear2 && ring[location].first.color != color) {
             return 0;
         }
+
+        if(invariant(location)==false){
+            return -1;
+        }
+
         return -1;
         //checks if inserting color at loc will bop
     }
@@ -79,6 +98,10 @@ public class Board {
                 return null;
             }
         }
+        if(invariant(location)==false){
+            return null;
+        }
+
         Pawn copy = new Pawn(-1, null);
         if (index == 0) {
             copy.color = ring[location].first.color;
@@ -105,6 +128,11 @@ public class Board {
             ring[location].first.location=location;
             return true;
         }
+
+        if(invariant(location)==false){
+            return false;
+        }
+
         return false;
     }
 

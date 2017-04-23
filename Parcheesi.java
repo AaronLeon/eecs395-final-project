@@ -198,9 +198,16 @@ public class Parcheesi implements Game {
         }
     }
 
+    public boolean startContract(){
+        return registered==4;
+    }
+
     public void start() {
         // registers players
-        int[] dice = rollDice();
+        if(!startContract()){
+            return;
+        }
+
         boolean gameover = false;
         int consecutiveDoubles = 0;
         boolean rolledDouble = false;
@@ -209,7 +216,10 @@ public class Parcheesi implements Game {
             if (players[turn] == null) {
                 continue;
             }
-            SPlayer player = (SPlayer)players[turn];
+
+            int[] dice = rollDice();
+
+            SPlayer player = players[turn];
             //we store a copy of player
             consecutiveDoubles = 0;
 
@@ -247,10 +257,20 @@ public class Parcheesi implements Game {
 
                         Pair<Board, Integer> result = processMoves(board, m);
                         nextBoard = result.first;
+                        int bonus = result.second;
+                        if (bonus>0){
+                            for (int i = 0;i<dice.length;i++){
+                                if (dice[i]==0){
+                                    dice[i]=bonus;
+                                    bonus=0;
+                                }
+                            }
+                        }
                     }
                     if (movedBlockadeTogether(board, nextBoard, moves, players[turn])) {
                         cheat(turn);
                     }
+                    board=nextBoard;
                 }
             }
 
