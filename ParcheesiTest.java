@@ -118,15 +118,24 @@ public class    ParcheesiTest {
      */
     @Test
     public void boppingGivesBonusTest() {
-        Pawn p1 = new Pawn(0, "blue");
-        Pawn p2 = new Pawn(0, "yellow");
+
+        //blue
+        Pawn p1 = game.players[0].getPawns()[0];
+        p1.home=false;
+        p1.location=20;
+        game.players[0].setPawn(0,p1);
+        //yellow
+        Pawn p2 = game.players[1].getPawns()[0];
+        p2.home=false;
+        p2.location=21;
+        game.players[0].setPawn(1,p2);
 
         //need to simulate game progressing
 
-        game.board.ring[0].first = p1;
-        game.board.ring[3].first = p2;
+        game.board.ring[20].first = p1;
+        game.board.ring[21].first = p2;
 
-        MoveMain m1 = new MoveMain(p1, 3);
+        MoveMain m1 = new MoveMain(p1, 1);
         Pair<Board, Integer> result = game.processMoves(m1);
 
         Assert.assertTrue("Bopping earns 20 bonus", result.second == 20);

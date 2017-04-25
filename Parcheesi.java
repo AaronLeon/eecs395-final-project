@@ -130,7 +130,7 @@ public class Parcheesi implements Game {
                 success = success && brd.add(copy.location, color, move.pawn.id);
 
                 if (bopTarget >= 0) {
-                    Pawn boppedCopy = brd.bopTarget(location, bopTarget);
+                    Pawn boppedCopy = brd.bopTarget(copy.location, bopTarget);
                     if (boppedCopy == null) {
                         cheat(turn);
                         return null;

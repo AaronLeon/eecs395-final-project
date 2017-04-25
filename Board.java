@@ -11,16 +11,16 @@ public class Board {
         return ring[pos].first != null && ring[pos].second != null;
     }
 
-    public boolean invariant(int pos){
-        if (ring[pos].first!=null && ring[pos].second!=null){
-            return ring[pos].first.color==ring[pos].second.color;
+    public boolean invariant(int pos) {
+        if (ring[pos].first != null && ring[pos].second != null) {
+            return ring[pos].first.color == ring[pos].second.color;
         }
         return true;
     }
 
     public Board() {
-        for (int i=0;i<17*4;i++){
-            ring[i]=new Pair();
+        for (int i = 0; i < 17 * 4; i++) {
+            ring[i] = new Pair();
         }
         homeLocations.put("blue", 5);
         homeLocations.put("yellow", 22);
@@ -43,12 +43,12 @@ public class Board {
         return ring[i].first != null && ring[i].second != null;
     }
 
-    public Pair<Pawn, Pawn> clearCell(int i){
-        Pair<Pawn, Pawn>set = new Pair();
-        set.first=ring[i].first;
-        set.second=ring[i].second;
-        ring[i]=new Pair();
-        if(invariant(i)==false){
+    public Pair<Pawn, Pawn> clearCell(int i) {
+        Pair<Pawn, Pawn> set = new Pair();
+        set.first = ring[i].first;
+        set.second = ring[i].second;
+        ring[i] = new Pair();
+        if (invariant(i) == false) {
             return null;
         }
         return set;
@@ -56,15 +56,21 @@ public class Board {
 
 
     public boolean remove(int location, String color, int id) {
-        if (ring[location].first.color == color && ring[location].first.id == id) {
+        boolean clear1 = ring[location].first == null;
+        boolean clear2 = ring[location].second == null;
+
+        if (clear1 && clear2) {
+            return false;
+        }
+        if (!clear1 && ring[location].first.color == color && ring[location].first.id == id) {
             ring[location].first = null;
             return true;
-        } else if (ring[location].second.color == color && ring[location].second.id == id) {
+        } else if (!clear2 && ring[location].second.color == color && ring[location].second.id == id) {
             ring[location].second = null;
             return true;
         }
 
-        if(invariant(location)==false){
+        if (invariant(location) == false) {
             return false;
         }
 
@@ -77,7 +83,7 @@ public class Board {
         boolean clear1 = ring[location].first == null;
         boolean clear2 = ring[location].second == null;
 
-        if(clear1&&clear2){
+        if (clear1 && clear2) {
             return -1;
         }
 
@@ -88,7 +94,7 @@ public class Board {
             return 0;
         }
 
-        if(invariant(location)==false){
+        if (invariant(location) == false) {
             return -1;
         }
 
@@ -97,23 +103,26 @@ public class Board {
     }
 
     public Pawn bopTarget(int location, int index) {
-        for(int loc: safeLocations){
-            if(loc==location){
+        for (int loc : safeLocations) {
+            if (loc == location) {
                 return null;
             }
-        }
-        if(invariant(location)==false){
-            return null;
         }
 
         Pawn copy = new Pawn(-1, null);
         if (index == 0) {
             copy.color = ring[location].first.color;
+            copy.id = ring[location].first.id;
             ring[location].first = null;
         } else if (index == 1) {
             copy.color = ring[location].second.color;
+            copy.id = ring[location].second.id;
             ring[location].second = null;
         }
+        if (invariant(location) == false) {
+            return null;
+        }
+
         return copy;
     }
 
@@ -123,17 +132,18 @@ public class Board {
         boolean clear2 = ring[location].second == null;
         if (clear1) {
             ring[location].first = new Pawn(id, color);
-            ring[location].first.home=false;
-            ring[location].first.location=location;
+            ring[location].first.home = false;
+            ring[location].first.location = location;
             return true;
         } else if (clear2) {
-            ring[location].second = new Pawn(id, color);;
-            ring[location].first.home=false;
-            ring[location].first.location=location;
+            ring[location].second = new Pawn(id, color);
+            ;
+            ring[location].first.home = false;
+            ring[location].first.location = location;
             return true;
         }
 
-        if(invariant(location)==false){
+        if (invariant(location) == false) {
             return false;
         }
 
@@ -151,11 +161,10 @@ public class Board {
             this.color = color;
             pieces = 0;
 
-            for (int i=0;i<6;i++){
-                runway[i]=new Pair();
+            for (int i = 0; i < 6; i++) {
+                runway[i] = new Pair();
             }
         }
-
 
 
         public boolean remove(int location, String color, int id) {
