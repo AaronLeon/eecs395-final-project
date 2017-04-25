@@ -143,34 +143,47 @@ public class    ParcheesiTest {
 
     @Test
     public void enterPieceCanBopTest() {
-        Parcheesi game = new Parcheesi();
-        Pawn p1 = new Pawn(0, "red");
-        Pawn p2 = new Pawn(0, "green");
+        //blue
+        Pawn p1 = game.players[0].getPawns()[0];
+        p1.home=false;
+        p1.location=22;
+        game.players[0].setPawn(0,p1);
+        //yellow
+        Pawn p2 = game.players[1].getPawns()[0];
 
-        game.board.ring[39].first = p1;
+
+        game.board.ring[22].first = p1;
 
         EnterPiece m1 = new EnterPiece(p2);
         Pair<Board, Integer> result = game.processMoves(m1);
 
-        Assert.assertFalse("Bopped piece should be removed", result.first.ring[3].first.equals(p1));
-        Assert.assertTrue("Moving piece should replace bopped piece", result.first.ring[3].first.equals(p2));
+        Assert.assertTrue("Bopped piece should be removed", game.players[0].getPawns()[0].home=true);
+        Assert.assertTrue("Moving piece should replace bopped piece", result.first.ring[22].second.color=="yellow");
     }
 
     @Test
     public void cannotBopOnSafetyTest() {
-        Parcheesi game = new Parcheesi();
-        Pawn p1 = new Pawn(0, "red");
-        Pawn p2 = new Pawn(0, "green");
+        Pawn p1 = game.players[0].getPawns()[0];
+        p1.home=false;
+        p1.location=19;
+        game.players[0].setPawn(0,p1);
+        //yellow
+        Pawn p2 = game.players[1].getPawns()[0];
+        p2.home=false;
+        p2.location=20;
+        game.players[0].setPawn(1,p2);
 
-        game.board.ring[3].first = p1;
+        //need to simulate game progressing
 
-        EnterPiece m1 = new EnterPiece(p2);
+        game.board.ring[20].first = p1;
+        game.board.ring[21].first = p2;
+
+        MoveMain m1 = new MoveMain(p1, 1);
         Pair<Board, Integer> result = game.processMoves(m1);
 
-        Assert.assertFalse("Piece should not be removed on safety", result.first.ring[3].first.equals(p1));
-        Assert.assertTrue("Moving piece should not replace piece at destination", result.first.ring[3].first.equals(p2));
-        // Check if cheated
-        Assert.assertNull("Bopping safety should return null (e.g. cheat)", result);
+        Assert.assertTrue("Piece should not be removed on safety", result.first.ring[21].first!=null);
+        Assert.assertTrue("cheater removed from game", result.first.ring[20].first==null);
+        Assert.assertTrue("Bopping safety should return null (e.g. cheat)", game.cheated[0]);
     }
 
     @Test

@@ -61,7 +61,7 @@ public class Parcheesi implements Game {
         EnterPiece move = (EnterPiece) m;
         if (move.pawn.home == false) {
             cheat(turn);
-            return null;
+            return new Pair(board, 0);
         } else {
             if (brd.blocked(brd.homeLocations.get(color))) {
                 Pair<Pawn, Pawn> gotBopped = brd.clearCell(brd.homeLocations.get(color));
@@ -117,7 +117,7 @@ public class Parcheesi implements Game {
                 players[turn].setPawn(copy.id, copy);
                 if (!success) {
                     cheat(turn);
-                    return null;
+                    return new Pair(board, 0);
                 }
                 return processMoves(newMove);
             } else {
@@ -133,7 +133,7 @@ public class Parcheesi implements Game {
                     Pawn boppedCopy = brd.bopTarget(copy.location, bopTarget);
                     if (boppedCopy == null) {
                         cheat(turn);
-                        return null;
+                        return new Pair(board, 0);
                     }
                     boppedCopy.home = true;
                     boppedCopy.location = -1;
@@ -144,13 +144,13 @@ public class Parcheesi implements Game {
                     }
                     if (!success) {
                         cheat(turn);
-                        return null;
+                        return new Pair(board, 0);
                     }
                     return new Pair(brd, 20);
                 }
                 if (!success) {
                     cheat(turn);
-                    return null;
+                    return new Pair(board, 0);
                 }
                 //brd.add bops
             }
@@ -162,15 +162,15 @@ public class Parcheesi implements Game {
         MoveHome move = (MoveHome) m;
         if (move.pawn.runway == false || (move.distance + move.pawn.location > 7)) {
             cheat(turn);
-            return null;
+            return new Pair(board, 0);
         } else {
             int destination = move.distance + move.pawn.location;
             brd.runways.get(colors[turn]).remove(move.pawn.location, move.pawn.color, move.pawn.id);
             brd.runways.get(colors[turn]).add(destination, move.pawn.color, move.pawn.id);
             Pawn moved = new Pawn(move.pawn.id, move.pawn.color);
-            moved.home=false;
-            moved.runway=true;
-            moved.location=destination;
+            moved.home = false;
+            moved.runway = true;
+            moved.location = destination;
             players[turn].setPawn(moved.id, moved);
             if (destination == 7) {
                 return new Pair(brd, 10);
@@ -183,7 +183,7 @@ public class Parcheesi implements Game {
 
     public Pair<Board, Integer> processMoves(Move m) {
         boolean success = true;
-        Pair<Board,Integer> retV= new Pair<Board,Integer>();
+        Pair<Board, Integer> retV = new Pair<Board, Integer>();
         if (m instanceof MoveMain) {
             retV = processMoveMain(board, m);
         } else if (m instanceof EnterPiece) {
@@ -191,7 +191,10 @@ public class Parcheesi implements Game {
         } else if (m instanceof MoveHome) {
             retV = processMoveHome(board, m);
         }
-        board=retV.first;
+        if (retV == null) {
+            return new Pair(board, 0);
+        }
+        board = retV.first;
         //should never be called
         return new Pair(board, retV.second);
     }
@@ -204,13 +207,13 @@ public class Parcheesi implements Game {
         }
     }
 
-    public boolean startContract(){
-        return registered==4;
+    public boolean startContract() {
+        return registered == 4;
     }
 
     public void start() {
         // registers players
-        if(!startContract()){
+        if (!startContract()) {
             return;
         }
 
@@ -264,11 +267,11 @@ public class Parcheesi implements Game {
                         Pair<Board, Integer> result = processMoves(m);
                         nextBoard = result.first;
                         int bonus = result.second;
-                        if (bonus>0){
-                            for (int i = 0;i<dice.length;i++){
-                                if (dice[i]==0){
-                                    dice[i]=bonus;
-                                    bonus=0;
+                        if (bonus > 0) {
+                            for (int i = 0; i < dice.length; i++) {
+                                if (dice[i] == 0) {
+                                    dice[i] = bonus;
+                                    bonus = 0;
                                 }
                             }
                         }
@@ -276,7 +279,7 @@ public class Parcheesi implements Game {
                     if (movedBlockadeTogether(board, nextBoard, moves, players[turn])) {
                         cheat(turn);
                     }
-                    board=nextBoard;
+                    board = nextBoard;
                 }
             }
 
@@ -317,10 +320,12 @@ public class Parcheesi implements Game {
     public void sendHome(Player p, int i) {
         //sends ith pawn home, i is its id/location in the arr
         Pawn curr = ((SPlayer) p).getPawns()[i];
-        curr.location = -1;
-        curr.home = true;
-        curr.runway = false;
-        ((SPlayer) p).getPawns()[i] = curr;
+        if (curr.location >= 0) {
+            board.remove(curr.location, curr.color, curr.id);
+            curr.location = -1;
+            curr.home = true;
+            curr.runway = false;
+        }
         //update this on board as well
         //@TODO
         //sends ith pawn home
