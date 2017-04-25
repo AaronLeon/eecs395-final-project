@@ -10,14 +10,20 @@ public class Parcheesi implements Game {
     int registered = 0;
     SPlayer[] players = new SPlayer[4];
     String[] colors = {"blue", "yellow", "green", "red"};
+
     int turn = 0;
-    boolean[] cheated = {false, false, false, false};
 
     public Parcheesi() {
         board = new Board();
     }
-
     // For a given move, checks if move runs into blockade
+
+    /**
+     * Checks if a move is Blockaded
+     *
+     * @param m Move that is being checked
+     * @return true if the move is blockaded, false otherwise
+     */
     public boolean isBlocked(MoveMain m) {
         String color = m.pawn.color;
         int home_loc = board.homeLocations.get(color);
@@ -35,6 +41,11 @@ public class Parcheesi implements Game {
         return false;
     }
 
+    /**
+     * Rolls the dice
+     *
+     * @return an array of values for the dice roll
+     */
     private int[] rollDice() {
         int[] dice = new int[4];
         for (int i = 0; i < 2; i++) {
@@ -52,148 +63,170 @@ public class Parcheesi implements Game {
         return dice;
     }
 
-    // Changes board state with provided move.
-    // Returns bonus dice roll. 0 if no bonus dice
-
-    public Pair<Board, Integer> processEnterPiece(Board brd, Move m) {
+    /**
+     * Processes an EnterPiece move given a starting board state
+     *
+     * @param m   EnterPiece move to be processed
+     * @return a pair containing the new board state after the piece has entered the board and, optionally, a bonus
+     * for bopping
+     */
+    public Pair<Board, Integer> processEnterPiece(Move m) {
         boolean bopped = false;
         String color = colors[turn];
         EnterPiece move = (EnterPiece) m;
-        if (move.pawn.home == false) {
+        if (!move.pawn.home) {
             cheat(turn);
             return null;
-        } else {
-            if (brd.blocked(brd.homeLocations.get(color))) {
-                Pair<Pawn, Pawn> gotBopped = brd.clearCell(brd.homeLocations.get(color));
-                if (gotBopped.first != null) {
-                    bopped = true;
-                    for (int i = 0; i < 4; i++) {
-                        if (gotBopped.first.color == colors[i]) {
-                            gotBopped.first.home = true;
-                            gotBopped.first.location = -1;
-                            players[i].setPawn(gotBopped.first.id, gotBopped.first);
-                        }
-                    }
-                }
-                if (gotBopped.second != null) {
-                    bopped = true;
-                    for (int i = 0; i < 4; i++) {
-                        if (gotBopped.second.color == colors[i]) {
-                            gotBopped.second.home = true;
-                            gotBopped.second.location = -1;
-                            players[i].setPawn(gotBopped.second.id, gotBopped.second);
-                        }
-                    }
-                }
-            }
-            Pawn copy = move.pawn;
-            copy.home = false;
-            copy.location = brd.homeLocations.get(copy.color);
-            players[turn].setPawn(copy.id, copy);
-            brd.add(copy.location, copy.color, copy.id);
-            if (bopped) {
-                return new Pair(brd, 20);
-            }
-            return new Pair(brd, 0);
         }
+        if (board.blocked(board.homeLocations.get(color))) {
+            Pair<Pawn, Pawn> gotBopped = board.clearCell(board.homeLocations.get(color));
+            if (gotBopped.first != null) {
+                bopped = true;
+                for (int i = 0; i < 4; i++) {
+                    if (gotBopped.first.color == colors[i]) {
+                        gotBopped.first.home = true;
+                        gotBopped.first.location = -1;
+                        players[i].setPawn(gotBopped.first.id, gotBopped.first);
+                    }
+                }
+            }
+            if (gotBopped.second != null) {
+                bopped = true;
+                for (int i = 0; i < 4; i++) {
+                    if (gotBopped.second.color == colors[i]) {
+                        gotBopped.second.home = true;
+                        gotBopped.second.location = -1;
+                        players[i].setPawn(gotBopped.second.id, gotBopped.second);
+                    }
+                }
+            }
+        }
+        Pawn copy = move.pawn;
+        copy.home = false;
+        copy.location = board.homeLocations.get(copy.color);
+        players[turn].setPawn(copy.id, copy);
+        board.add(copy.location, copy.color, copy.id);
+        if (bopped) {
+            return new Pair<>(board, 20);
+        }
+        return new Pair<>(board, 0);
     }
 
-    public Pair<Board, Integer> processMoveMain(Board brd, Move m) {
+    /**
+     * Processes a MoveMain move given a starting board state
+     *
+     * @param m   MoveMain move to be processed
+     * @return a pair containing the board state after the MoveMain move has taken place and, optionally,
+     * a bonus for bopping or entering home
+     */
+    public Pair<Board, Integer> processMoveMain(Move m) {
         boolean success = true;
         int bopTarget;
         int location;
         MoveMain move = (MoveMain) m;
         String color = move.pawn.color;
-        if (!isBlocked(move)) {
-            location = move.pawn.location;
-            if (location + move.distance > brd.runwayLocations.get(color) && location + move.distance < brd.homeLocations.get(color)) {
-                Pawn copy = move.pawn;
-                copy.location = 0;
-                copy.runway = true;
-                success = success && brd.remove(location, color, move.pawn.id);
-                int distance = location + move.distance - brd.runwayLocations.get(color) - 1;
-                success = success && brd.runways.get(color).add(0, color, copy.id);
-                MoveHome newMove = new MoveHome(copy, copy.location, distance);
-                players[turn].setPawn(copy.id, copy);
-                if (!success) {
-                    cheat(turn);
-                    return null;
-                }
-                return processMoves(newMove);
-            } else {
-                Pawn copy = move.pawn;
-                copy.location = location + move.distance;
-                players[turn].setPawn(move.pawn.id, copy);
-
-                success = success && brd.remove(location, color, move.pawn.id);
-                bopTarget = brd.bopLoc(location + move.distance, color);
-                success = success && brd.add(copy.location, color, move.pawn.id);
-
-                if (bopTarget >= 0) {
-                    Pawn boppedCopy = brd.bopTarget(location, bopTarget);
-                    if (boppedCopy == null) {
-                        cheat(turn);
-                        return null;
-                    }
-                    boppedCopy.home = true;
-                    boppedCopy.location = -1;
-                    for (int i = 0; i < 4; i++) {
-                        if (boppedCopy.color == colors[i]) {
-                            players[i].setPawn(boppedCopy.id, boppedCopy);
-                        }
-                    }
-                    if (!success) {
-                        cheat(turn);
-                        return null;
-                    }
-                    return new Pair(brd, 20);
-                }
-                if (!success) {
-                    cheat(turn);
-                    return null;
-                }
-                //brd.add bops
-            }
-        }
-        return new Pair(brd, 0);
-    }
-
-    public Pair<Board, Integer> processMoveHome(Board brd, Move m) {
-        MoveHome move = (MoveHome) m;
-        if (move.pawn.runway == false || (move.distance + move.pawn.location > 7)) {
+        if (isBlocked(move)) {
             cheat(turn);
             return null;
-        } else {
-            int destination = move.distance + move.pawn.location;
-            brd.runways.get(colors[turn]).remove(move.pawn.location, move.pawn.color, move.pawn.id);
-            brd.runways.get(colors[turn]).add(destination, move.pawn.color, move.pawn.id);
-            Pawn moved = new Pawn(move.pawn.id, move.pawn.color);
-            moved.home=false;
-            moved.runway=true;
-            moved.location=destination;
-            players[turn].setPawn(moved.id, moved);
-            if (destination == 7) {
-                return new Pair(brd, 10);
-            } else {
-                return new Pair(brd, 0);
+        }
+        location = move.pawn.location;
+        if (location + move.distance > board.runwayLocations.get(color) && location + move.distance < board.homeLocations.get(color)) {
+            Pawn copy = move.pawn;
+            copy.location = 0;
+            copy.runway = true;
+            success = success && board.remove(location, color, move.pawn.id);
+            int distance = location + move.distance - board.runwayLocations.get(color) - 1;
+            success = success && board.runways.get(color).add(0, color, copy.id);
+            MoveHome newMove = new MoveHome(copy, copy.location, distance);
+            players[turn].setPawn(copy.id, copy);
+            if (!success) {
+                cheat(turn);
+                return null;
             }
+            return processMoves(newMove);
+        } else {
+            Pawn copy = move.pawn;
+            copy.location = location + move.distance;
+            players[turn].setPawn(move.pawn.id, copy);
+
+            success = success && board.remove(location, color, move.pawn.id);
+            bopTarget = board.bopLoc(location + move.distance, color);
+            success = success && board.add(copy.location, color, move.pawn.id);
+
+            if (bopTarget >= 0) {
+                Pawn boppedCopy = board.bopTarget(location, bopTarget);
+                if (boppedCopy == null) {
+                    cheat(turn);
+                    return null;
+                }
+                boppedCopy.home = true;
+                boppedCopy.location = -1;
+                for (int i = 0; i < 4; i++) {
+                    if (boppedCopy.color == colors[i]) {
+                        players[i].setPawn(boppedCopy.id, boppedCopy);
+                    }
+                }
+                if (!success) {
+                    cheat(turn);
+                    return null;
+                }
+                return new Pair<>(board, 20);
+            }
+            if (!success) {
+                cheat(turn);
+                return null;
+            }
+            //brd.add bops
+            return new Pair<>(board, 0);
         }
     }
 
-
-    public Pair<Board, Integer> processMoves(Move m) {
-        boolean success = true;
-        Pair<Board,Integer> retV= new Pair<Board,Integer>();
-        if (m instanceof MoveMain) {
-            retV = processMoveMain(board, m);
-        } else if (m instanceof EnterPiece) {
-            retV = processEnterPiece(board, m);
-        } else if (m instanceof MoveHome) {
-            retV = processMoveHome(board, m);
+    /**
+     * Processes a MoveHome move given a starting board state
+     *
+     * @param m   MoveHome move to be processed
+     * @return a pair containing the board state after the MoveHome move has taken place and, optionally, entering home
+     */
+    public Pair<Board, Integer> processMoveHome(Move m) {
+        MoveHome move = (MoveHome) m;
+        if (!move.pawn.runway || (move.distance + move.pawn.location > 7)) {
+            cheat(turn);
+            return null;
         }
-        board=retV.first;
+        int destination = move.distance + move.pawn.location;
+        board.runways.get(colors[turn]).remove(move.pawn.location, move.pawn.color, move.pawn.id);
+        board.runways.get(colors[turn]).add(destination, move.pawn.color, move.pawn.id);
+        Pawn moved = new Pawn(move.pawn.id, move.pawn.color);
+        moved.home=false;
+        moved.runway=true;
+        moved.location=destination;
+        players[turn].setPawn(moved.id, moved);
+        int bonus = destination == 7
+                ? 10
+                : 0;
+        return new Pair<>(board, bonus);
+    }
+
+    /**
+     * Processes a move given a starting board state
+     *
+     * @param m   move to be processed
+     * @return a pair containing the new board state after the move takes place and, optionally, a bonus roll from
+     * moving home or bopping
+     */
+    public Pair<Board, Integer> processMoves(Move m) {
+//        boolean success = true;
+        Pair<Board,Integer> res= new Pair<Board,Integer>();
+        if (m instanceof MoveMain) {
+            res = processMoveMain(m);
+        } else if (m instanceof EnterPiece) {
+            res = processEnterPiece(m);
+        } else if (m instanceof MoveHome) {
+            res = processMoveHome(m);
+        }
+        board=res.first;
         //should never be called
-        return new Pair(board, retV.second);
+        return new Pair(board, res.second);
     }
 
     public void register(Player p) {
@@ -204,13 +237,17 @@ public class Parcheesi implements Game {
         }
     }
 
-    public boolean startContract(){
-        return registered==4;
+    /**
+     * Enforces the contract that players must be registered before the game is started
+     * @return
+     */
+    public boolean registeredPlayersBeforeStart() {
+        return registered == 4;
     }
 
     public void start() {
         // registers players
-        if(!startContract()){
+        if (!registeredPlayersBeforeStart()) {
             return;
         }
 
@@ -218,6 +255,7 @@ public class Parcheesi implements Game {
         int consecutiveDoubles = 0;
         boolean rolledDouble = false;
         boolean doubleTurn = false;
+
         while (!gameover) {
             if (players[turn] == null) {
                 continue;
@@ -231,8 +269,6 @@ public class Parcheesi implements Game {
 
             if (dice[0] == dice[1] && player.allOut()) {
                 //we need to check if everything is out of the board for the player
-
-                doubleTurn = true;
                 consecutiveDoubles++;
             }
 
@@ -245,14 +281,11 @@ public class Parcheesi implements Game {
                     if (rolledDouble) {
                         dice = rollDice();
                         if (dice[0] == dice[1]) {
-                            doubleTurn = true;
                             consecutiveDoubles++;
                         } else {
-                            doubleTurn = false;
                             consecutiveDoubles = 0;
                         }
                     }
-                    continue;
                 } else {
                     Move[] moves = player.doMove(board, dice);
                     //doMove only returns one move
@@ -264,11 +297,11 @@ public class Parcheesi implements Game {
                         Pair<Board, Integer> result = processMoves(m);
                         nextBoard = result.first;
                         int bonus = result.second;
-                        if (bonus>0){
-                            for (int i = 0;i<dice.length;i++){
-                                if (dice[i]==0){
-                                    dice[i]=bonus;
-                                    bonus=0;
+                        if (bonus > 0) {
+                            for (int i = 0; i < dice.length; i++) {
+                                if (dice[i] == 0) {
+                                    dice[i] = bonus;
+                                    bonus = 0;
                                 }
                             }
                         }
@@ -276,7 +309,7 @@ public class Parcheesi implements Game {
                     if (movedBlockadeTogether(board, nextBoard, moves, players[turn])) {
                         cheat(turn);
                     }
-                    board=nextBoard;
+                    board = nextBoard;
                 }
             }
 
@@ -284,12 +317,19 @@ public class Parcheesi implements Game {
         }
     }
 
+
+    /**
+     * Consumes dice roll with respect to the given move.
+     * @param dice An int array that holds the values of the dice roll
+     * @param m Move that uses dice roll
+     * @return The dice array once the given move has consumed its respective dice roll.
+     */
     public int[] consumeDice(int[] dice, Move m) {
         int[] res = dice;
 
         if (m instanceof EnterPiece) {
             if (dice[0] + dice[1] == 5) {
-                dice[0] = dice[1] = 0;
+                res[0] = res[1] = 0;
             } else if (dice[0] == 5) {
                 res[0] = 0;
             } else if (dice[1] == 5) {
@@ -311,7 +351,7 @@ public class Parcheesi implements Game {
             }
         }
 
-        return dice;
+        return res;
     }
 
     public void sendHome(Player p, int i) {
@@ -322,8 +362,6 @@ public class Parcheesi implements Game {
         curr.runway = false;
         ((SPlayer) p).getPawns()[i] = curr;
         //update this on board as well
-        //@TODO
-        //sends ith pawn home
     }
 
     public void doublesPenalty(Player p) {
@@ -359,7 +397,6 @@ public class Parcheesi implements Game {
         for (int j = 0; j < 4; j++) {
             sendHome(players[i], j);
         }
-        cheated[i] = true;
         players[i] = null;
     }
 
@@ -403,12 +440,20 @@ public class Parcheesi implements Game {
     }
 
     /*
-     * Checks to see if any blockades have moved together by comparing
-     * board states from before and after a set of moves
+     *
+     */
+
+    /**
+     * Checks to see if any blockades have moved together by comparing board states from before and after a set of moves
+     * @param board1 Starting board state
+     * @param board2 Ending board state
+     * @param moves Array of history of moves that occurred between board states
+     * @param player Player that moved
+     * @return true if player moved a blockade together and false otherwise
      */
     public boolean movedBlockadeTogether(Board board1, Board board2, Move[] moves, Player player) {
         // List of blockades that formed across all moves in a turn
-        Pair<Pair, Pair> blockades = new Pair<>();
+        Pair<Pair<Pawn, Pawn>, Pair<Pawn, Pawn>> blockades = new Pair<>();
 
         for (Pawn p : ((SPlayer) player).getPawns()) {
             if (board2.isBlockade(p.location)) {
@@ -437,8 +482,8 @@ public class Parcheesi implements Game {
     }
 
     public boolean allDiceUsed(int[] dice) {
-        for (int i = 0; i < dice.length; i++) {
-            if (dice[i] != 0) {
+        for (int val : dice) {
+            if (val != 0) {
                 return false;
             }
         }
