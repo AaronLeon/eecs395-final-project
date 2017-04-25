@@ -170,7 +170,7 @@ public class Board {
         }
 
         public boolean add(int location, String color, int id) {
-            if (location == 7) {
+            if (location == 6) {
                 for (int i = 0; i < 4; i++) {
                     if (endZone[i] == null) {
                         endZone[i] = new Pawn(id, color);

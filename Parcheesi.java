@@ -168,6 +168,9 @@ public class Parcheesi implements Game {
             brd.runways.get(colors[turn]).remove(move.pawn.location, move.pawn.color, move.pawn.id);
             brd.runways.get(colors[turn]).add(destination, move.pawn.color, move.pawn.id);
             Pawn moved = new Pawn(move.pawn.id, move.pawn.color);
+            moved.home=false;
+            moved.runway=true;
+            moved.location=destination;
             players[turn].setPawn(moved.id, moved);
             if (destination == 7) {
                 return new Pair(brd, 10);
