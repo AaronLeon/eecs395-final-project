@@ -1,18 +1,10 @@
 public class SPlayer implements Player {
-    private String color;
-    private Pawn[] pawns = new Pawn[4];
-    private int[] dice = new int[4];
+    String color;
+    Pawn[] pawns = new Pawn[4];
+    int[] dice = new int[4];
 
     public SPlayer(String c) {
         startGame(c);
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public Pawn[] getPawns() {
-        return pawns;
     }
 
     public void startGame(String newColor) {
@@ -40,7 +32,7 @@ public class SPlayer implements Player {
 
     public boolean allOut() {
         for (int i = 0; i < pawns.length; i++) {
-            if (pawns[i].home == true) {
+            if (pawns[i].bc == Board.BoardComponent.NEST) {
                 return false;
             }
         }
@@ -52,7 +44,7 @@ public class SPlayer implements Player {
     }
 
     public EnterPiece tryEnterPiece(int i) {
-        if (pawns[i].home == false) {
+        if (pawns[i].bc != Board.BoardComponent.NEST) {
             return null;
         }
         if (dice[0] + dice[1] == 5) {

@@ -81,19 +81,19 @@ public class    ParcheesiTest {
         p1.runway=true;
         p1.home=false;
         p1.location=2;
-        game.board.runways.get("blue").runway[2].first = p1;
+        game.board.homerows.get("blue").runway[2].first = p1;
         game.players[0].setPawn(0,p1);
         MoveHome m1 = new MoveHome(p1, 2, 2);
 
         Pair<Board, Integer> result = game.processMoves(m1);
 
-        Assert.assertTrue("Pawn should move 4 spaces in runway", result.first.runways.get("blue").runway[4].first!=null);
-        Assert.assertFalse("Pawn should not be in original space in runway", result.first.runways.get("blue").runway[2]==null);
+        Assert.assertTrue("Pawn should move 4 spaces in runway", result.first.homerows.get("blue").runway[4].first!=null);
+        Assert.assertFalse("Pawn should not be in original space in runway", result.first.homerows.get("blue").runway[2]==null);
 
         MoveHome m2 = new MoveHome(game.players[0].getPawns()[0], 4, 2);
         result = game.processMoves(m2);
 
-        Assert.assertTrue("Pawn should move 2 spaces in runway", result.first.runways.get("blue").endZone[1]!=null);
+        Assert.assertTrue("Pawn should move 2 spaces in runway", result.first.homerows.get("blue").endZone[1]!=null);
     }
 
     /*
@@ -305,9 +305,9 @@ public class    ParcheesiTest {
         Pawn blockade2 = new Pawn(1, "red");
         Pawn p1 = new Pawn(0, "red");
 
-        game.board.runways.get("red").runway[2].first = blockade1;
-        game.board.runways.get("red").runway[2].second = blockade2;
-        game.board.runways.get("red").runway[0].first = p1;
+        game.board.homerows.get("red").runway[2].first = blockade1;
+        game.board.homerows.get("red").runway[2].second = blockade2;
+        game.board.homerows.get("red").runway[0].first = p1;
 
         MoveMain m1 = new MoveMain(p1, 4);
         Pair<Board, Integer> result = game.processMoves(m1);
@@ -407,7 +407,7 @@ public class    ParcheesiTest {
         MoveMain m1 = new MoveMain(p1, 5);
         Pair<Board, Integer> result = game.processMoves(m1);
 
-        Assert.assertEquals("Pawn can move from ring into home row", result.first.runways.get("green").runway[2], p1);
+        Assert.assertEquals("Pawn can move from ring into home row", result.first.homerows.get("green").runway[2], p1);
     }
 
     @Test
@@ -421,7 +421,7 @@ public class    ParcheesiTest {
         Pair<Board, Integer> result = game.processMoves(m1);
 
         // TODO: Check pawn is in endzone
-//        Assert.assertEquals("Pawn can move from ring into home row", result.first.runways.get("green").runway[2], p1);
+//        Assert.assertEquals("Pawn can move from ring into home row", result.first.homerows.get("green").runway[2], p1);
     }
 
     /*
@@ -526,7 +526,7 @@ public class    ParcheesiTest {
 
 
 
-        game.board.runways.get("red").runway[0].first = p1;
+        game.board.homerows.get("red").runway[0].first = p1;
         game.board.ring[3].first = p2;
         game.board.ring[5].first = blockade1;
         game.board.ring[5].second = blockade2;
