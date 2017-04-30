@@ -3,7 +3,6 @@
  * The Parcheesi class represents the game engine
  */
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import static java.util.Arrays.sort;
@@ -24,6 +23,7 @@ public class Parcheesi implements Game {
      * @param m Move that is being checked
      * @return true if the move is blockaded, false otherwise
      */
+    //TODO: Check if MoveHome is blocked
     public boolean isBlocked(MoveMain m) {
         Pawn pawn = m.pawn;
         int nestLocation = Board.NEST_LOCATIONS.get(pawn.color);
@@ -52,15 +52,13 @@ public class Parcheesi implements Game {
      */
     private Pair<int[], Boolean> rollDice(Player p) {
         int[] dice = new int[4];
-        boolean doubles = false;
-        boolean doublesBonus = false;
 
         for (int i = 0; i < 2; i++) {
             dice[i] = (int) (Math.random() * 6) + 1;
         }
 
-        doubles = dice[0] == dice[1];
-        doublesBonus = doubles && ((SPlayer) p).allOut();
+        boolean doubles = dice[0] == dice[1];
+        boolean doublesBonus = doubles && canEarnDoubleBonus(p);
 
         dice[2] = dice[3] = doublesBonus
             ? 7 - dice[0]
@@ -82,7 +80,7 @@ public class Parcheesi implements Game {
         Pawn pawn = move.pawn;
         int nestLocation = Board.NEST_LOCATIONS.get(pawn.color);
 
-        if (pawn.bc != Board.BoardComponent.HOME
+        if (pawn.bc != Board.BoardComponent.NEST
                 || board.isBlockade(Board.BoardComponent.RING, nestLocation, null)) {
             cheat(pawn.color);
             return null;
@@ -107,8 +105,6 @@ public class Parcheesi implements Game {
      * a bonus for bopping or entering home
      */
     public Pair<Board, Integer> processMoveMain(Move m) {
-//        boolean success = true;
-//        int bopTarget;
         MoveMain move = (MoveMain) m;
         Pawn pawn = move.pawn;
         if (pawn.bc != Board.BoardComponent.RING || isBlocked(move)) {
@@ -138,10 +134,14 @@ public class Parcheesi implements Game {
 
         Object bopped = board.get(bc, location, pawn.color);
         if (bopped instanceof Pawn && !((Pawn) bopped).color.equals(pawn.color)) {
+            if (board.isSafe(location)) {
+                cheat(pawn.color);
+                return null;
+            }
             board.sendBackToNest((Pawn) bopped);
             bonus = 20;
         }
-        board.movePawnHome(pawn);
+        board.movePawnRing(pawn, move.distance);
         return new Pair<>(board, bonus);
     }
 
@@ -195,7 +195,7 @@ public class Parcheesi implements Game {
 
     /**
      * Enforces the contract that players must be registered before the game is started
-     * @return
+     * @return true if four players have been registered and false otherwise
      */
     public boolean registeredPlayersBeforeStart() {
         return players.size() == 4;
@@ -310,9 +310,7 @@ public class Parcheesi implements Game {
     }
 
     public void doublesPenalty(Player p) {
-        SPlayer player = (SPlayer) p;
         String color = ((SPlayer) p).color;
-        int nestLocation = Board.NEST_LOCATIONS.get(color);
         int homeRowLocation = Board.HOMEROW_LOCATIONS.get(color);
         Pawn furthest = null;
         for (int i = Board.HOMEROW_SIZE-1; i >= 0; i++) {
@@ -389,20 +387,20 @@ public class Parcheesi implements Game {
         //iterate over pawns in player p,
         SPlayer player = (SPlayer) p;
         Pawn[] pawns = board.pawns.get(player.color);
-        for (int i = 0; i < 4; i++) {
-            if ((pawns[i].bc == Board.BoardComponent.NEST)) {
+        for (Pawn pawn: pawns) {
+            if ((pawn.bc == Board.BoardComponent.NEST)) {
                 return canEnter(dice);
                 //check if integers in dice can sum to 5
-            } else if (pawns[i].bc == Board.BoardComponent.HOMEROW) {
-                //TODO: Make isBlocked accepted MoveHome as well
-                for (int j = 0; j < dice.length; j++) {
-                    if (board.homeRows.get(player.color)[i] instanceof Blockade) {
+            } else if (pawn.bc == Board.BoardComponent.HOMEROW) {
+                //TODO: Make isBlocked accepted MoveHome as well..this doesn't check all squares for blockades
+                for (int d : dice) {
+                    if (board.homeRows.get(player.color)[pawn.location + d] instanceof Blockade) {
                         return false;
                     }
                 }
             } else {
-                for (int j = 0; j < dice.length; j++) {
-                    MoveMain testMove = new MoveMain(pawns[i], dice[j]);
+                for (int d : dice) {
+                    MoveMain testMove = new MoveMain(pawn, d);
                     if (!isBlocked(testMove)) {
                         return true;
                     }
@@ -459,6 +457,16 @@ public class Parcheesi implements Game {
     public boolean allDiceUsed(int[] dice) {
         for (int val : dice) {
             if (val != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean canEarnDoubleBonus(Player p) {
+        SPlayer player = (SPlayer) p;
+        for (Pawn pawn : board.pawns.get(player.color)) {
+            if (pawn.bc == Board.BoardComponent.NEST) {
                 return false;
             }
         }
