@@ -117,7 +117,10 @@ public class Parcheesi implements Game {
         int location = pawn.location;
         int distance = move.distance;
         int bonus = 0;
-        while (distance >= 0) {
+        while (distance > 0) {
+            ++location;
+            --distance;
+
             if (location > homeRowLocation) {
                 bc = Board.BoardComponent.HOMEROW;
                 location = 0;
@@ -127,9 +130,6 @@ public class Parcheesi implements Game {
                 cheat(pawn.color);
                 return null;
             }
-
-            location++;
-            distance--;
         }
 
         Object bopped = board.get(bc, location, pawn.color);
@@ -181,7 +181,7 @@ public class Parcheesi implements Game {
         } else if (m instanceof MoveHome) {
             res = processMoveHome(m);
         }
-        this.board = res.first;
+//        this.board = res.first;
         return res;
     }
 
@@ -340,28 +340,6 @@ public class Parcheesi implements Game {
         if (furthest != null){
             board.sendBackToNest(furthest);
         }
-
-//        for (int i = 0; i < 4; i++) {
-//            Pawn curr = ((SPlayer) p).getPawns()[i];
-//
-//            if (!curr.home && !curr.runway) {
-//                //piece not at home
-//                dist = curr.location - nestLocation;
-//                if (curr.location > nestLocation) {
-//                    if (dist > furthestDistance) {
-//                        furthestDistance = dist;
-//                        furthestPawn = i;
-//                    }
-//                } else {
-//                    dist = 68 - dist;
-//                    if (dist > furthestDistance) {
-//                        furthestDistance = dist;
-//                        furthestPawn = i;
-//                    }
-//                }
-//            }
-//        }
-//        sendHome(p, furthestPawn);
     }
 
     public void cheat(String color) {

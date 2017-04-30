@@ -1,12 +1,9 @@
+import com.sun.tools.internal.xjc.reader.Ring;
 import com.sun.tools.javac.comp.Enter;
 import org.junit.*;
 
 public class ParcheesiTest {
     Parcheesi game;
-    SPlayer player1;
-    SPlayer player2;
-    SPlayer player3;
-    SPlayer player4;
 
     @BeforeClass
     public static void beforeClass() {
@@ -39,6 +36,7 @@ public class ParcheesiTest {
             Pawn pawn = game.board.pawns.get(color)[0];
             EnterPiece m = new EnterPiece(pawn);
             game.board = (game.processMoves(m)).first;
+
             Assert.assertTrue(((Pawn) game.board.ring[nestLocation]).equals(pawn));
         }
     }
@@ -50,6 +48,7 @@ public class ParcheesiTest {
         Pawn pawn1 = game.board.pawns.get(color)[0];
         EnterPiece e1 = new EnterPiece(pawn1);
         game.board = (game.processMoves(e1)).first;
+
         // Move the pawn again
         MoveMain m1 = new MoveMain(pawn1, 4);
         Pair<Board, Integer> result = game.processMoves(m1);
@@ -64,7 +63,7 @@ public class ParcheesiTest {
         Pawn pawn = game.board.pawns.get(color)[0];
         pawn.bc = Board.BoardComponent.HOMEROW;
         pawn.location = 2;
-        game.board.homeRows.get(color)[2] = pawn;
+        game.board.homeRows.get(color)[pawn.location] = pawn;
         MoveHome m1 = new MoveHome(pawn, 2, 2);
 
         Pair<Board, Integer> result = game.processMoves(m1);
@@ -103,18 +102,23 @@ public class ParcheesiTest {
      */
     @Test
     public void boppingGivesBonusTest() {
-        Pawn pawn1 = game.board.pawns.get(player1.color)[0];
-        Pawn pawn2 = game.board.pawns.get(player2.color)[0];
+        String color1 = Board.COLORS[0];
+        String color2 = Board.COLORS[1];
 
-        pawn1.bc = pawn2.bc = Board.BoardComponent.RING;
-        pawn1.location = 20;
-        pawn2.location = 21;
+        // Setup bopping pawn
+        Pawn p1 = game.board.pawns.get(color1)[0];
+        p1.bc = Board.BoardComponent.RING;
+        p1.location = 19;
+        game.board.ring[p1.location] = p1;
 
-        game.board.ring[20] = pawn1;
-        game.board.ring[21] = pawn2;
+        // Setup bopped pawn
+        Pawn p2 = game.board.pawns.get(color2)[0];
+        p2.bc = Board.BoardComponent.RING;
+        p2.location = 20;
+        game.board.ring[p2.location] = p2;
 
-        MoveMain m1 = new MoveMain(pawn1, 1);
-        Pair<Board, Integer> result = game.processMoves(m1);
+        MoveMain m = new MoveMain(p1, 1);
+        Pair<Board, Integer> result = game.processMoves(m);
         int bonus = result.second;
 
         Assert.assertEquals("Bopping earns 20 bonus", 20, bonus);
@@ -147,53 +151,66 @@ public class ParcheesiTest {
         Assert.assertEquals("Bonus is earned", 20, bonus);
 
     }
-//
-//    @Test
-//    public void cannotBopOnSafetyTest() {
-//        Pawn p1 = game.players[0].getPawns()[0];
-//        p1.home = false;
-//        p1.location = 19;
-//        game.players[0].setPawn(0, p1);
-//        //yellow
-//        Pawn p2 = game.players[1].getPawns()[0];
-//        p2.home = false;
-//        p2.location = 20;
-//        game.players[0].setPawn(1, p2);
-//
-//        //need to simulate game progressing
-//
-//        game.board.ring[20].first = p1;
-//        game.board.ring[21].first = p2;
-//
-//        MoveMain m1 = new MoveMain(p1, 1);
-//        Pair<Board, Integer> result = game.processMoves(m1);
-//
-//        Assert.assertTrue("Piece should not be removed on safety", result.first.ring[21].first != null);
+
+    @Test
+    public void cannotBopOnSafetyTest() {
+        String color1 = Board.COLORS[0];
+        String color2 = Board.COLORS[1];
+
+        // Setup bopping pawn
+        Pawn p1 = game.board.pawns.get(color1)[0];
+        p1.bc = Board.BoardComponent.RING;
+        p1.location = 20;
+        game.board.ring[p1.location] = p1;
+
+        // Setup bopped pawn
+        Pawn p2 = game.board.pawns.get(color2)[0];
+        p2.bc = Board.BoardComponent.RING;
+        p2.location = 21;
+        game.board.ring[p2.location] = p2;
+
+        MoveMain m = new MoveMain(p1, 1);
+        Pair<Board, Integer> result = game.processMoves(m);
+
+//        Assert.assertTrue("Piece should not be removed on safety", result.first.ring[21] != null);
 //        Assert.assertTrue("cheater removed from game", result.first.ring[20].first == null);
-//        Assert.assertTrue("Bopping safety should return null (e.g. cheat)", game.cheated[0]);
-//    }
-//
-//    @Test
-//    public void boppingTwoPiecesGivesTwoBonusesTest() {
-//        Parcheesi game = new Parcheesi();
-//        Pawn p1 = new Pawn(0, "red");
-//        Pawn p2 = new Pawn(1, "red");
-//        Pawn p3 = new Pawn(0, "green");
-//        Pawn p4 = new Pawn(1, "green");
-//
-//        game.board.ring[0].first = p1;
-//        game.board.ring[1].first = p2;
-//        game.board.ring[3].first = p3;
-//        game.board.ring[7].first = p4;
-//
-//        MoveMain m1 = new MoveMain(p1, 3);
-//        MoveMain m2 = new MoveMain(p2, 6);
-//        Pair<Board, Integer> result1 = game.processMoves(m1);
-//        Pair<Board, Integer> result2 = game.processMoves(m2);
-//
-//        Assert.assertEquals("First bop earns 20 bonus", result1.second, 20);
-//        Assert.assertEquals("Second bop earns 20 bonus", result2.second, 20);
-//    }
+        Assert.assertNull("Bopping safety should return null (e.g. cheat)", result);
+    }
+
+    @Test
+    public void boppingTwoPiecesGivesTwoBonusesTest() {
+        String color1 = Board.COLORS[0];
+        String color2 = Board.COLORS[1];
+
+        Pawn p1 = game.board.pawns.get(color1)[0];
+        p1.bc = Board.BoardComponent.RING;
+        p1.location = 0;
+        game.board.ring[p1.location] = p1;
+
+        Pawn p2 = game.board.pawns.get(color1)[1];
+        p2.bc = Board.BoardComponent.RING;
+        p2.location = 1;
+        game.board.ring[p2.location] = p2;
+
+
+        Pawn p3 = game.board.pawns.get(color2)[0];
+        p3.bc = Board.BoardComponent.RING;
+        p3.location = 3;
+        game.board.ring[p3.location] = p3;
+
+        Pawn p4 = game.board.pawns.get(color2)[1];
+        p4.bc = Board.BoardComponent.RING;
+        p4.location = 7;
+        game.board.ring[p4.location] = p4;
+
+        MoveMain m1 = new MoveMain(p1, 3);
+        MoveMain m2 = new MoveMain(p2, 6);
+        Pair<Board, Integer> result1 = game.processMoves(m1);
+        Pair<Board, Integer> result2 = game.processMoves(m2);
+
+        Assert.assertEquals("First bop earns 20 bonus", result1.second, 20);
+        Assert.assertEquals("Second bop earns 20 bonus", result2.second, 20);
+    }
 //
 //    @Test
 //    public void blockadeCannotMoveTogetherWithBopBonusTest() {
@@ -218,95 +235,129 @@ public class ParcheesiTest {
 //        //TODO: Check that bonus moves cant move blockade together
 //    }
 //
-//    /*
-//     * Blockades
-//     */
-//    @Test
-//    public void cannotEnterPieceOnBlockadedEntryTest() {
-//        Parcheesi game = new Parcheesi();
-//
-//        Pawn blockade1 = new Pawn(0, "red");
-//        Pawn blockade2 = new Pawn(1, "red");
-//        Pawn p1 = new Pawn(2, "red");
-//
-//        game.board.ring[39].first = blockade1;
-//        game.board.ring[39].second = blockade2;
-//
-//        EnterPiece m1 = new EnterPiece(p1);
-//        Pair<Board, Integer> result = game.processMoves(m1);
-//
-//        Assert.assertNull("Entering piece on blockaded entry is flagged as cheating", result);
-//    }
-//
-//    @Test
-//    public void cannotMoveToOwnBlockadeTest() {
-//        Parcheesi game = new Parcheesi();
-//        Pawn blockade1 = new Pawn(0, "red");
-//        Pawn blockade2 = new Pawn(1, "red");
-//        Pawn p1 = new Pawn(0, "red");
-//
-//        game.board.ring[3].first = blockade1;
-//        game.board.ring[3].second = blockade2;
-//        game.board.ring[0].first = p1;
-//
-//        MoveMain m1 = new MoveMain(p1, 3);
-//        Pair<Board, Integer> result = game.processMoves(m1);
-//
-//        Assert.assertNull("Moving to your own blockade is flagged as cheating", result);
-//    }
-//
-//    @Test
-//    public void cannotMoveThroughOwnBlockadeTest() {
-//        Parcheesi game = new Parcheesi();
-//
-//        Pawn blockade1 = new Pawn(0, "red");
-//        Pawn blockade2 = new Pawn(1, "red");
-//        Pawn p1 = new Pawn(0, "red");
-//
-//        game.board.ring[3].first = blockade1;
-//        game.board.ring[3].second = blockade2;
-//        game.board.ring[0].first = p1;
-//
-//        MoveMain m1 = new MoveMain(p1, 5);
-//        Pair<Board, Integer> result = game.processMoves(m1);
-//
-//        Assert.assertNull("Moving through your own blockade is flagged as cheating", result);
-//    }
-//
-//    @Test
-//    public void cannotMoveToOpponentBlockadeTest() {
-//        Parcheesi game = new Parcheesi();
-//        Pawn blockade1 = new Pawn(0, "green");
-//        Pawn blockade2 = new Pawn(1, "green");
-//        Pawn p1 = new Pawn(0, "red");
-//
-//        game.board.ring[3].first = blockade1;
-//        game.board.ring[3].second = blockade2;
-//        game.board.ring[0].first = p1;
-//
-//        MoveMain m1 = new MoveMain(p1, 3);
-//        Pair<Board, Integer> result = game.processMoves(m1);
-//
-//        Assert.assertNull("Moving to an opponent's blockade is flagged as cheating", result);
-//    }
-//
-//    @Test
-//    public void cannotMoveThroughOpponentBlockadeTest() {
-//        Parcheesi game = new Parcheesi();
-//        Pawn blockade1 = new Pawn(0, "green");
-//        Pawn blockade2 = new Pawn(1, "green");
-//        Pawn p1 = new Pawn(0, "red");
-//
-//        game.board.ring[3].first = blockade1;
-//        game.board.ring[3].second = blockade2;
-//        game.board.ring[0].first = p1;
-//
-//        MoveMain m1 = new MoveMain(p1, 5);
-//        Pair<Board, Integer> result = game.processMoves(m1);
-//
-//        Assert.assertNull("Moving through an opponent's blockade is flagged as cheating", result);
-//    }
-//
+    /*
+     * Blockades
+     */
+    @Test
+    public void cannotEnterPieceOnBlockadedEntryTest() {
+        String color1 = Board.COLORS[0];
+        String color2 = Board.COLORS[1];
+        int nestLocation = Board.NEST_LOCATIONS.get(color1);
+
+        // Setup entering pawn
+        Pawn p1 = game.board.pawns.get(color1)[0];
+
+        // Setup blockade
+        Pawn b1 = game.board.pawns.get(color2)[0];
+        Pawn b2 = game.board.pawns.get(color2)[1];
+        b1.bc = b2.bc = Board.BoardComponent.RING;
+        b1.location = b2.location = nestLocation;
+        game.board.ring[nestLocation] = new Blockade(b1, b2);
+
+        EnterPiece m1 = new EnterPiece(p1);
+        Pair<Board, Integer> result = game.processMoves(m1);
+
+        Assert.assertNull("Entering piece on blockaded entry is flagged as cheating", result);
+    }
+
+    @Test
+    public void cannotMoveToOwnBlockadeTest() {
+        String color1 = Board.COLORS[0];
+        int nestLocation = Board.NEST_LOCATIONS.get(color1);
+
+        // Setup moving pawn
+        Pawn p1 = game.board.pawns.get(color1)[0];
+        p1.bc = Board.BoardComponent.RING;
+        p1.location = 1;
+        game.board.ring[p1.location] = p1;
+
+        // Setup blockade
+        Pawn b1 = game.board.pawns.get(color1)[1];
+        Pawn b2 = game.board.pawns.get(color1)[2];
+        b1.bc = b2.bc = Board.BoardComponent.RING;
+        b1.location = b2.location = 6;
+        game.board.ring[b1.location] = new Blockade(b1, b2);
+
+        MoveMain m1 = new MoveMain(p1, 5);
+        Pair<Board, Integer> result = game.processMoves(m1);
+
+        Assert.assertNull("Moving to your own blockade is flagged as cheating", result);
+    }
+
+    @Test
+    public void cannotMoveThroughOwnBlockadeTest() {
+        String color1 = Board.COLORS[0];
+        int nestLocation = Board.NEST_LOCATIONS.get(color1);
+
+        // Setup moving pawn
+        Pawn p1 = game.board.pawns.get(color1)[0];
+        p1.bc = Board.BoardComponent.RING;
+        p1.location = 1;
+        game.board.ring[p1.location] = p1;
+
+        // Setup blockade
+        Pawn b1 = game.board.pawns.get(color1)[1];
+        Pawn b2 = game.board.pawns.get(color1)[2];
+        b1.bc = b2.bc = Board.BoardComponent.RING;
+        b1.location = b2.location = 3;
+        game.board.ring[b1.location] = new Blockade(b1, b2);
+
+        MoveMain m1 = new MoveMain(p1, 5);
+        Pair<Board, Integer> result = game.processMoves(m1);
+
+        Assert.assertNull("Moving to your own blockade is flagged as cheating", result);
+    }
+
+    @Test
+    public void cannotMoveToOpponentBlockadeTest() {
+        String color1 = Board.COLORS[0];
+        String color2 = Board.COLORS[1];
+        int nestLocation = Board.NEST_LOCATIONS.get(color1);
+
+        // Setup moving pawn
+        Pawn p1 = game.board.pawns.get(color1)[0];
+        p1.bc = Board.BoardComponent.RING;
+        p1.location = 1;
+        game.board.ring[p1.location] = p1;
+
+        // Setup blockade
+        Pawn b1 = game.board.pawns.get(color2)[0];
+        Pawn b2 = game.board.pawns.get(color2)[1];
+        b1.bc = b2.bc = Board.BoardComponent.RING;
+        b1.location = b2.location = 6;
+        game.board.ring[b1.location] = new Blockade(b1, b2);
+
+        MoveMain m1 = new MoveMain(p1, 5);
+        Pair<Board, Integer> result = game.processMoves(m1);
+
+        Assert.assertNull("Moving to your own blockade is flagged as cheating", result);
+    }
+
+    @Test
+    public void cannotMoveThroughOpponentBlockadeTest() {
+        String color1 = Board.COLORS[0];
+        String color2 = Board.COLORS[1];
+        int nestLocation = Board.NEST_LOCATIONS.get(color1);
+
+        // Setup moving pawn
+        Pawn p1 = game.board.pawns.get(color1)[0];
+        p1.bc = Board.BoardComponent.RING;
+        p1.location = 1;
+        game.board.ring[p1.location] = p1;
+
+        // Setup blockade
+        Pawn b1 = game.board.pawns.get(color2)[0];
+        Pawn b2 = game.board.pawns.get(color2)[1];
+        b1.bc = b2.bc = Board.BoardComponent.RING;
+        b1.location = b2.location = 3;
+        game.board.ring[b1.location] = new Blockade(b1, b2);
+
+        MoveMain m1 = new MoveMain(p1, 5);
+        Pair<Board, Integer> result = game.processMoves(m1);
+
+        Assert.assertNull("Moving to your own blockade is flagged as cheating", result);
+    }
+
 //    @Test
 //    public void cannotPassBlockadeInHomeRowTest() {
 //        Parcheesi game = new Parcheesi();
