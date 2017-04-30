@@ -1,3 +1,4 @@
+import com.sun.tools.javac.comp.Enter;
 import org.junit.*;
 
 public class ParcheesiTest {
@@ -18,17 +19,10 @@ public class ParcheesiTest {
     @Before
     public void beforeTest() {
         game = new Parcheesi();
-
-        for (String color: Board.COLORS)
-        player1 = new SPlayer("blue");
-        player2 = new SPlayer("yellow");
-        player3 = new SPlayer("red");
-        player4 = new SPlayer("green");
-
-        game.register(player1);
-        game.register(player2);
-        game.register(player3);
-        game.register(player4);
+        for (String color: Board.COLORS) {
+            SPlayer player = new SPlayer(color);
+            game.register(player);
+        }
     }
 
     @After
@@ -40,25 +34,13 @@ public class ParcheesiTest {
      */
     @Test
     public void processEnterPieceTest() {
-        Pawn pawn1 = game.board.pawns.get(player1.color)[0];
-        Pawn pawn2 = game.board.pawns.get(player2.color)[0];
-        Pawn pawn3 = game.board.pawns.get(player3.color)[0];
-        Pawn pawn4 = game.board.pawns.get(player4.color)[0];
-
-        EnterPiece m1 = new EnterPiece(pawn1);
-        EnterPiece m2 = new EnterPiece(pawn2);
-        EnterPiece m3 = new EnterPiece(pawn3);
-        EnterPiece m4 = new EnterPiece(pawn4);
-
-        game.board = (game.processMoves(m1)).first;
-        game.board = (game.processMoves(m2)).first;
-        game.board = (game.processMoves(m3)).first;
-        game.board = (game.processMoves(m4)).first;
-
-        Assert.assertTrue(((Pawn) game.board.ring[5]).equals(pawn1));
-        Assert.assertTrue(((Pawn) game.board.ring[22]).equals(pawn1));
-        Assert.assertTrue(((Pawn) game.board.ring[39]).equals(pawn1));
-        Assert.assertTrue(((Pawn) game.board.ring[56]).equals(pawn1));
+        for (String color: Board.COLORS) {
+            int nestLocation = Board.NEST_LOCATIONS.get(color);
+            Pawn pawn = game.board.pawns.get(color)[0];
+            EnterPiece m = new EnterPiece(pawn);
+            game.board = (game.processMoves(m)).first;
+            Assert.assertTrue(((Pawn) game.board.ring[nestLocation]).equals(pawn));
+        }
     }
 
     @Test
