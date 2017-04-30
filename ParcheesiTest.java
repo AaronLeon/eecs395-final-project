@@ -45,13 +45,13 @@ public class ParcheesiTest {
 
     @Test
     public void processMainMoveTest() {
-        Pawn pawn1 = game.board.pawns.get(player1.color)[0];
-
+        // Set up pawn and have it enter
+        String color = Board.COLORS[0];
+        Pawn pawn1 = game.board.pawns.get(color)[0];
         EnterPiece e1 = new EnterPiece(pawn1);
         game.board = (game.processMoves(e1)).first;
-        //make another move
-        MoveMain m1 = new MoveMain(pawn1, 3);
-
+        // Move the pawn again
+        MoveMain m1 = new MoveMain(pawn1, 4);
         Pair<Board, Integer> result = game.processMoves(m1);
 
         Assert.assertTrue("Pawn should move 3 spaces in ring", result.first.ring[8] != null);
@@ -60,22 +60,25 @@ public class ParcheesiTest {
 
     @Test
     public void processMoveHomeTest() {
-        Pawn pawn1 = game.board.pawns.get(player1.color)[0];
-        pawn1.bc = Board.BoardComponent.HOMEROW;
-        pawn1.location = 2;
-        game.board.homeRows.get("blue")[2] = pawn1;
-        MoveHome m1 = new MoveHome(pawn1, 2, 2);
+        String color = Board.COLORS[0];
+        Pawn pawn = game.board.pawns.get(player1.color)[0];
+        pawn.bc = Board.BoardComponent.HOMEROW;
+        pawn.location = 2;
+        game.board.homeRows.get(color)[2] = pawn;
+        MoveHome m1 = new MoveHome(pawn, 2, 2);
 
         Pair<Board, Integer> result = game.processMoves(m1);
+        Board board = result.first;
 
-        Assert.assertTrue("Pawn should move 4 spaces in runway", result.first.homeRows.get("blue")[4] != null);
-        Assert.assertFalse("Pawn should not be in original space in runway", result.first.homeRows.get("blue")[2] == null);
+        Assert.assertEquals("Pawn should move 4 spaces in runway", pawn, board.homeRows.get(color)[4]);
+        Assert.assertNull("Pawn should not be in original space in runway", board.homeRows.get(color)[2]);
 
-        MoveHome m2 = new MoveHome(pawn1, 4, 2);
+        MoveHome m2 = new MoveHome(pawn, 4, 2);
         result = game.processMoves(m2);
+        board = result.first;
 
-        //TODO: CHANGE USE OF LENGTH
-        Assert.assertTrue("Pawn should move 2 spaces in runway", result.first.homes.get("blue").length == 1);
+
+        Assert.assertEquals("Pawn should move 2 spaces in runway and enter home", pawn, board.homes.get(color)[pawn.id]);
     }
 
     /*
@@ -112,28 +115,38 @@ public class ParcheesiTest {
 
         MoveMain m1 = new MoveMain(pawn1, 1);
         Pair<Board, Integer> result = game.processMoves(m1);
-        Assert.assertTrue("Bopping earns 20 bonus", result.second == 20);
+        int bonus = result.second;
+
+        Assert.assertEquals("Bopping earns 20 bonus", 20, bonus);
     }
 
-//    @Test
-//    public void enterPieceCanBopTest() {
-//        //blue
-//        Pawn p1 = game.players[0].getPawns()[0];
-//        p1.home = false;
-//        p1.location = 22;
-//        game.players[0].setPawn(0, p1);
-//        //yellow
-//        Pawn p2 = game.players[1].getPawns()[0];
-//
-//
-//        game.board.ring[22] = p1;
-//
-//        EnterPiece m1 = new EnterPiece(p2);
-//        Pair<Board, Integer> result = game.processMoves(m1);
-//
-//        Assert.assertTrue("Bopped piece should be removed", game.players[0].getPawns()[0].home = true);
-//        Assert.assertTrue("Moving piece should replace bopped piece", result.first.ring[22].color == "yellow");
-//    }
+    @Test
+    public void enterPieceCanBopTest() {
+        // Set up entering/bopping pawn
+        String color1 = "blue";
+        Pawn pawn1 = game.board.pawns.get(color1)[0];
+
+        // Set up bopped pawn
+        String color2 = "yellow";
+        Pawn pawn2 = game.board.pawns.get(color2)[0];
+
+        int nestLocation = Board.NEST_LOCATIONS.get(color1);
+        pawn2.bc = Board.BoardComponent.RING;
+        pawn2.location = nestLocation;
+        game.board.ring[nestLocation] = pawn2;
+
+        // Enter pawn
+        EnterPiece m = new EnterPiece(pawn1);
+        Pair<Board, Integer> result = game.processMoves(m);
+
+        Board board = result.first;
+        int bonus = result.second;
+
+        Assert.assertEquals("Entering piece should replace bopped piece", pawn1, board.ring[nestLocation]);
+        Assert.assertEquals("Bopped piece should be returned to nest", pawn2, board.nests.get(color2)[pawn2.id]);
+        Assert.assertEquals("Bonus is earned", 20, bonus);
+
+    }
 //
 //    @Test
 //    public void cannotBopOnSafetyTest() {

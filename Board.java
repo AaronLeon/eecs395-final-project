@@ -15,21 +15,22 @@ public class Board {
 
     static final HashMap<String, Integer> NEST_LOCATIONS = new HashMap<String, Integer>() {
         {
-            put("blue", 5);
-            put("yellow", 22);
-            put("green", 39);
-            put("red", 56);
+            put("blue", 4);
+            put("yellow", 21);
+            put("green", 38);
+            put("red", 55);
         }
     };
     static final HashMap<String, Integer> HOMEROW_LOCATIONS = new HashMap<String, Integer>() {
         {
-            put("blue", 0);
-            put("yellow", 17);
-            put("green", 34);
-            put("red", 51);
+            put("blue", 67);
+            put("yellow", 16);
+            put("green", 33);
+            put("red", 50);
         }
     };
-    static final int SAFE_LOCATIONS[] = {0, 5, 12, 17, 22, 29, 34, 39, 46, 51, 56, 63};
+    static final int SAFE_LOCATIONS[] = {4, 11, 16, 21, 28, 33, 38, 45, 50, 55, 62, 67};
+
 
     Object[] ring;
     HashMap<String, Object[]> nests;
