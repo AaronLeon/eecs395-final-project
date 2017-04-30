@@ -44,7 +44,7 @@ public class ParcheesiTest {
     }
 
     @Test
-    public void processMainMoveTest() {
+    public void processMoveMainTest() {
         // Set up pawn and have it enter
         String color = Board.COLORS[0];
         Pawn pawn1 = game.board.pawns.get(color)[0];
@@ -61,7 +61,7 @@ public class ParcheesiTest {
     @Test
     public void processMoveHomeTest() {
         String color = Board.COLORS[0];
-        Pawn pawn = game.board.pawns.get(player1.color)[0];
+        Pawn pawn = game.board.pawns.get(color)[0];
         pawn.bc = Board.BoardComponent.HOMEROW;
         pawn.location = 2;
         game.board.homeRows.get(color)[2] = pawn;
@@ -73,7 +73,7 @@ public class ParcheesiTest {
         Assert.assertEquals("Pawn should move 4 spaces in runway", pawn, board.homeRows.get(color)[4]);
         Assert.assertNull("Pawn should not be in original space in runway", board.homeRows.get(color)[2]);
 
-        MoveHome m2 = new MoveHome(pawn, 4, 2);
+        MoveHome m2 = new MoveHome(pawn, 4, 3);
         result = game.processMoves(m2);
         board = result.first;
 

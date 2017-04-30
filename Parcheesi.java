@@ -155,7 +155,7 @@ public class Parcheesi implements Game {
         MoveHome move = (MoveHome) m;
         Pawn pawn = move.pawn;
         int newLocation = pawn.location + move.distance;
-        if (pawn.bc == Board.BoardComponent.HOMEROW && newLocation <= 6) {
+        if (pawn.bc != Board.BoardComponent.HOMEROW || newLocation > Board.HOMEROW_SIZE) {
             cheat(pawn.color);
             return null;
         }

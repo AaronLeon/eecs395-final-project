@@ -39,8 +39,8 @@ public class Board {
     HashMap<String, Pawn[]> pawns;
 
     public Board() {
-        pawns = new HashMap<>(4);
         ring = new Object[RING_SIZE];
+        pawns = new HashMap<>(4);
         nests = new HashMap<>(4);
         homeRows = new HashMap<>(4);
         homes = new HashMap<>(4);
@@ -53,7 +53,9 @@ public class Board {
 
             pawns.put(color, temp);
             nests.put(color, new Object[NEST_SIZE]);
-            homeRows.put(color, temp);
+            homeRows.put(color, new Object[HOMEROW_SIZE]);
+            homes.put(color, new Object[HOME_SIZE]);
+
         }
     }
 
@@ -119,7 +121,7 @@ public class Board {
 
     public boolean movePawnHomeRow(Pawn pawn, int distance) {
         int newLocation = pawn.location + distance;
-        if (newLocation > 6) {
+        if (newLocation == HOMEROW_SIZE) {
             movePawnHome(pawn);
             return true;
         }
