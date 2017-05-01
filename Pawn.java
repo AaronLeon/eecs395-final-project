@@ -6,6 +6,9 @@ class Pawn {
   Board.BoardComponent bc;
   int location;
 
+  Pawn(){
+
+  }
   Pawn (int id, String color) {
     this.id=id;
     this.color=color;

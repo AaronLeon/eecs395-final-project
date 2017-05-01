@@ -3,6 +3,8 @@
  * The Parcheesi class represents the game engine
  */
 
+import com.sun.tools.internal.xjc.reader.Ring;
+
 import java.util.HashMap;
 
 import static java.util.Arrays.sort;
@@ -362,8 +364,8 @@ public class Parcheesi implements Game {
 
     public boolean canMove(SPlayer player, Pawn pawn,int[] dice, Board board){
         if ((pawn.bc == Board.BoardComponent.NEST)) {
-            return canEnter(dice);
-            //check if integers in dice can sum to 5
+            return canEnter(dice) && board.isBlockade(board.BoardComponent.RING,board.NEST_LOCATIONS.get(pawn.color),pawn.color);
+            //check if integers in dice can sum to 5 and entryway isn't blockaded
         } else if (pawn.bc == Board.BoardComponent.HOMEROW) {
             //TODO: Make isBlocked accepted MoveHome as well..this doesn't check all squares for blockades
             for (int d : dice) {
@@ -378,8 +380,6 @@ public class Parcheesi implements Game {
                     return true;
                 }
             }
-            //iterate over rolls in dice,
-            //moveMain
         }
         return false;
     }
