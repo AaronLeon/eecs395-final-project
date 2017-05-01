@@ -1,5 +1,3 @@
-import com.sun.tools.internal.xjc.reader.Ring;
-import com.sun.tools.javac.comp.Enter;
 import org.junit.*;
 
 public class ParcheesiTest {
