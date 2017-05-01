@@ -36,6 +36,7 @@ public class Board {
     HashMap<String, Object[]> nests;
     HashMap<String, Object[]> homeRows;
     HashMap<String, Object[]> homes;
+    //map color to string of pawns
     HashMap<String, Pawn[]> pawns;
 
     public Board() {
