@@ -29,6 +29,7 @@ public class ParcheesiTest {
     /*
      * Basic tests
      */
+
     @Test
     public void processEnterPieceTest() {
         for (String color: Board.COLORS) {

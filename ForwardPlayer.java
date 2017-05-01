@@ -1,30 +1,31 @@
-public class SPlayer implements Player {
+/**
+ * Created by yulunwu on 4/30/17.
+ */
+public class ForwardPlayer extends SPlayer {
     String color;
 
-    public SPlayer(){
-        startGame(null);
-    }
-
-    public SPlayer(String c) {
+    public ForwardPlayer(String c) {
         startGame(c);
     }
 
     public void startGame(String color) {
-        this.color = color;
+        super.startGame(color);
     }
 
 
+    public int[] ForwardSortMoves(){
+        return null;
+    }
+
     public Move[] doMove(Board brd, int[] rolls) {
         Move[] moves = new Move[4];
-
         //TODO: Not implemented yet
         //check that the move is possible given the die rolls
-
         return moves;
     }
 
 
     public void doublesPenalty() {
-        //TODO: Not implemented yet 
+        //TODO: Not implemented yet
     }
 }
