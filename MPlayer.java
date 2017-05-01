@@ -41,10 +41,30 @@ public class MPlayer extends SPlayer {
                 if(game.canEnter(rolls)){
                     //enter
                 } else if(pawn.bc == Board.BoardComponent.HOMEROW){
-                    //try to enter home
+                    for (int d : rolls) {
+                        boolean blocked=false;
+                        for(int i=0;i<=d;i++){
+                            //d+1 because we check d cell as well
+                            if (game.board.homeRows.get(color)[pawn.location + i] instanceof Blockade) {
+                                blocked=true;
+                            }
+                        }
+                        if(blocked==false){
+                            //make a move home and return
+                        }
+                    }
                 }
                 else{
-                    //try move main
+                    for (int d : rolls) {
+                        boolean blocked=false;
+                        MoveMain testMove = new MoveMain(pawn, d);
+                        if (game.isBlocked(testMove)) {
+                            blocked=true;
+                        }
+                        if(!blocked){
+                            //make move and return move
+                        }
+                    }
                 }
             }
         }

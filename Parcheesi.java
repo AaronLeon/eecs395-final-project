@@ -369,8 +369,11 @@ public class Parcheesi implements Game {
         } else if (pawn.bc == Board.BoardComponent.HOMEROW) {
             //TODO: Make isBlocked accepted MoveHome as well..this doesn't check all squares for blockades
             for (int d : dice) {
-                if (board.homeRows.get(player.color)[pawn.location + d] instanceof Blockade) {
-                    return false;
+                for(int i=0;i<=d;i++){
+                    //d+1 because we check d cell as well
+                    if (board.homeRows.get(player.color)[pawn.location + i] instanceof Blockade) {
+                        return false;
+                    }
                 }
             }
         } else {
