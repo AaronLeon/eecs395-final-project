@@ -30,10 +30,10 @@ public class ForwardPlayer extends SPlayer {
         return pawns;
     }
 
-    public Move[] doMove(Board brd, int[] rolls) {
+    public Move[] doMove(Parcheesi game, int[] rolls) {
         Move[] moves = new Move[4];
         Pawn[] sortedPawns = new Pawn[4];
-        sortedPawns=ForwardSortPawns(brd.pawns.get(color),brd.NEST_LOCATIONS.get(color));
+        sortedPawns=ForwardSortPawns(game.board.pawns.get(color),game.board.NEST_LOCATIONS.get(color));
 
         //TODO: Not implemented yet
         //check that the move is possible given the die rolls
