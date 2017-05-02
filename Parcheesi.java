@@ -364,7 +364,7 @@ public class Parcheesi implements Game {
 
     public boolean canMove(SPlayer player, Pawn pawn,int[] dice, Board board){
         if ((pawn.bc == Board.BoardComponent.NEST)) {
-            return canEnter(dice) && board.isBlockade(board.BoardComponent.RING,board.NEST_LOCATIONS.get(pawn.color),pawn.color);
+            return canEnter(dice) && !board.isBlockade(board.BoardComponent.RING,board.NEST_LOCATIONS.get(pawn.color),pawn.color);
             //check if integers in dice can sum to 5 and entryway isn't blockaded
         } else if (pawn.bc == Board.BoardComponent.HOMEROW) {
             //TODO: Make isBlocked accepted MoveHome as well..this doesn't check all squares for blockades

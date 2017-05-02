@@ -15,30 +15,41 @@ public class MPlayer extends SPlayer {
     }
 
 
-    public Pawn[] ForwardSortPawns(Pawn [] pawns,int home){
-        for(Pawn pawn: pawns){
-            if (pawn.location<home){
-                pawn.location+=100;
-            }
+    public int[] ForwardSortPawns(Pawn [] pawns,int home){
+        int[] ids = new int[4];
+        int[][] data=new int[4][2];
+        int counter=0;
+        for(Pawn pawn : pawns){
+            int[] temp ={pawn.location,pawn.id};
+            data[counter]=temp;
+            counter++;
         }
-        Arrays.sort(pawns);
-        for(Pawn pawn: pawns){
-            if (pawn.location<100){
-                pawn.location-=100;
+        java.util.Arrays.sort(data, new java.util.Comparator<int[]>() {
+            public int compare(int[] a, int[] b) {
+                return Integer.compare(a[0], b[0]);
             }
+        });
+        //data should be sorted
+
+        for(int i = 0;i<4;i++){
+            ids[i]=data[i][1];
         }
-        return pawns;
+
+        return ids;
     }
 
-    public Move[] ForwardMove(Parcheesi game, int[] rolls) {
+
+    public Move[] BackwardMove(Parcheesi game, int[] rolls) {
         Move[] moves = new Move[1];
-        Pawn[] sortedPawns = new Pawn[4];
-        sortedPawns=ForwardSortPawns(game.board.pawns.get(color),game.board.NEST_LOCATIONS.get(color));
+        int[] ids = new int[4];
+        ids=ForwardSortPawns(game.board.pawns.get(color),game.board.NEST_LOCATIONS.get(color));
+        ids=reverse4(ids);
 
-
-        for(Pawn pawn : sortedPawns){
+        for(int x=0;x<4;x++){
+            Pawn pawn=game.board.pawns.get(color)[ids[x]];
             if ((pawn.bc == Board.BoardComponent.NEST)) {
                 if(game.canEnter(rolls)){
+                    moves[0]=new EnterPiece(pawn);
                     //enter
                 } else if(pawn.bc == Board.BoardComponent.HOMEROW){
                     for (int d : rolls) {
@@ -50,6 +61,8 @@ public class MPlayer extends SPlayer {
                             }
                         }
                         if(blocked==false){
+                            moves[0]=new MoveHome(pawn,pawn.location,d);
+                            return moves;
                             //make a move home and return
                         }
                     }
@@ -62,6 +75,53 @@ public class MPlayer extends SPlayer {
                             blocked=true;
                         }
                         if(!blocked){
+                            moves[0]=new MoveMain(pawn,d);
+                            //make move and return move
+                        }
+                    }
+                }
+            }
+        }
+        return moves;
+    }
+
+
+    public Move[] ForwardMove(Parcheesi game, int[] rolls) {
+        Move[] moves = new Move[1];
+        int[] ids = new int[4];
+        ids=ForwardSortPawns(game.board.pawns.get(color),game.board.NEST_LOCATIONS.get(color));
+
+        for(int x=0;x<4;x++){
+            Pawn pawn=game.board.pawns.get(color)[ids[x]];
+            if ((pawn.bc == Board.BoardComponent.NEST)) {
+                if(game.canEnter(rolls)){
+                    moves[0]=new EnterPiece(pawn);
+                    //enter
+                } else if(pawn.bc == Board.BoardComponent.HOMEROW){
+                    for (int d : rolls) {
+                        boolean blocked=false;
+                        for(int i=0;i<=d;i++){
+                            //d+1 because we check d cell as well
+                            if (game.board.homeRows.get(color)[pawn.location + i] instanceof Blockade) {
+                                blocked=true;
+                            }
+                        }
+                        if(blocked==false){
+                            moves[0]=new MoveHome(pawn,pawn.location,d);
+                            return moves;
+                            //make a move home and return
+                        }
+                    }
+                }
+                else{
+                    for (int d : rolls) {
+                        boolean blocked=false;
+                        MoveMain testMove = new MoveMain(pawn, d);
+                        if (game.isBlocked(testMove)) {
+                            blocked=true;
+                        }
+                        if(!blocked){
+                            moves[0]=new MoveMain(pawn,d);
                             //make move and return move
                         }
                     }
@@ -91,35 +151,16 @@ public class MPlayer extends SPlayer {
         }
   */
 
-
-
-    public Pawn[] reverse(Pawn[] pawns){
-        Pawn tempPawn=new Pawn();
-        tempPawn=pawns[3];
-        pawns[3]=pawns[0];
-        pawns[0]=tempPawn;
-        tempPawn=pawns[2];
-        pawns[2]=pawns[1];
-        pawns[1]=tempPawn;
-        return pawns;
+    public int[] reverse4(int[] index){
+        int temp=0;
+        temp=index[3];
+        index[3]=index[0];
+        index[0]=temp;
+        temp=index[2];
+        index[2]=index[1];
+        index[1]=temp;
+        return index;
     }
-
-    public Move[] BackwardMove(Parcheesi game, int[] rolls){
-        Move[] moves = new Move[4];
-        Pawn[] sortedPawns = new Pawn[4];
-        sortedPawns=ForwardSortPawns(game.board.pawns.get(color),game.board.NEST_LOCATIONS.get(color));
-        sortedPawns=reverse(sortedPawns);
-
-
-        for(Pawn pawn : sortedPawns){
-            if (game.canMove((SPlayer)this,pawn,rolls,game.board)){
-                //make move
-            }
-        }
-
-        return moves;
-    }
-
 
     public void doublesPenalty() {
         //TODO: Not implemented yet
