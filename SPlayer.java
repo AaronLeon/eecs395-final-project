@@ -1,30 +1,17 @@
-public class SPlayer implements Player {
+public abstract class SPlayer implements Player {
     String color;
-
-    public SPlayer(){
-        startGame(null);
-    }
 
     public SPlayer(String c) {
         startGame(c);
     }
 
-    public void startGame(String color) {
+    public final void startGame(String color) {
         this.color = color;
     }
 
+    public abstract Move[] doMove(Board brd, int[] rolls);
 
-    public Move[] doMove(Parcheesi game, int[] rolls) {
-        Move[] moves = new Move[4];
-
+    public final void doublesPenalty() {
         //TODO: Not implemented yet
-        //check that the move is possible given the die rolls
-
-        return moves;
-    }
-
-
-    public void doublesPenalty() {
-        //TODO: Not implemented yet 
     }
 }

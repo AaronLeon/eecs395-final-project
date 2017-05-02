@@ -12,9 +12,14 @@ public class Pair<T, U> {
         second = b;
     }
 
-    public boolean equals(Pair other) {
-        return first.equals(other.first) && second.equals(other.second)
-                || first.equals(other.second) && second.equals(other.first);
+    @Override
+    public boolean equals(Object other) {
+        if (! (other instanceof Pair)) {
+            return false;
+        }
+        Pair p = (Pair) other;
+        return (first.equals(p.first) && second.equals(p.second))
+                || (first.equals(p.second) && second.equals(p.first));
     }
 
     public boolean isEmpty() {

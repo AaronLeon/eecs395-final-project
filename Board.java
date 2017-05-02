@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class Board {
@@ -71,9 +69,9 @@ public class Board {
     public boolean isBlockade(BoardComponent bc, int location, String color) {
         switch (bc) {
             case RING:
-                return ring[location] instanceof Pair;
+                return ring[location] instanceof Blockade;
             case HOMEROW:
-                return homes.get(color)[location] instanceof Pair;
+                return homeRows.get(color)[location] instanceof Blockade;
         }
         return false;
     }
@@ -93,21 +91,36 @@ public class Board {
         nests.get(pawn.color)[pawn.id] = pawn;
     }
 
-    public void enterPiece(Pawn pawn) {
+    public void enterPiece(Pawn pawn) throws Exception {
         if (pawn.bc != BoardComponent.NEST) {
-            return;
+            throw new Exception("Pawn that is not in nest is trying to enter board");
         }
         int homeLocation = NEST_LOCATIONS.get(pawn.color);
         nests.get(pawn.color)[pawn.location] = null;
         pawn.bc = BoardComponent.RING;
         pawn.location = homeLocation;
-        ring[homeLocation] = pawn;
+
+        // Check if forming new blockade
+        if (ring[homeLocation] instanceof Pawn) {
+            formBlockade(pawn, (Pawn) ring[homeLocation]);
+        }
+        else {
+            ring[homeLocation] = pawn;
+        }
     }
 
-    public boolean movePawnRing(Pawn pawn, int distance) {
+    public boolean movePawnRing(Pawn pawn, int distance) throws Exception {
         int homeRowLocation = HOMEROW_LOCATIONS.get(pawn.color);
         int newLocation = pawn.location + distance;
-        ring[pawn.location] = null;
+
+        // Check if breaking pawn from blockade
+        if (ring[pawn.location] instanceof Blockade) {
+            breakBlockade(pawn, (Blockade) ring[pawn.location]);
+        }
+        else {
+            ring[pawn.location] = null;
+        }
+
         if (newLocation > homeRowLocation) {
             int newDistance = (newLocation % homeRowLocation) - 1;
             pawn.bc = BoardComponent.HOMEROW;
@@ -115,19 +128,38 @@ public class Board {
             return movePawnHomeRow(pawn, newDistance);
         }
         pawn.location = newLocation;
-        ring[newLocation] = pawn;
+
+        // Check if forming new blockade
+        if (ring[newLocation] instanceof Pawn) {
+            formBlockade(pawn, (Pawn) ring[newLocation]);
+        }
+        else {
+            ring[newLocation] = pawn;
+        }
         return false;
     }
 
-    public boolean movePawnHomeRow(Pawn pawn, int distance) {
+    public boolean movePawnHomeRow(Pawn pawn, int distance) throws Exception {
         int newLocation = pawn.location + distance;
         if (newLocation == HOMEROW_SIZE) {
             movePawnHome(pawn);
             return true;
         }
+
+        // Check if breaking pawn from blockade
+        if (homeRows.get(pawn.color)[pawn.location] instanceof Blockade) {
+            breakBlockade(pawn, (Blockade) homeRows.get(pawn.color)[pawn.location]);
+        }
         else {
             homeRows.get(pawn.color)[pawn.location] = null;
-            pawn.location = newLocation;
+        }
+        pawn.location = newLocation;
+
+        // Check if forming  blockade
+        if (homeRows.get(pawn.color)[newLocation] instanceof Pawn) {
+            formBlockade(pawn, (Pawn) homeRows.get(pawn.color)[newLocation]);
+        }
+        else  {
             homeRows.get(pawn.color)[newLocation] = pawn;
         }
         return false;
@@ -145,7 +177,7 @@ public class Board {
         homes.get(pawn.color)[pawn.id] = pawn;
     }
 
-    public Pawn extractPawnFromBlockade(Pawn pawn, Blockade blockade) throws Exception {
+    public Pawn breakBlockade(Pawn pawn, Blockade blockade) throws Exception {
         if (pawn.bc != blockade.first.bc || pawn.bc != blockade.second.bc
                 || pawn.location != blockade.first.location || pawn.location != blockade.second.location) {
             throw new Exception("Trying to extract pawn from blockade that is not in same location");
@@ -162,7 +194,7 @@ public class Board {
             set(blockade.first, bc, location, color);
             return pawn;
         }
-        throw new Exception("Trying to extract pawn from blockade that it does not belong to");
+        else throw new Exception("Trying to extract pawn from blockade that it does not belong to");
     }
 
     public void formBlockade(Pawn p1, Pawn p2) throws Exception {
@@ -190,13 +222,16 @@ public class Board {
         return null;
     }
 
-    public Object set(Object obj, BoardComponent bc, int location, String color) {
+    public void set(Object obj, BoardComponent bc, int location, String color) {
         switch(bc) {
             case RING:
                 ring[location] = obj;
+                break;
             case HOMEROW:
                 homeRows.get(color)[(location)] = obj;
+                break;
+            default:
+                break;
         }
-        return null;
     }
 }

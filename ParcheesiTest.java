@@ -15,7 +15,7 @@ public class ParcheesiTest {
     public void beforeTest() {
         game = new Parcheesi();
         for (String color: Board.COLORS) {
-            SPlayer player = new SPlayer(color);
+            SPlayer player = new SimplePlayer(color);
             game.register(player);
         }
     }
@@ -63,7 +63,7 @@ public class ParcheesiTest {
         pawn.bc = Board.BoardComponent.HOMEROW;
         pawn.location = 2;
         game.board.homeRows.get(color)[pawn.location] = pawn;
-        MoveHome m1 = new MoveHome(pawn, 2, 2);
+        MoveHome m1 = new MoveHome(pawn, 2);
 
         Pair<Board, Integer> result = game.processMoves(m1);
         Board board = result.first;
@@ -71,7 +71,7 @@ public class ParcheesiTest {
         Assert.assertEquals("Pawn should move 4 spaces in runway", pawn, board.homeRows.get(color)[4]);
         Assert.assertNull("Pawn should not be in original space in runway", board.homeRows.get(color)[2]);
 
-        MoveHome m2 = new MoveHome(pawn, 4, 3);
+        MoveHome m2 = new MoveHome(pawn, 3);
         result = game.processMoves(m2);
         board = result.first;
 
@@ -262,7 +262,6 @@ public class ParcheesiTest {
     @Test
     public void cannotMoveToOwnBlockadeTest() {
         String color1 = Board.COLORS[0];
-        int nestLocation = Board.NEST_LOCATIONS.get(color1);
 
         // Setup moving pawn
         Pawn p1 = game.board.pawns.get(color1)[0];
@@ -286,7 +285,6 @@ public class ParcheesiTest {
     @Test
     public void cannotMoveThroughOwnBlockadeTest() {
         String color1 = Board.COLORS[0];
-        int nestLocation = Board.NEST_LOCATIONS.get(color1);
 
         // Setup moving pawn
         Pawn p1 = game.board.pawns.get(color1)[0];
@@ -336,7 +334,6 @@ public class ParcheesiTest {
     public void cannotMoveThroughOpponentBlockadeTest() {
         String color1 = Board.COLORS[0];
         String color2 = Board.COLORS[1];
-        int nestLocation = Board.NEST_LOCATIONS.get(color1);
 
         // Setup moving pawn
         Pawn p1 = game.board.pawns.get(color1)[0];
@@ -357,39 +354,47 @@ public class ParcheesiTest {
         Assert.assertNull("Moving to your own blockade is flagged as cheating", result);
     }
 
-//    @Test
-//    public void cannotPassBlockadeInHomeRowTest() {
-//        Parcheesi game = new Parcheesi();
-//        Pawn blockade1 = new Pawn(0, "red");
-//        Pawn blockade2 = new Pawn(1, "red");
-//        Pawn p1 = new Pawn(0, "red");
-//
-//        game.board.homerows.get("red").runway[2].first = blockade1;
-//        game.board.homerows.get("red").runway[2].second = blockade2;
-//        game.board.homerows.get("red").runway[0].first = p1;
-//
-//        MoveMain m1 = new MoveMain(p1, 4);
-//        Pair<Board, Integer> result = game.processMoves(m1);
-//
-//        Assert.assertNull("Passing to your own blockade in the home row is flagged as cheating", result);
-//    }
-//
-//    @Test
-//    public void breakBlockadeTest() {
-//        Parcheesi game = new Parcheesi();
-//        Pawn blockade1 = new Pawn(0, "green");
-//        Pawn blockade2 = new Pawn(1, "green");
-//        Pawn p1 = new Pawn(0, "red");
-//
-//        game.board.ring[3].first = blockade1;
-//        game.board.ring[3].second = blockade2;
-//
-//        MoveMain m1 = new MoveMain(blockade1, 4);
-//        Pair<Board, Integer> result = game.processMoves(m1);
-//
-//        Assert.assertEquals("Blockading pawn can move out of blockade", result.first.ring[7].first, blockade1);
-//        Assert.assertEquals("Remaining blockading pawn stays in original location", result.first.ring[7].second, blockade2);
-//    }
+    @Test
+    public void cannotPassBlockadeInHomeRowTest() {
+        String color = Board.COLORS[0];
+        Pawn[] pawns = game.board.pawns.get(color);
+
+        Pawn b1 = pawns[0];
+        Pawn b2 = pawns[1];
+        b1.bc = b2.bc = Board.BoardComponent.HOMEROW;
+        b1.location = b2.location = 2;
+        Blockade blockade = new Blockade(b1, b2);
+        game.board.homeRows.get(color)[2] = blockade;
+
+        Pawn p1 = pawns[2];
+        p1.bc = Board.BoardComponent.HOMEROW;
+        p1.location = 0;
+        game.board.homeRows.get(color)[0] = p1;
+
+        MoveHome m1 = new MoveHome(p1, 4);
+        Pair<Board, Integer> result = game.processMoves(m1);
+
+        Assert.assertNull("Passing your own blockade in the home row is flagged as cheating", result);
+    }
+
+    @Test
+    public void breakBlockadeTest() {
+        String color = Board.COLORS[0];
+        Pawn[] pawns = game.board.pawns.get(color);
+
+        Pawn b1 = pawns[0];
+        Pawn b2 = pawns[1];
+        b1.bc = b2.bc = Board.BoardComponent.RING;
+        b1.location = b2.location = 7;
+        Blockade blockade = new Blockade(b1, b2);
+        game.board.ring[7] = blockade;
+
+        MoveMain m1 = new MoveMain(b1, 4);
+        Pair<Board, Integer> result = game.processMoves(m1);
+
+        Assert.assertEquals("Blockading pawn can move out of blockade", b1, result.first.ring[11]);
+        Assert.assertEquals("Remaining blockading pawn stays in original location", b2, result.first.ring[7]);
+    }
 //
 //    @Test
 //    public void cannotMoveBlockadeTogetherTest() {
@@ -430,59 +435,85 @@ public class ParcheesiTest {
 //        Assert.assertNull("Moving blockade together in multiple moves with doubles bonus is flagged as cheating", result4);
 //    }
 //
-//    @Test
-//    public void formNewBlockadeTest() {
-//
-//    }
-//
-//    public void cannotEnterHomeRowOnBlockadeTest() {
-//        Parcheesi game = new Parcheesi();
-//        Pawn blockade1 = new Pawn(0, "green");
-//        Pawn blockade2 = new Pawn(1, "green");
-//        Pawn p1 = new Pawn(0, "red");
-//
-//        game.board.ring[34].first = blockade1;
-//        game.board.ring[34].second = blockade2;
-//        game.board.ring[32].second = p1;
-//
-//        MoveMain m1 = new MoveMain(p1, 5);
-//
-//        Pair<Board, Integer> result = game.processMoves(m1);
-//
-//        Assert.assertNull("Moving blockade past blockade on home row is flagged as cheating", result);
-//    }
-//
-//    /*
-//     * Exit row
-//     */
-//
-//    @Test
-//    public void canMoveFromRingToRunwayTest() {
-//        Parcheesi game = new Parcheesi();
-//        Pawn p1 = new Pawn(0, "green");
-//
-//        game.board.ring[32].second = p1;
-//
-//        MoveMain m1 = new MoveMain(p1, 5);
-//        Pair<Board, Integer> result = game.processMoves(m1);
-//
-//        Assert.assertEquals("Pawn can move from ring into home row", result.first.homerows.get("green").runway[2], p1);
-//    }
-//
-//    @Test
-//    public void canMoveFromRingToHome() {
-//        Parcheesi game = new Parcheesi();
-//        Pawn p1 = new Pawn(0, "green");
-//
-//        game.board.ring[33].second = p1;
-//
-//        MoveMain m1 = new MoveMain(p1, 6);
-//        Pair<Board, Integer> result = game.processMoves(m1);
-//
-//        // TODO: Check pawn is in endzone
-////        Assert.assertEquals("Pawn can move from ring into home row", result.first.homerows.get("green").runway[2], p1);
-//    }
-//
+    @Test
+    public void formNewBlockadeTest() {
+        String color = Board.COLORS[0];
+        Pawn[] pawns = game.board.pawns.get(color);
+
+        Pawn b1 = pawns[0];
+        b1.bc = Board.BoardComponent.RING;
+        b1.location = 3;
+        game.board.ring[3] = b1;
+
+        Pawn b2 = pawns[1];
+        b2.bc = Board.BoardComponent.RING;
+        b2.location = 7;
+        game.board.ring[7] = b2;
+
+
+        MoveMain m1 = new MoveMain(b1, 4);
+        Pair<Board, Integer> result = game.processMoves(m1);
+
+        boolean boo = (new Blockade(b1, b2)).equals(result.first.ring[7]);
+        Assert.assertEquals("Blockade is formed at new location", new Blockade(b1, b2), result.first.ring[7]);
+    }
+
+    @Test
+    public void cannotEnterHomeRowOnBlockadeTest() {
+        String color1 = Board.COLORS[0];
+        String color2 = Board.COLORS[1];
+
+        Pawn[] pawns1 = game.board.pawns.get(color1);
+        Pawn[] pawns2 = game.board.pawns.get(color2);
+
+        // Set up moving pawn
+        int homeRowLocation = Board.HOMEROW_LOCATIONS.get(color1);
+        int startLocation = homeRowLocation - 3;
+        Pawn p1 = pawns1[0];
+        p1.bc = Board.BoardComponent.RING;
+        p1.location = startLocation;
+        game.board.ring[startLocation] = p1;
+
+        // Set up blockade
+        Pawn b1 = pawns2[0];
+        Pawn b2 = pawns2[1];
+        b1.bc = b2.bc = Board.BoardComponent.RING;
+        b1.location = b2.location = homeRowLocation;
+        Blockade blockade = new Blockade(b1, b2);
+        game.board.ring[homeRowLocation] = blockade;
+
+        MoveMain m1 = new MoveMain(p1, 5);
+
+        Pair<Board, Integer> result = game.processMoves(m1);
+
+        Assert.assertNull("Moving blockade past blockade on home row is flagged as cheating", result);
+    }
+
+    /*
+     * Exit row
+     */
+
+    @Test
+    public void canMoveFromRingToHomeRowTest() {
+        String color = Board.COLORS[0];
+
+        Pawn[] pawns = game.board.pawns.get(color);
+
+        // Set up moving pawn
+        int homeRowLocation = Board.HOMEROW_LOCATIONS.get(color);
+        int startLocation = homeRowLocation - 3;
+        Pawn p = pawns[0];
+        p.bc = Board.BoardComponent.RING;
+        p.location = startLocation;
+        game.board.ring[startLocation] = p;
+        Parcheesi game = new Parcheesi();
+
+        MoveMain m1 = new MoveMain(p, 5);
+        Pair<Board, Integer> result = game.processMoves(m1);
+
+        Assert.assertEquals("Pawn can move from ring into home row", p, result.first.homeRows.get(color)[1]);
+    }
+
 //    /*
 //     * Complete Move
 //     */
