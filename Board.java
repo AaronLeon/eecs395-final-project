@@ -56,7 +56,6 @@ public class Board {
             nests.put(color, new Object[NEST_SIZE]);
             homeRows.put(color, new Object[HOMEROW_SIZE]);
             homes.put(color, new Object[HOME_SIZE]);
-
         }
     }
 

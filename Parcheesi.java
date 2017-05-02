@@ -26,29 +26,68 @@ public class Parcheesi implements Game {
      * @return true if the move is blockaded, false otherwise
      */
     //TODO: Check if MoveHome is blocked
-    public boolean isBlocked(MoveMain m) {
+    private boolean isMoveMainBlocked(MoveMain m) {
         Pawn pawn = m.pawn;
-        int nestLocation = Board.NEST_LOCATIONS.get(pawn.color);
         int homeRowLocation = Board.HOMEROW_LOCATIONS.get(pawn.color);
-        int checkedLocation;
-        for (int i = 1; i < m.distance; i++) {
-            checkedLocation = (pawn.location + i);
-            if (checkedLocation > homeRowLocation) {
-                checkedLocation = checkedLocation % homeRowLocation;
-                if (board.homeRows.get(pawn.color)[checkedLocation] instanceof Blockade) {
-                    return true;
-                }
+        Board.BoardComponent bc = pawn.bc;
+        int location = pawn.location;
+        int distance = m.distance;
+        while (distance > 0) {
+            ++location;
+            --distance;
+
+            if (location > homeRowLocation) {
+                bc = Board.BoardComponent.HOMEROW;
+                location = 0;
             }
-            if (board.ring[checkedLocation] instanceof Blockade) {
+
+            if (board.isBlockade(bc, location, pawn.color)) {
                 return true;
             }
         }
         return false;
     }
 
+    private boolean isMoveHomeBlocked(MoveHome m) {
+        Pawn pawn = m.pawn;
+        Board.BoardComponent bc = pawn.bc;
+        int location = pawn.location;
+        int distance = m.distance;
+        while (distance > 0) {
+            ++location;
+            --distance;
+
+            if (board.isBlockade(bc, location, pawn.color)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isEnterPieceBlocked(EnterPiece m) {
+        Pawn pawn = m.pawn;
+        int nestLocation = Board.NEST_LOCATIONS.get(pawn.color);
+        Board.BoardComponent bc = Board.BoardComponent.RING;
+        return board.isBlockade(bc, nestLocation, null);
+    }
+
+    public boolean isBlocked(Move m) {
+        if (m instanceof EnterPiece) {
+            return isEnterPieceBlocked((EnterPiece) m);
+        }
+        else if (m instanceof MoveMain) {
+            return isMoveMainBlocked((MoveMain) m);
+        }
+        else if (m instanceof MoveHome) {
+            return isMoveHomeBlocked((MoveHome) m);
+        }
+        else {
+            return false;
+        }
+    }
+
     /**
      * Rolls the dice
-     *
      * @return a pair containing an int array that represents the dice roll and a boolean
      * denoting whether the roll was a pair of doubles
      */
@@ -76,14 +115,13 @@ public class Parcheesi implements Game {
      * @return a pair containing the new board state after the piece has entered the board and, optionally, a bonus
      * for bopping
      */
-    public Pair<Board, Integer> processEnterPiece(Move m) {
+    public Pair<Board, Integer> processEnterPiece(EnterPiece m) {
         int bonus = 0;
-        EnterPiece move = (EnterPiece) m;
-        Pawn pawn = move.pawn;
+        Pawn pawn = m.pawn;
         int nestLocation = Board.NEST_LOCATIONS.get(pawn.color);
 
         if (pawn.bc != Board.BoardComponent.NEST
-                || board.isBlockade(Board.BoardComponent.RING, nestLocation, null)) {
+                || isBlocked(m)) {
             cheat(pawn.color);
             return null;
         }
@@ -106,8 +144,8 @@ public class Parcheesi implements Game {
      * @return a pair containing the board state after the MoveMain move has taken place and, optionally,
      * a bonus for bopping or entering home
      */
-    public Pair<Board, Integer> processMoveMain(Move m) {
-        MoveMain move = (MoveMain) m;
+    public Pair<Board, Integer> processMoveMain(MoveMain m) {
+        MoveMain move = m;
         Pawn pawn = move.pawn;
         if (pawn.bc != Board.BoardComponent.RING || isBlocked(move)) {
             cheat(pawn.color);
@@ -153,10 +191,9 @@ public class Parcheesi implements Game {
      * @param m   MoveHome move to be processed
      * @return a pair containing the board state after the MoveHome move has taken place and, optionally, entering home
      */
-    public Pair<Board, Integer> processMoveHome(Move m) {
-        MoveHome move = (MoveHome) m;
-        Pawn pawn = move.pawn;
-        int newLocation = pawn.location + move.distance;
+    public Pair<Board, Integer> processMoveHome(MoveHome m) {
+        Pawn pawn = m.pawn;
+        int newLocation = pawn.location + m.distance;
         if (pawn.bc != Board.BoardComponent.HOMEROW || newLocation > Board.HOMEROW_SIZE) {
             cheat(pawn.color);
             return null;
@@ -177,11 +214,11 @@ public class Parcheesi implements Game {
     public Pair<Board, Integer> processMoves(Move m) {
         Pair<Board,Integer> res = new Pair<>();
         if (m instanceof MoveMain) {
-            res = processMoveMain(m);
+            res = processMoveMain((MoveMain) m);
         } else if (m instanceof EnterPiece) {
-            res = processEnterPiece(m);
+            res = processEnterPiece((EnterPiece) m);
         } else if (m instanceof MoveHome) {
-            res = processMoveHome(m);
+            res = processMoveHome((MoveHome) m);
         }
 //        this.board = res.first;
         return res;
@@ -240,6 +277,11 @@ public class Parcheesi implements Game {
         }
     }
 
+    /**
+     *
+     * @param p
+     * @return Returns a pair containing the new board state after the turn and a boolean that shows whether the player rolled a double
+     */
     public Pair<Board, Boolean> giveTurn(Player p) {
         SPlayer player = (SPlayer) p;
 
