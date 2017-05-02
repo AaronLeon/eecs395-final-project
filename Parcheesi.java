@@ -3,6 +3,8 @@
  * The Parcheesi class represents the game engine
  */
 
+import com.sun.tools.internal.xjc.reader.Ring;
+
 import java.util.HashMap;
 
 import static java.util.Arrays.sort;
@@ -264,7 +266,7 @@ public class Parcheesi implements Game {
             while (doubles) {
                 consecutiveDoubles++;
                 if (consecutiveDoubles > 2) {
-                    player.doublesPenalty();
+                    doublesPenalty(player);
                 }
                 turnResults = giveTurn(player);
                 board = turnResults.first;
@@ -286,8 +288,8 @@ public class Parcheesi implements Game {
         Pair<int[], Boolean> diceResults = rollDice(player);
         int[] dice = diceResults.first;
         boolean doubles = diceResults.second;
-        Move[] moves = player.doMove(board, dice);
-        while (!allDiceUsed(dice)) {
+        while (!allDiceUsed(dice) && movesPossible(player,dice,board)) {
+            Move[] moves = player.doMove(this, dice);
             dice = consumeDice(dice, moves[0]);
             Board nextBoard = null;
             for (Move m : moves) {
@@ -402,31 +404,39 @@ public class Parcheesi implements Game {
         return false;
     }
 
+    public boolean canMove(SPlayer player, Pawn pawn,int[] dice, Board board){
+        if ((pawn.bc == Board.BoardComponent.NEST)) {
+            return canEnter(dice) && !board.isBlockade(board.BoardComponent.RING,board.NEST_LOCATIONS.get(pawn.color),pawn.color);
+            //check if integers in dice can sum to 5 and entryway isn't blockaded
+        } else if (pawn.bc == Board.BoardComponent.HOMEROW) {
+            //TODO: Make isBlocked accepted MoveHome as well..this doesn't check all squares for blockades
+            for (int d : dice) {
+                for(int i=0;i<=d;i++){
+                    //d+1 because we check d cell as well
+                    if (board.homeRows.get(player.color)[pawn.location + i] instanceof Blockade) {
+                        return false;
+                    }
+                }
+            }
+        } else {
+            for (int d : dice) {
+                MoveMain testMove = new MoveMain(pawn, d);
+                if (!isBlocked(testMove)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public boolean movesPossible(Player p, int[] dice, Board board) {
         sort(dice);
         //iterate over pawns in player p,
         SPlayer player = (SPlayer) p;
         Pawn[] pawns = board.pawns.get(player.color);
         for (Pawn pawn: pawns) {
-            if ((pawn.bc == Board.BoardComponent.NEST)) {
-                return canEnter(dice);
-                //check if integers in dice can sum to 5
-            } else if (pawn.bc == Board.BoardComponent.HOMEROW) {
-                //TODO: Make isBlocked accepted MoveHome as well..this doesn't check all squares for blockades
-                for (int d : dice) {
-                    if (board.homeRows.get(player.color)[pawn.location + d] instanceof Blockade) {
-                        return false;
-                    }
-                }
-            } else {
-                for (int d : dice) {
-                    MoveMain testMove = new MoveMain(pawn, d);
-                    if (!isBlocked(testMove)) {
-                        return true;
-                    }
-                }
-                //iterate over rolls in dice,
-                //moveMain
+            if(canMove(player,pawn,dice,board)){
+                return true;
             }
         }
         return false;

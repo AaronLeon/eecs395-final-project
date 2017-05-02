@@ -1,9 +1,14 @@
+import java.util.Comparator;
+
 class Pawn {
   int /* 0-3 */ id;
   String color;
   Board.BoardComponent bc;
   int location;
 
+  Pawn(){
+
+  }
   Pawn (int id, String color) {
     this.id=id;
     this.color=color;
@@ -40,4 +45,12 @@ class Pawn {
             && this.bc == other.bc
             && this.location == other.location;
   }
+
+  public class PawnCompare implements Comparator<Pawn> {
+    @Override
+    public int compare(Pawn p1, Pawn p2){
+      return p1.location-p2.location;
+    }
+  }
+
 }

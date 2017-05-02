@@ -14,7 +14,7 @@ public class SPlayer implements Player {
     }
 
 
-    public Move[] doMove(Board brd, int[] rolls) {
+    public Move[] doMove(Parcheesi game, int[] rolls) {
         Move[] moves = new Move[4];
 
         //TODO: Not implemented yet
