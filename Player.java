@@ -4,7 +4,7 @@ interface Player {
   void startGame(String color);
 
   // ask the player what move they want to make
-  Move[] doMove(Parcheesi game, int[] dice);
+  Move[] doMove(Board board, int[] dice);
 
   // inform the player that they have suffered
   // a doubles penalty

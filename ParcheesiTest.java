@@ -15,7 +15,7 @@ public class ParcheesiTest {
     public void beforeTest() {
         game = new Parcheesi();
         for (String color: Board.COLORS) {
-            SPlayer player = new SimplePlayer(color);
+            SPlayer player = new MPlayer(color);
             game.register(player);
         }
     }
@@ -82,6 +82,7 @@ public class ParcheesiTest {
     /*
      * Entering
      */
+    //TODO: Move this to RuleEngineTest
     @Test
     public void canEnterPawnTest() {
         Parcheesi game = new Parcheesi();
@@ -90,10 +91,10 @@ public class ParcheesiTest {
         int[] d3 = {5, 5, 0, 0};
         int[] d4 = {6, 2, 0, 0};
 
-        Assert.assertTrue("Can enter pawn with 1, 4", game.canEnter(d1));
-        Assert.assertTrue("Can enter pawn with 2, 3", game.canEnter(d2));
-        Assert.assertTrue("Can enter pawn with 5, 5", game.canEnter(d3));
-        Assert.assertFalse("Cannot enter pawn with 6, 2", game.canEnter(d4));
+        Assert.assertTrue("Can enter pawn with 1, 4", RuleEngine.canEnter(d1));
+        Assert.assertTrue("Can enter pawn with 2, 3", RuleEngine.canEnter(d2));
+        Assert.assertTrue("Can enter pawn with 5, 5", RuleEngine.canEnter(d3));
+        Assert.assertFalse("Cannot enter pawn with 6, 2", RuleEngine.canEnter(d4));
     }
 
     /*
