@@ -242,7 +242,10 @@ public class Parcheesi implements Game {
         boolean doubles = diceResults.second;
         while (!RuleEngine.allDiceUsed(dice) && RuleEngine.canMove(player, dice, board)) {
             Move[] moves = player.doMove(board, dice);
-            dice = consumeDice(dice, moves[0]);
+            for (Move m:moves){
+                dice=consumeDice(dice,m);
+            }
+
             Board nextBoard = null;
             for (Move m : moves) {
 
