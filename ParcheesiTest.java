@@ -432,23 +432,6 @@ public class ParcheesiTest {
     }
 //
 //    @Test
-//    public void cannotMoveBlockadeTogetherTest() {
-//        Parcheesi game = new Parcheesi();
-//        Pawn blockade1 = new Pawn(0, "green");
-//        Pawn blockade2 = new Pawn(1, "green");
-//
-//        game.board.ring[3].first = blockade1;
-//        game.board.ring[3].second = blockade2;
-//
-//        MoveMain m1 = new MoveMain(blockade1, 4);
-//        MoveMain m2 = new MoveMain(blockade2, 4);
-//        Pair<Board, Integer> result1 = game.processMoves(m1);
-//        Pair<Board, Integer> result2 = game.processMoves(m2);
-//
-//        Assert.assertNull("Moving blockade together is flagged as cheating", result2);
-//    }
-//
-//    @Test
 //    public void cannotMoveBlockadeTogetherInMultipleMovesTest() {
 //        Parcheesi game = new Parcheesi();
 //        Pawn blockade1 = new Pawn(0, "green");
@@ -553,10 +536,6 @@ public class ParcheesiTest {
 //     * Complete Move
 //     */
 //
-//    @Test
-//    public void cannotIgnoreDieRoll() {
-//
-//    }
 //
 //    @Test
 //    public void noMovesLeftDueToBlockadeTest() {
