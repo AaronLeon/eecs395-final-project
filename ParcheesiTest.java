@@ -53,6 +53,7 @@ public class ParcheesiTest {
         Pair<Board, Integer> result = game.processMoves(m1);
 
         Assert.assertTrue("Pawn should move 3 spaces in ring", result.first.ring[8] != null);
+        Assert.assertTrue("pawn updated in pawns hash",result.first.pawns.get(Board.COLORS[0])[0].location==8);
         Assert.assertTrue("Pawn should not be in original space in ring", result.first.ring[5] == null);
     }
 
