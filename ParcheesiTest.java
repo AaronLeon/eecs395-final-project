@@ -212,6 +212,39 @@ public class ParcheesiTest {
         Assert.assertEquals("First bop earns 20 bonus", result1.second, 20);
         Assert.assertEquals("Second bop earns 20 bonus", result2.second, 20);
     }
+
+
+    @Test
+    public void blockadeCannotMove(){
+        String color1 = Board.COLORS[0];
+
+        Pawn p1 = game.board.pawns.get(color1)[0];
+        p1.bc = Board.BoardComponent.RING;
+        p1.location = 10;
+        game.board.ring[p1.location] = p1;
+
+        Pawn p2 = game.board.pawns.get(color1)[0];
+        p2.bc = Board.BoardComponent.RING;
+        p2.location = 10;
+        game.board.ring[p2.location] = p2;
+
+
+        MoveMain m1 = new MoveMain(p1, 3);
+        MoveMain m2 = new MoveMain(p2, 3);
+
+        Board startState = game.board;
+
+        Move[] singleMove={m1};
+
+        Move[] moves = {m1,m2};
+
+        Pair<Board, Integer> result1 = game.processMoves(m1);
+        Pair<Board, Integer> result2 = game.processMoves(m2);
+        Assert.assertFalse("player did not cheat by moving blockade",RuleEngine.movedBlockadeTogether(startState,result1.first,singleMove,game.players.get(color1)));
+
+        Assert.assertTrue("player cheated by moving blockade",RuleEngine.movedBlockadeTogether(startState,result2.first,moves,game.players.get(color1)));
+
+    }
 //
 //    @Test
 //    public void blockadeCannotMoveTogetherWithBopBonusTest() {
