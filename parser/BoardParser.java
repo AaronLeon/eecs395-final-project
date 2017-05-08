@@ -15,32 +15,117 @@ public class BoardParser extends AbstractParser<Board> {
     }
 
     public Board fromXml(Document xml) throws Exception {
-        Node type = xml.getFirstChild();
-        if (!type.getNodeName().equals("board")) {
+
+        //EVERY OTHER ELEMENT IS "BLANK"
+
+        Node root = xml.getFirstChild();
+        if (!root.getNodeName().equals("board")) {
             throw new Exception("Tried to parse XML Document that is not <board></board>");
         }
 
         Board board = new Board();
-        NodeList nodes = type.getChildNodes();
+
+        NodeList nodes = root.getChildNodes();
         int counter=0;
         int end=nodes.getLength();
         int length=0;
         Node boardNode = nodes.item(0);
-        Node start = nodes.item(1);
-        NodeList startPawns = nodes.item(1).getChildNodes();
-        length = startPawns.getLength();
-        Node main = nodes.item(3);
-        NodeList mainPawns = nodes.item(4).getChildNodes();
-        length = mainPawns.getLength();
-        Node homeRows = nodes.item(5);
-        NodeList homeRowPawns = nodes.item(6).getChildNodes();
-        Node home = nodes.item(7);
-        NodeList homePawns = nodes.item(8).getChildNodes();
+        length=boardNode.getChildNodes().getLength();
 
-        //start
-        //main
-        //home-rows
-        //home
+        Node start = nodes.item(1);
+        NodeList startPawns=start.getChildNodes();
+        length=startPawns.getLength();
+        for (int i=0;i<length;i++){
+            Node pawn = startPawns.item(i);
+            String name = pawn.getNodeName();
+            if (name=="pawn"){
+                //copied from pawnParser
+                Node color = pawn.getFirstChild();
+                Node id = color.getNextSibling();
+
+                if (color == null || id == null
+                        || !color.getNodeName().equals("color")
+                        || !id.getNodeName().equals("id")) {
+                    throw new Exception("Invalid Pawn XML Document");
+                }
+
+                String _color = color.getTextContent();
+                int _id = Integer.parseInt(id.getTextContent());
+                //create new pawn
+            }
+        }
+
+
+        Node main = nodes.item(2);
+        NodeList mainPawns = main.getChildNodes();
+        length = mainPawns.getLength();
+        for (int i=0;i<length;i++){
+            Node pawn = startPawns.item(i);
+            String name = pawn.getNodeName();
+            if (name=="pawn"){
+                //copied from pawnParser
+                Node color = pawn.getFirstChild();
+                Node id = color.getNextSibling();
+
+                if (color == null || id == null
+                        || !color.getNodeName().equals("color")
+                        || !id.getNodeName().equals("id")) {
+                    throw new Exception("Invalid Pawn XML Document");
+                }
+
+                String _color = color.getTextContent();
+                int _id = Integer.parseInt(id.getTextContent());
+                //create new pawn
+            }
+        }
+
+
+        Node homeRows = nodes.item(3);
+        NodeList homeRowPawns=homeRows.getChildNodes();
+        length = homeRowPawns.getLength();
+        for (int i=0;i<length;i++){
+            Node pawn = startPawns.item(i);
+            String name = pawn.getNodeName();
+            if (name=="pawn"){
+                //copied from pawnParser
+                Node color = pawn.getFirstChild();
+                Node id = color.getNextSibling();
+
+                if (color == null || id == null
+                        || !color.getNodeName().equals("color")
+                        || !id.getNodeName().equals("id")) {
+                    throw new Exception("Invalid Pawn XML Document");
+                }
+
+                String _color = color.getTextContent();
+                int _id = Integer.parseInt(id.getTextContent());
+                //create new pawn
+            }
+        }
+
+        Node home = nodes.item(4);
+        NodeList homePawns = home.getChildNodes();
+        length = homePawns.getLength();
+        for (int i=0;i<length;i++){
+            Node pawn = startPawns.item(i);
+            String name = pawn.getNodeName();
+            if (name=="pawn"){
+                //copied from pawnParser
+                Node color = pawn.getFirstChild();
+                Node id = color.getNextSibling();
+
+                if (color == null || id == null
+                        || !color.getNodeName().equals("color")
+                        || !id.getNodeName().equals("id")) {
+                    throw new Exception("Invalid Pawn XML Document");
+                }
+
+                String _color = color.getTextContent();
+                int _id = Integer.parseInt(id.getTextContent());
+                //create new pawn
+            }
+        }
+
         return board;
     }
 
