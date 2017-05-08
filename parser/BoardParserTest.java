@@ -47,6 +47,25 @@ public class BoardParserTest {
     }
 
     @Test
+    public void constructNewBoardFromXmlTest() {
+        String buffer = "<board> <start> <pawn> <color> yellow </color> <id> 3 </id> </pawn> <pawn> <color> yellow </color> <id> 2 </id> </pawn> <pawn> <color> yellow </color> <id> 1 </id> </pawn> <pawn> <color> yellow </color> <id> 0 </id> </pawn> <pawn> <color> red </color> <id> 3 </id> </pawn> <pawn> <color> red </color> <id> 2 </id> </pawn> <pawn> <color> red </color> <id> 1 </id> </pawn> <pawn> <color> red </color> <id> 0 </id> </pawn> <pawn> <color> green </color> <id> 3 </id> </pawn> <pawn> <color> green </color> <id> 2 </id> </pawn> <pawn> <color> green </color> <id> 1 </id> </pawn> <pawn> <color> green </color> <id> 0 </id> </pawn> <pawn> <color> blue </color> <id> 3 </id> </pawn> <pawn> <color> blue </color> <id> 2 </id> </pawn> <pawn> <color> blue </color> <id> 1 </id> </pawn> <pawn> <color> blue </color> <id> 0 </id> </pawn> </start> <main> </main> <home-rows> </home-rows> <home> </home> </board>";
+        InputStream is = new ByteArrayInputStream(buffer.getBytes());
+        Document doc;
+        Board board = new Board();
+        try {
+            doc = db.parse(is);
+            System.out.println(doc.getNodeName());
+            board = parser.fromXml(doc);
+            //builds from Xml
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        Pawn expected = new Pawn(3, "red");
+        Assert.assertEquals("Parsing pawn XML should return correct pawn", expected, board);
+    }
+
+    @Test
     public void constructXmlFromNewBoardTest() {
         String buffer = "<board> <start> <pawn> <color> yellow </color> <id> 3 </id> </pawn> <pawn> <color> yellow </color> <id> 2 </id> </pawn> <pawn> <color> yellow </color> <id> 1 </id> </pawn> <pawn> <color> yellow </color> <id> 0 </id> </pawn> <pawn> <color> red </color> <id> 3 </id> </pawn> <pawn> <color> red </color> <id> 2 </id> </pawn> <pawn> <color> red </color> <id> 1 </id> </pawn> <pawn> <color> red </color> <id> 0 </id> </pawn> <pawn> <color> green </color> <id> 3 </id> </pawn> <pawn> <color> green </color> <id> 2 </id> </pawn> <pawn> <color> green </color> <id> 1 </id> </pawn> <pawn> <color> green </color> <id> 0 </id> </pawn> <pawn> <color> blue </color> <id> 3 </id> </pawn> <pawn> <color> blue </color> <id> 2 </id> </pawn> <pawn> <color> blue </color> <id> 1 </id> </pawn> <pawn> <color> blue </color> <id> 0 </id> </pawn> </start> <main> </main> <home-rows> </home-rows> <home> </home> </board>";
         InputStream is = new ByteArrayInputStream(buffer.getBytes());
@@ -62,24 +81,6 @@ public class BoardParserTest {
         }
         Assert.assertTrue("Parsing pawn should return correct pawn XML", expected.isEqualNode(doc));
 
-    }
-
-    @Test
-    public void constructNewBoardFromXmlTest() {
-        String buffer = "<board> <start> <pawn> <color> yellow </color> <id> 3 </id> </pawn> <pawn> <color> yellow </color> <id> 2 </id> </pawn> <pawn> <color> yellow </color> <id> 1 </id> </pawn> <pawn> <color> yellow </color> <id> 0 </id> </pawn> <pawn> <color> red </color> <id> 3 </id> </pawn> <pawn> <color> red </color> <id> 2 </id> </pawn> <pawn> <color> red </color> <id> 1 </id> </pawn> <pawn> <color> red </color> <id> 0 </id> </pawn> <pawn> <color> green </color> <id> 3 </id> </pawn> <pawn> <color> green </color> <id> 2 </id> </pawn> <pawn> <color> green </color> <id> 1 </id> </pawn> <pawn> <color> green </color> <id> 0 </id> </pawn> <pawn> <color> blue </color> <id> 3 </id> </pawn> <pawn> <color> blue </color> <id> 2 </id> </pawn> <pawn> <color> blue </color> <id> 1 </id> </pawn> <pawn> <color> blue </color> <id> 0 </id> </pawn> </start> <main> </main> <home-rows> </home-rows> <home> </home> </board>";
-        InputStream is = new ByteArrayInputStream(buffer.getBytes());
-        Document doc;
-        Board board = new Board();
-        try {
-            doc = db.parse(is);
-            System.out.println(doc.getNodeName());
-            board = parser.fromXml(doc);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        Pawn expected = new Pawn(3, "red");
-        Assert.assertEquals("Parsing pawn XML should return correct pawn", expected, board);
     }
 
     @Test
