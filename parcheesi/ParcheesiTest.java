@@ -1,3 +1,5 @@
+package parcheesi;
+
 import org.junit.*;
 
 public class ParcheesiTest {
@@ -48,13 +50,13 @@ public class ParcheesiTest {
         EnterPiece e1 = new EnterPiece(pawn1);
         game.board = (game.processMoves(e1)).first;
 
-        // Move the pawn again
+        // parcheesi.Move the pawn again
         MoveMain m1 = new MoveMain(pawn1, 4);
         Pair<Board, Integer> result = game.processMoves(m1);
 
-        Assert.assertTrue("Pawn should move 3 spaces in ring", result.first.ring[8] != null);
+        Assert.assertTrue("parcheesi.Pawn should move 3 spaces in ring", result.first.ring[8] != null);
         Assert.assertTrue("pawn updated in pawns hash",result.first.pawns.get(Board.COLORS[0])[0].location==8);
-        Assert.assertTrue("Pawn should not be in original space in ring", result.first.ring[5] == null);
+        Assert.assertTrue("parcheesi.Pawn should not be in original space in ring", result.first.ring[5] == null);
     }
 
     @Test
@@ -69,21 +71,21 @@ public class ParcheesiTest {
         Pair<Board, Integer> result = game.processMoves(m1);
         Board board = result.first;
 
-        Assert.assertEquals("Pawn should move 4 spaces in runway", pawn, board.homeRows.get(color)[4]);
-        Assert.assertNull("Pawn should not be in original space in runway", board.homeRows.get(color)[2]);
+        Assert.assertEquals("parcheesi.Pawn should move 4 spaces in runway", pawn, board.homeRows.get(color)[4]);
+        Assert.assertNull("parcheesi.Pawn should not be in original space in runway", board.homeRows.get(color)[2]);
 
         MoveHome m2 = new MoveHome(pawn, 3);
         result = game.processMoves(m2);
         board = result.first;
 
 
-        Assert.assertEquals("Pawn should move 2 spaces in runway and enter home", pawn, board.homes.get(color)[pawn.id]);
+        Assert.assertEquals("parcheesi.Pawn should move 2 spaces in runway and enter home", pawn, board.homes.get(color)[pawn.id]);
     }
 
     /*
      * Entering
      */
-    //TODO: Move this to RuleEngineTest
+    //TODO: parcheesi.Move this to RuleEngineTest
     @Test
     public void canEnterPawnTest() {
         Parcheesi game = new Parcheesi();
@@ -248,23 +250,23 @@ public class ParcheesiTest {
 //
 //    @Test
 //    public void blockadeCannotMoveTogetherWithBopBonusTest() {
-//        Parcheesi game = new Parcheesi();
-//        Pawn p1 = new Pawn(0, "red");
-//        Pawn p2 = new Pawn(1, "red");
-//        Pawn blockade1 = new Pawn(2, "red");
-//        Pawn blockade2 = new Pawn(3, "red");
-//        Pawn p3 = new Pawn(0, "green");
-//        Pawn p4 = new Pawn(1, "green");
+//        parcheesi.Parcheesi game = new parcheesi.Parcheesi();
+//        parcheesi.Pawn p1 = new parcheesi.Pawn(0, "red");
+//        parcheesi.Pawn p2 = new parcheesi.Pawn(1, "red");
+//        parcheesi.Pawn blockade1 = new parcheesi.Pawn(2, "red");
+//        parcheesi.Pawn blockade2 = new parcheesi.Pawn(3, "red");
+//        parcheesi.Pawn p3 = new parcheesi.Pawn(0, "green");
+//        parcheesi.Pawn p4 = new parcheesi.Pawn(1, "green");
 //
 //        game.board.ring[0] = p1;
 //        game.board.ring[1] = p2;
 //        game.board.ring[3] = p3;
 //        game.board.ring[7] = p4;
 //
-//        MoveMain m1 = new MoveMain(p1, 3);
-//        MoveMain m2 = new MoveMain(p2, 6);
-//        Pair<Board, Integer> result1 = game.processMoves(m1);
-//        Pair<Board, Integer> result2 = game.processMoves(m2);
+//        parcheesi.MoveMain m1 = new parcheesi.MoveMain(p1, 3);
+//        parcheesi.MoveMain m2 = new parcheesi.MoveMain(p2, 6);
+//        parcheesi.Pair<parcheesi.Board, Integer> result1 = game.processMoves(m1);
+//        parcheesi.Pair<parcheesi.Board, Integer> result2 = game.processMoves(m2);
 //
 //        //TODO: Check that bonus moves cant move blockade together
 //    }
@@ -433,22 +435,22 @@ public class ParcheesiTest {
 //
 //    @Test
 //    public void cannotMoveBlockadeTogetherInMultipleMovesTest() {
-//        Parcheesi game = new Parcheesi();
-//        Pawn blockade1 = new Pawn(0, "green");
-//        Pawn blockade2 = new Pawn(1, "green");
+//        parcheesi.Parcheesi game = new parcheesi.Parcheesi();
+//        parcheesi.Pawn blockade1 = new parcheesi.Pawn(0, "green");
+//        parcheesi.Pawn blockade2 = new parcheesi.Pawn(1, "green");
 //
 //        game.board.ring[3].first = blockade1;
 //        game.board.ring[3].second = blockade2;
 //
-//        MoveMain m1 = new MoveMain(blockade1, 2);
-//        MoveMain m2 = new MoveMain(blockade1, 5);
-//        MoveMain m3 = new MoveMain(blockade2, 2);
-//        MoveMain m4 = new MoveMain(blockade2, 5);
+//        parcheesi.MoveMain m1 = new parcheesi.MoveMain(blockade1, 2);
+//        parcheesi.MoveMain m2 = new parcheesi.MoveMain(blockade1, 5);
+//        parcheesi.MoveMain m3 = new parcheesi.MoveMain(blockade2, 2);
+//        parcheesi.MoveMain m4 = new parcheesi.MoveMain(blockade2, 5);
 //
-//        Pair<Board, Integer> result1 = game.processMoves(m1);
-//        Pair<Board, Integer> result2 = game.processMoves(m2);
-//        Pair<Board, Integer> result3 = game.processMoves(m3);
-//        Pair<Board, Integer> result4 = game.processMoves(m4);
+//        parcheesi.Pair<parcheesi.Board, Integer> result1 = game.processMoves(m1);
+//        parcheesi.Pair<parcheesi.Board, Integer> result2 = game.processMoves(m2);
+//        parcheesi.Pair<parcheesi.Board, Integer> result3 = game.processMoves(m3);
+//        parcheesi.Pair<parcheesi.Board, Integer> result4 = game.processMoves(m4);
 //
 //        Assert.assertNull("Moving blockade together in multiple moves with doubles bonus is flagged as cheating", result4);
 //    }
@@ -473,7 +475,7 @@ public class ParcheesiTest {
         Pair<Board, Integer> result = game.processMoves(m1);
 
         boolean boo = (new Blockade(b1, b2)).equals(result.first.ring[7]);
-        Assert.assertEquals("Blockade is formed at new location", new Blockade(b1, b2), result.first.ring[7]);
+        Assert.assertEquals("parcheesi.Blockade is formed at new location", new Blockade(b1, b2), result.first.ring[7]);
     }
 
     @Test
@@ -529,20 +531,20 @@ public class ParcheesiTest {
         MoveMain m1 = new MoveMain(p, 5);
         Pair<Board, Integer> result = game.processMoves(m1);
 
-        Assert.assertEquals("Pawn can move from ring into home row", p, result.first.homeRows.get(color)[1]);
+        Assert.assertEquals("parcheesi.Pawn can move from ring into home row", p, result.first.homeRows.get(color)[1]);
     }
 
 //    /*
-//     * Complete Move
+//     * Complete parcheesi.Move
 //     */
 //
 //
 //    @Test
 //    public void noMovesLeftDueToBlockadeTest() {
-//        Parcheesi game = new Parcheesi();
-//        Pawn blockade1 = new Pawn(0, "green");
-//        Pawn blockade2 = new Pawn(1, "green");
-//        Pawn p1 = new Pawn(0, "red");
+//        parcheesi.Parcheesi game = new parcheesi.Parcheesi();
+//        parcheesi.Pawn blockade1 = new parcheesi.Pawn(0, "green");
+//        parcheesi.Pawn blockade2 = new parcheesi.Pawn(1, "green");
+//        parcheesi.Pawn p1 = new parcheesi.Pawn(0, "red");
 //
 //        game.board.ring[3].first = blockade1;
 //        game.board.ring[3].second = blockade2;
@@ -556,18 +558,18 @@ public class ParcheesiTest {
 //
 //    @Test
 //    public void canOnlyUseFirstDiceDueToBlockadeTest() {
-//        Parcheesi game = new Parcheesi();
+//        parcheesi.Parcheesi game = new parcheesi.Parcheesi();
 //
-//        Pawn p1 = new Pawn(0, "red");
-//        Pawn blockade1 = new Pawn(1, "green");
-//        Pawn blockade2 = new Pawn(2, "green");
+//        parcheesi.Pawn p1 = new parcheesi.Pawn(0, "red");
+//        parcheesi.Pawn blockade1 = new parcheesi.Pawn(1, "green");
+//        parcheesi.Pawn blockade2 = new parcheesi.Pawn(2, "green");
 //
 //        game.board.ring[0].first = p1;
 //        game.board.ring[4].first = blockade1;
 //        game.board.ring[4].second = blockade2;
 //
-//        MoveMain m1 = new MoveMain(p1, 3);
-//        Pair<Board, Integer> result = game.processMoves(m1);
+//        parcheesi.MoveMain m1 = new parcheesi.MoveMain(p1, 3);
+//        parcheesi.Pair<parcheesi.Board, Integer> result = game.processMoves(m1);
 //        int[] dice = {2, 5, 0, 0};
 //
 //        boolean movesPossible = game.movesPossible(game.players[0], dice, game.board);
@@ -577,18 +579,18 @@ public class ParcheesiTest {
 //
 //    @Test
 //    public void canOnlyUseSecondDiceDueToBlockadeTest() {
-//        Parcheesi game = new Parcheesi();
+//        parcheesi.Parcheesi game = new parcheesi.Parcheesi();
 //
-//        Pawn p1 = new Pawn(0, "red");
-//        Pawn blockade1 = new Pawn(1, "green");
-//        Pawn blockade2 = new Pawn(2, "green");
+//        parcheesi.Pawn p1 = new parcheesi.Pawn(0, "red");
+//        parcheesi.Pawn blockade1 = new parcheesi.Pawn(1, "green");
+//        parcheesi.Pawn blockade2 = new parcheesi.Pawn(2, "green");
 //
 //        game.board.ring[0].first = p1;
 //        game.board.ring[4].first = blockade1;
 //        game.board.ring[4].second = blockade2;
 //
-//        MoveMain m1 = new MoveMain(p1, 3);
-//        Pair<Board, Integer> result = game.processMoves(m1);
+//        parcheesi.MoveMain m1 = new parcheesi.MoveMain(p1, 3);
+//        parcheesi.Pair<parcheesi.Board, Integer> result = game.processMoves(m1);
 //        int[] dice = {5, 2, 0, 0};
 //
 //        boolean movesPossible = game.movesPossible(game.players[0], dice, game.board);
@@ -598,20 +600,20 @@ public class ParcheesiTest {
 //
 //    @Test
 //    public void cannotUseBopBonusTest() {
-//        Parcheesi game = new Parcheesi();
+//        parcheesi.Parcheesi game = new parcheesi.Parcheesi();
 //
-//        Pawn p1 = new Pawn(0, "red");
-//        Pawn p2 = new Pawn(0, "green");
-//        Pawn blockade1 = new Pawn(1, "green");
-//        Pawn blockade2 = new Pawn(2, "green");
+//        parcheesi.Pawn p1 = new parcheesi.Pawn(0, "red");
+//        parcheesi.Pawn p2 = new parcheesi.Pawn(0, "green");
+//        parcheesi.Pawn blockade1 = new parcheesi.Pawn(1, "green");
+//        parcheesi.Pawn blockade2 = new parcheesi.Pawn(2, "green");
 //
 //        game.board.ring[0].first = p1;
 //        game.board.ring[3].first = p2;
 //        game.board.ring[5].first = blockade1;
 //        game.board.ring[5].second = blockade2;
 //
-//        MoveMain m1 = new MoveMain(p1, 3);
-//        Pair<Board, Integer> result = game.processMoves(m1);
+//        parcheesi.MoveMain m1 = new parcheesi.MoveMain(p1, 3);
+//        parcheesi.Pair<parcheesi.Board, Integer> result = game.processMoves(m1);
 //        int[] dice = {0, 0, 0, result.second};
 //
 //        boolean movesPossible = game.movesPossible(game.players[0], dice, game.board);
@@ -621,12 +623,12 @@ public class ParcheesiTest {
 //
 //    @Test
 //    public void cannotUseHomeBonusTest() {
-//        Parcheesi game = new Parcheesi();
+//        parcheesi.Parcheesi game = new parcheesi.Parcheesi();
 //
-//        Pawn p1 = new Pawn(0, "red");
-//        Pawn p2 = new Pawn(1, "red");
-//        Pawn blockade1 = new Pawn(0, "green");
-//        Pawn blockade2 = new Pawn(1, "green");
+//        parcheesi.Pawn p1 = new parcheesi.Pawn(0, "red");
+//        parcheesi.Pawn p2 = new parcheesi.Pawn(1, "red");
+//        parcheesi.Pawn blockade1 = new parcheesi.Pawn(0, "green");
+//        parcheesi.Pawn blockade2 = new parcheesi.Pawn(1, "green");
 //
 //
 //        game.board.homerows.get("red").runway[0].first = p1;
@@ -634,8 +636,8 @@ public class ParcheesiTest {
 //        game.board.ring[5].first = blockade1;
 //        game.board.ring[5].second = blockade2;
 //
-//        MoveHome m1 = new MoveHome(p1, 3, 3);
-//        Pair<Board, Integer> result = game.processMoves(m1);
+//        parcheesi.MoveHome m1 = new parcheesi.MoveHome(p1, 3, 3);
+//        parcheesi.Pair<parcheesi.Board, Integer> result = game.processMoves(m1);
 //        int[] dice = {0, 0, 0, result.second};
 //
 //        boolean movesPossible = game.movesPossible(game.players[0], dice, game.board);
@@ -645,16 +647,16 @@ public class ParcheesiTest {
 //
 //    @Test
 //    public void canOnlyUseOneDiceDueToMovingBlockadeTogetherTest() {
-//        Parcheesi game = new Parcheesi();
+//        parcheesi.Parcheesi game = new parcheesi.Parcheesi();
 //
-//        Pawn blockade1 = new Pawn(0, "green");
-//        Pawn blockade2 = new Pawn(1, "green");
+//        parcheesi.Pawn blockade1 = new parcheesi.Pawn(0, "green");
+//        parcheesi.Pawn blockade2 = new parcheesi.Pawn(1, "green");
 //
 //        game.board.ring[4].first = blockade1;
 //        game.board.ring[4].second = blockade2;
 //
-//        MoveMain m1 = new MoveMain(blockade1, 3);
-//        Pair<Board, Integer> result = game.processMoves(m1);
+//        parcheesi.MoveMain m1 = new parcheesi.MoveMain(blockade1, 3);
+//        parcheesi.Pair<parcheesi.Board, Integer> result = game.processMoves(m1);
 //        int[] dice = {0, 3, 0, 0};
 //
 //        boolean movesPossible = game.movesPossible(game.players[0], dice, game.board);

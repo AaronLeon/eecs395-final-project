@@ -1,22 +1,21 @@
-import java.util.Comparator;
+package parcheesi;
 
-class Pawn {
-  int /* 0-3 */ id;
-  String color;
-  Board.BoardComponent bc;
-  int location;
+public class Pawn {
+  public int /* 0-3 */ id;
+  public String color;
+  public Board.BoardComponent bc;
+  public int location;
 
-  Pawn(){
+  public Pawn() {}
 
-  }
-  Pawn (int id, String color) {
+  public Pawn (int id, String color) {
     this.id = id;
     this.color = color;
     this.bc = Board.BoardComponent.NEST;
     this.location = id;
   }
 
-  Pawn (int id, String color, Board.BoardComponent bc, int location) {
+  public Pawn (int id, String color, Board.BoardComponent bc, int location) {
     this.id = id;
     this.color = color;
     this.bc = bc;
@@ -34,12 +33,4 @@ class Pawn {
             && this.bc == p.bc
             && this.location == p.location;
   }
-
-  public class PawnCompare implements Comparator<Pawn> {
-    @Override
-    public int compare(Pawn p1, Pawn p2){
-      return p1.location-p2.location;
-    }
-  }
-
 }

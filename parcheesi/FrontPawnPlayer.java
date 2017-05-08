@@ -1,8 +1,10 @@
+package parcheesi;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class BackPawnPlayer extends MPlayer {
-    public BackPawnPlayer(String color) {
+public class FrontPawnPlayer extends  MPlayer {
+    public FrontPawnPlayer(String color) {
         super(color);
     }
 
@@ -15,10 +17,10 @@ public class BackPawnPlayer extends MPlayer {
             else if (b.bc == Board.BoardComponent.HOME || b.bc == Board.BoardComponent.NEST
                     || (a.bc == Board.BoardComponent.HOMEROW && b.bc == Board.BoardComponent.RING)
                     || (a.bc == b.bc && a.location > b.location)) {
-                return -1;
+                return 1;
             }
             else {
-                return 1;
+                return -1;
             }
         });
         return pawns;

@@ -1,3 +1,5 @@
+package parcheesi;
+
 interface Player {
   // inform the player that a game has started
   // and what color the player is.

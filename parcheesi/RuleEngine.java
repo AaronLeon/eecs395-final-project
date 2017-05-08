@@ -1,10 +1,12 @@
+package parcheesi;
+
 import static java.util.Arrays.sort;
 
 public class RuleEngine {
     /**
      * Checks if player can earn double bonus (e.g. whether all their pawns are out of the nest)
      *
-     * @param p Player that is being checked
+     * @param p parcheesi.Player that is being checked
      * @return true if player's pawns are all out of the nest and false otherwise
      */
     public static boolean canEarnDoubleBonus(Board board, Player p) {
@@ -53,7 +55,7 @@ public class RuleEngine {
             return canEnter(dice) && !board.isBlockade(Board.BoardComponent.RING, board.NEST_LOCATIONS.get(pawn.color), pawn.color);
             //check if integers in dice can sum to 5 and entryway isn't blockaded
         } else if (pawn.bc == Board.BoardComponent.HOMEROW) {
-            //TODO: Make isBlocked accepted MoveHome as well..this doesn't check all squares for blockades
+            //TODO: Make isBlocked accepted parcheesi.MoveHome as well..this doesn't check all squares for blockades
             for (int d : dice) {
                 for (int i = 0; i <= d; i++) {
                     //d+1 because we check d cell as well
@@ -76,7 +78,7 @@ public class RuleEngine {
     /**
      * Checks if player still has moves possible given dice roll and current board state
      *
-     * @param p     Player that is being checked
+     * @param p     parcheesi.Player that is being checked
      * @param dice  Array of dice roll values
      * @param board Current board state
      * @return
@@ -95,10 +97,10 @@ public class RuleEngine {
     }
 
     /**
-     * Helper function that checks if a MoveMain is blockaded
+     * Helper function that checks if a parcheesi.MoveMain is blockaded
      *
-     * @param m MoveMain that is being checked
-     * @return true if the MoveMain is blockaded, false otherwise
+     * @param m parcheesi.MoveMain that is being checked
+     * @return true if the parcheesi.MoveMain is blockaded, false otherwise
      */
     private static boolean isBlocked(Board board, MoveMain m) {
         Pawn pawn = m.pawn;
@@ -123,10 +125,10 @@ public class RuleEngine {
     }
 
     /**
-     * Helper function that checks if a MoveHome is blockaded
+     * Helper function that checks if a parcheesi.MoveHome is blockaded
      *
-     * @param m MoveHome that is being checked
-     * @return true if the MoveHome is blockaded, false otherwise
+     * @param m parcheesi.MoveHome that is being checked
+     * @return true if the parcheesi.MoveHome is blockaded, false otherwise
      */
     private static boolean isBlocked(Board board, MoveHome m) {
         Pawn pawn = m.pawn;
@@ -145,10 +147,10 @@ public class RuleEngine {
     }
 
     /**
-     * Helper function that checks if an EnterPiece is blockaded
+     * Helper function that checks if an parcheesi.EnterPiece is blockaded
      *
-     * @param m EnterPiece that is being checked
-     * @return true if the EnterPiece is blockaded, false otherwise
+     * @param m parcheesi.EnterPiece that is being checked
+     * @return true if the parcheesi.EnterPiece is blockaded, false otherwise
      */
     private static boolean isBlocked(Board board, EnterPiece m) {
         Pawn pawn = m.pawn;
@@ -160,8 +162,8 @@ public class RuleEngine {
     /**
      * Checks if a move is blockaded
      *
-     * @param m Move that is being checked
-     * @return true if the Move is blockaded, false otherwise
+     * @param m parcheesi.Move that is being checked
+     * @return true if the parcheesi.Move is blockaded, false otherwise
      */
     public static boolean isBlocked(Board board, Move m) {
         if (m instanceof EnterPiece) {
@@ -181,7 +183,7 @@ public class RuleEngine {
      * @param board1 Starting board state
      * @param board2 Ending board state
      * @param moves  Array of history of moves that occurred between board states
-     * @param player Player that moved
+     * @param player parcheesi.Player that moved
      * @return true if player moved a blockade together and false otherwise
      */
     //TODO: Should check using moves to see if blockade is formed in intermediary move

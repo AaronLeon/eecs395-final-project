@@ -1,3 +1,5 @@
+package parcheesi;
+
 public class MPlayer extends SPlayer {
     String color;
 

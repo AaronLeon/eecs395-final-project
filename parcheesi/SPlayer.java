@@ -1,3 +1,5 @@
+package parcheesi;
+
 public abstract class SPlayer implements Player {
     String color;
 

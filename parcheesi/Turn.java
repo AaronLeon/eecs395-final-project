@@ -1,3 +1,5 @@
+package parcheesi;
+
 import java.util.LinkedList;
 
 /**

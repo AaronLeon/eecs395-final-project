@@ -1,6 +1,8 @@
+package parcheesi;
+
 /**
- * SimplePlayer
- * An implementation of SPlayer for testing who does nothing
+ * parcheesi.SimplePlayer
+ * An implementation of parcheesi.SPlayer for testing who does nothing
  */
 public class SimplePlayer extends SPlayer {
     public SimplePlayer(String c) {

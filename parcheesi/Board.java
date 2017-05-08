@@ -1,3 +1,5 @@
+package parcheesi;
+
 import java.util.HashMap;
 
 public class Board {
@@ -93,7 +95,7 @@ public class Board {
 
     public void enterPiece(Pawn pawn) throws Exception {
         if (pawn.bc != BoardComponent.NEST) {
-            throw new Exception("Pawn that is not in nest is trying to enter board");
+            throw new Exception("parcheesi.Pawn that is not in nest is trying to enter board");
         }
         int homeLocation = NEST_LOCATIONS.get(pawn.color);
         nests.get(pawn.color)[pawn.location] = null;

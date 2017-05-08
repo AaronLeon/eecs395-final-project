@@ -1,0 +1,3 @@
+package parcheesi;
+
+interface Move {}

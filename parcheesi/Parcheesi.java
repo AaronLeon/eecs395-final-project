@@ -1,6 +1,6 @@
-/**
- * Parcheesi
- * The Parcheesi class represents the game engine
+package parcheesi; /**
+ * parcheesi.Parcheesi
+ * The parcheesi.Parcheesi class represents the game engine
  */
 
 import java.util.HashMap;
@@ -15,7 +15,7 @@ public class Parcheesi implements Game {
     }
 
     /**
-     * Entry point to Parcheesi game. Gives players their turns and updates board states until a winner is decided.
+     * Entry point to parcheesi.Parcheesi game. Gives players their turns and updates board states until a winner is decided.
      */
     public void start() {
         // registers players
@@ -57,7 +57,7 @@ public class Parcheesi implements Game {
     /**
      * Rolls the dice awarding doubles bonus if the player is eligible (e.g. if all the player's pawns are out)
      *
-     * @return Pair containing an int array that represents the dice roll and a boolean denoting whether the player
+     * @return parcheesi.Pair containing an int array that represents the dice roll and a boolean denoting whether the player
      * rolled doubles.
      */
     private Pair<int[], Boolean> rollDice(Player p) {
@@ -78,10 +78,10 @@ public class Parcheesi implements Game {
     }
 
     /**
-     * Processes an EnterPiece
+     * Processes an parcheesi.EnterPiece
      *
-     * @param m EnterPiece to be processed
-     * @return Pair containing the board state after the EnterPiece move has taken place and
+     * @param m parcheesi.EnterPiece to be processed
+     * @return parcheesi.Pair containing the board state after the parcheesi.EnterPiece move has taken place and
      * a bonus for bopping (0 if no bonus is earned)
      */
     public Pair<Board, Integer> processMove(EnterPiece m) {
@@ -114,10 +114,10 @@ public class Parcheesi implements Game {
     }
 
     /**
-     * Processes a MoveMain
+     * Processes a parcheesi.MoveMain
      *
-     * @param m MoveMain to be processed
-     * @return Pair containing the board state after the MoveMain move has taken place and
+     * @param m parcheesi.MoveMain to be processed
+     * @return parcheesi.Pair containing the board state after the parcheesi.MoveMain move has taken place and
      * a bonus for bopping or entering home (0 if no bonus is earned)
      */
     public Pair<Board, Integer> processMove(MoveMain m) {
@@ -159,10 +159,10 @@ public class Parcheesi implements Game {
     }
 
     /**
-     * Processes a MoveHome
+     * Processes a parcheesi.MoveHome
      *
-     * @param m MoveHome to be processed
-     * @return Pair containing the board state after the MoveHome move has taken place and
+     * @param m parcheesi.MoveHome to be processed
+     * @return parcheesi.Pair containing the board state after the parcheesi.MoveHome move has taken place and
      * a bonus for bopping or entering home (0 if no bonus is earned)
      */
     public Pair<Board, Integer> processMove(MoveHome m) {
@@ -186,10 +186,10 @@ public class Parcheesi implements Game {
     }
 
     /**
-     * Processes a Move
+     * Processes a parcheesi.Move
      *
-     * @param m Move to be processed
-     * @return Pair containing the board state after the Move move has taken place and
+     * @param m parcheesi.Move to be processed
+     * @return parcheesi.Pair containing the board state after the parcheesi.Move move has taken place and
      * a bonus for bopping or entering home (0 if no bonus is earned)
      */
     // TODO: does board member need to be updated?
@@ -208,7 +208,7 @@ public class Parcheesi implements Game {
     /**
      * Registers a player and tells the player that the game has started
      *
-     * @param p Player that is being registered
+     * @param p parcheesi.Player that is being registered
      */
     public void register(Player p) {
         SPlayer player = (SPlayer) p;
@@ -231,8 +231,8 @@ public class Parcheesi implements Game {
      * Gives a turn to a player. Rolls the dice and asks the player for moves until all dice are consumed.
      * Awards dice bonus as needed
      *
-     * @param p Player who is taking the current turn
-     * @return Pair containing the new board state after the turn and a boolean that denotes a double roll
+     * @param p parcheesi.Player who is taking the current turn
+     * @return parcheesi.Pair containing the new board state after the turn and a boolean that denotes a double roll
      */
     public Pair<Board, Boolean> giveTurn(Player p) {
         SPlayer player = (SPlayer) p;
@@ -276,7 +276,7 @@ public class Parcheesi implements Game {
      * Consumes dice roll with respect to the given move.
      *
      * @param dice Array of dice roll values
-     * @param m    Move that uses dice roll
+     * @param m    parcheesi.Move that uses dice roll
      * @return The dice array once the given move has consumed its respective dice roll.
      */
     // TODO: Abstract into a Dice utility class?
@@ -313,7 +313,7 @@ public class Parcheesi implements Game {
     /**
      * Sends the player's furthest pawn back to its nest
      *
-     * @param p Player who incurred doubles penalty by rolling 3 consecutive doubles
+     * @param p parcheesi.Player who incurred doubles penalty by rolling 3 consecutive doubles
      */
     public void doublesPenalty(Player p) {
         String color = ((SPlayer) p).color;
@@ -349,7 +349,7 @@ public class Parcheesi implements Game {
     }
 
     /**
-     * Punishes a cheating Player by removing it from the player list and sending all of its pawns back to the nest
+     * Punishes a cheating parcheesi.Player by removing it from the player list and sending all of its pawns back to the nest
      *
      * @param color Color of the cheating player
      */

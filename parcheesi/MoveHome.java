@@ -1,3 +1,5 @@
+package parcheesi;
+
 // represents a move that starts on one of the home rows
 public class MoveHome implements Move {
   Pawn pawn;

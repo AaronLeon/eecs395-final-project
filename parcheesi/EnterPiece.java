@@ -1,3 +1,5 @@
+package parcheesi;
+
 // represents a move where a player enters a piece
 class EnterPiece implements Move {
   Pawn pawn;  
