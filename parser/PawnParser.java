@@ -38,7 +38,6 @@ public class PawnParser extends AbstractParser<Pawn> {
         Document doc = db.newDocument();
 
         Element pawn = doc.createElement("pawn");
-        doc.appendChild(pawn);
 
         Element color = doc.createElement("color");
         color.appendChild(doc.createTextNode(p.color));
@@ -48,6 +47,7 @@ public class PawnParser extends AbstractParser<Pawn> {
 
         pawn.appendChild(color);
         pawn.appendChild(id);
+        doc.appendChild(pawn);
 
         return doc;
     }
