@@ -19,6 +19,7 @@ public class Parcheesi implements Game {
 
     public Parcheesi() {
         board = new Board();
+        board.initPawns();
         players = new HashMap<>(4);
     }
 

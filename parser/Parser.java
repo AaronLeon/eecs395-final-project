@@ -45,7 +45,19 @@ public class Parser {
     }
 
     public static Document generateMovesXml(DocumentBuilder db, Move[] moves) {
-        return db.newDocument();
+        MoveParser moveParser = new MoveParser(db);
+
+        Document doc = db.newDocument();
+        Element movesRoot = doc.createElement("moves");
+
+        for (Move move : moves) {
+            Node tempMove = doc.importNode(moveParser.toXml(move).getFirstChild(), true);
+            movesRoot.appendChild(tempMove);
+        }
+        
+        doc.appendChild(movesRoot);
+
+        return doc;
     }
 
     public static Document generateDoublesPenaltyXml(DocumentBuilder db) {
