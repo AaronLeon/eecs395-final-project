@@ -1,5 +1,6 @@
 package parcheesi;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Board {
@@ -7,13 +8,13 @@ public class Board {
         NEST, RING, HOMEROW, HOME
     }
 
-    static final String[] COLORS = {"blue", "yellow", "green", "red"};
-    static final int RING_SIZE = 17 * 4;
-    static final int HOMEROW_SIZE =  7;
-    static final int NEST_SIZE = 4;
-    static final int HOME_SIZE = 4;
+    public static final String[] COLORS = {"blue", "yellow", "green", "red"};
+    public static final int RING_SIZE = 17 * 4;
+    public static final int HOMEROW_SIZE =  7;
+    public static final int NEST_SIZE = 4;
+    public static final int HOME_SIZE = 4;
 
-    static final HashMap<String, Integer> NEST_LOCATIONS = new HashMap<String, Integer>() {
+    public static final HashMap<String, Integer> NEST_LOCATIONS = new HashMap<String, Integer>() {
         {
             put("blue", 4);
             put("yellow", 21);
@@ -21,7 +22,7 @@ public class Board {
             put("red", 55);
         }
     };
-    static final HashMap<String, Integer> HOMEROW_LOCATIONS = new HashMap<String, Integer>() {
+    public static final HashMap<String, Integer> HOMEROW_LOCATIONS = new HashMap<String, Integer>() {
         {
             put("blue", 67);
             put("yellow", 16);
@@ -29,15 +30,15 @@ public class Board {
             put("red", 50);
         }
     };
-    static final int SAFE_LOCATIONS[] = {4, 11, 16, 21, 28, 33, 38, 45, 50, 55, 62, 67};
+    public static final int SAFE_LOCATIONS[] = {4, 11, 16, 21, 28, 33, 38, 45, 50, 55, 62, 67};
 
 
-    Object[] ring;
-    HashMap<String, Object[]> nests;
-    HashMap<String, Object[]> homeRows;
-    HashMap<String, Object[]> homes;
+    public Object[] ring;
+    public HashMap<String, Object[]> nests;
+    public HashMap<String, Object[]> homeRows;
+    public HashMap<String, Object[]> homes;
     //map color to string of pawns
-    HashMap<String, Pawn[]> pawns;
+    public HashMap<String, Pawn[]> pawns;
 
     public Board() {
         ring = new Object[RING_SIZE];
@@ -235,5 +236,26 @@ public class Board {
             default:
                 break;
         }
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Board)) {
+            return false;
+        }
+        Board b = (Board) other;
+
+
+        if (!Arrays.equals(ring, b.ring)) {
+            return false;
+        }
+        for (String color : COLORS) {
+            if (Arrays.equals(nests.get(color), b.nests.get(color))
+                || Arrays.equals(homeRows.get(color), b.homeRows.get(color))
+                || Arrays.equals(homes.get(color), b.homes.get(color))) {
+                return false;
+            }
+        }
+        return true;
     }
 }

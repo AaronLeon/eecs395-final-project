@@ -1,11 +1,19 @@
-package parcheesi; /**
+package parcheesi;
+
+/**
  * parcheesi.Parcheesi
  * The parcheesi.Parcheesi class represents the game engine
  */
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.net.ServerSocket;
+import java.util.Iterator;
 
 public class Parcheesi implements Game {
+    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     Board board;
     HashMap<String, Player> players;
 
@@ -17,40 +25,52 @@ public class Parcheesi implements Game {
     /**
      * Entry point to parcheesi.Parcheesi game. Gives players their turns and updates board states until a winner is decided.
      */
-    public void start() {
-        // registers players
-        if (!registeredPlayersBeforeStart()) {
-            return;
-        }
-
+    public void start() throws Exception {
         boolean gameover = false;
 
-        int turn = 0;
-        while (!gameover) {
-            String color = Board.COLORS[turn];
-            SPlayer player = (SPlayer) players.get(color);
+        Iterator<String> colors = Arrays.asList(Board.COLORS).iterator();
+        ServerSocket listener = new ServerSocket(8000);
+        try {
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            register(new RemotePlayer(colors.next(), listener.accept(), db));
+            register(new MPlayer(colors.next()));
+            register(new MPlayer(colors.next()));
+            register(new MPlayer(colors.next()));
 
-            // We have a cheater :(
-            if (player == null) {
-                continue;
+            if (!registeredAllPlayers()) {
+                throw new Exception("Tried to start game without registering players");
             }
 
-            Pair<Board, Boolean> turnResults = giveTurn(player);
-            board = turnResults.first;
-            boolean doubles = turnResults.second;
+            int turn = 0;
+            while (!gameover) {
+                String color = Board.COLORS[turn];
+                SPlayer player = (SPlayer) players.get(color);
 
-            int consecutiveDoubles = 0;
-            while (doubles) {
-                consecutiveDoubles++;
-                if (consecutiveDoubles > 2) {
-                    player.doublesPenalty();
+                // We have a cheater :(
+                if (player == null) {
+                    continue;
                 }
-                turnResults = giveTurn(player);
-                board = turnResults.first;
-                doubles = turnResults.second;
-            }
 
-            turn = (++turn) % 4;
+                Pair<Board, Boolean> turnResults = giveTurn(player);
+                board = turnResults.first;
+                boolean doubles = turnResults.second;
+
+                int consecutiveDoubles = 0;
+                while (doubles) {
+                    consecutiveDoubles++;
+                    if (consecutiveDoubles > 2) {
+                        player.doublesPenalty();
+                    }
+                    turnResults = giveTurn(player);
+                    board = turnResults.first;
+                    doubles = turnResults.second;
+                }
+
+                turn = (++turn) % 4;
+            }
+        }
+        finally {
+            listener.close();
         }
     }
 
@@ -212,7 +232,7 @@ public class Parcheesi implements Game {
      */
     public void register(Player p) {
         SPlayer player = (SPlayer) p;
-        if (players.size() < 4) {
+        if (!registeredAllPlayers()) {
             p.startGame(((SPlayer) p).color);
             players.put(player.color, player);
         }
@@ -223,7 +243,7 @@ public class Parcheesi implements Game {
      *
      * @return true if four players have been registered and false otherwise
      */
-    public boolean registeredPlayersBeforeStart() {
+    public boolean registeredAllPlayers() {
         return players.size() == 4;
     }
 

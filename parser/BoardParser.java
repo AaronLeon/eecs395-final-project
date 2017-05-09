@@ -3,169 +3,152 @@ package parser;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import parcheesi.Pawn;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.xml.parsers.DocumentBuilder;
 
 import parcheesi.Board;
+import parcheesi.Pawn;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class BoardParser extends AbstractParser<Board> {
+    PawnParser pawnParser;
     public BoardParser(DocumentBuilder db) {
         super(db);
+        pawnParser = new PawnParser(db);
     }
 
     public Board fromXml(Document xml) throws Exception {
-
-        //EVERY OTHER ELEMENT IS "BLANK"
-
-        Node root = xml.getFirstChild();
-        if (!root.getNodeName().equals("board")) {
+        Node board = xml.getFirstChild();
+        if (!board.getNodeName().equals("board")) {
             throw new Exception("Tried to parse XML Document that is not <board></board>");
         }
 
-        Board board = new Board();
+        Board b = new Board();
+        Map<String, Pawn[]> pawns = new HashMap<String, Pawn[]>()
+        {{
+            put("blue", new Pawn[4]);
+            put("yellow", new Pawn[4]);
+            put("green", new Pawn[4]);
+            put("red", new Pawn[4]);
+        }};
 
-        NodeList nodes = root.getChildNodes();
-        int counter=0;
-        int end=nodes.getLength();
-        int length=0;
-        Node boardNode = nodes.item(0);
-        length=boardNode.getChildNodes().getLength();
+        final Map<String, Board.BoardComponent> XML_TO_BC_MAP = new LinkedHashMap<String, Board.BoardComponent>()
+        {{
+            put("start", Board.BoardComponent.NEST);
+            put("main", Board.BoardComponent.RING);
+            put("home-rows", Board.BoardComponent.HOMEROW);
+            put("home", Board.BoardComponent.HOME);
+        }};
 
-        Node start = nodes.item(1);
-        NodeList startPawns=start.getChildNodes();
-        length=startPawns.getLength();
-        for (int i=0;i<length;i++){
-            Node pawn = startPawns.item(i);
-            String name = pawn.getNodeName();
-            if (name=="pawn"){
-                //copied from pawnParser
-                Node color = pawn.getFirstChild();
-                Node id = color.getNextSibling();
-
-                if (color == null || id == null
-                        || !color.getNodeName().equals("color")
-                        || !id.getNodeName().equals("id")) {
-                    throw new Exception("Invalid Pawn XML Document");
-                }
-
-                String _color = color.getTextContent();
-                int _id = Integer.parseInt(id.getTextContent());
-                Pawn insertMe = new Pawn(_id, _color);
-                // TODO: insert
+        Node currentBoardComponent = board.getFirstChild();
+        for (Map.Entry<String, Board.BoardComponent> entry : XML_TO_BC_MAP.entrySet()) {
+            if (currentBoardComponent == null || !currentBoardComponent.getNodeName().equals(entry.getKey())) {
+                throw new Exception("Tried to parse XML Document that is not <board></board>");
             }
-        }
 
+            Board.BoardComponent bc = entry.getValue();
 
-        Node main = nodes.item(2);
-        NodeList mainPawns = main.getChildNodes();
-        length = mainPawns.getLength();
-        for (int i=0;i<length;i++){
-            Node piece_loc = startPawns.item(i);
-            String name = piece_loc.getNodeName();
-            if (name=="piece-loc"){
-                //copied from pawnParser
-                Node pawn= piece_loc.getFirstChild();
-                Node loc = pawn.getNextSibling();
-
-                if (pawn == null || loc == null
-                        || !pawn.getNodeName().equals("pawn")
-                        || !loc.getNodeName().equals("number")) {
-                    throw new Exception("Invalid Pawn XML Document");
+            if (bc == Board.BoardComponent.NEST) {
+                Node currentPawn = currentBoardComponent.getFirstChild();
+                while (currentPawn != null) {
+                    Pawn pawn = pawnParser.fromXml((Document) currentPawn);
+                    pawn.bc = bc;
+                    pawns.get(pawn.color)[pawn.id] = pawn;
+                    b.nests.get(pawn.color)[pawn.id] = pawn;
                 }
 
-                Node color = pawn.getFirstChild();
-                Node id = color.getNextSibling();
-
-                if (color == null || id == null
-                        || !color.getNodeName().equals("color")
-                        || !id.getNodeName().equals("id")) {
-                    throw new Exception("Invalid Pawn XML Document");
+            } else if (bc == Board.BoardComponent.RING) {
+                Node currentPieceLoc = currentBoardComponent.getFirstChild();
+                while (currentPieceLoc != null) {
+                    Pawn pawn = pawnFromPieceLocXml(currentPieceLoc);
+                    pawn.bc = Board.BoardComponent.RING;
+                    pawns.get(pawn.color)[pawn.id] = pawn;
+                    b.ring[pawn.id] = pawn;
+                    currentPieceLoc = currentPieceLoc.getNextSibling();
                 }
-
-                String _color = color.getTextContent();
-                int _id = Integer.parseInt(id.getTextContent());
-                Pawn insertMe = new Pawn(_id, _color);
-                insertMe.location=Integer.parseInt(loc.getTextContent());
-                // TODO: modify board component bc and insert
-
+            } else if (bc == Board.BoardComponent.HOMEROW) {
+                Node currentPieceLoc = currentBoardComponent.getFirstChild();
+                while (currentPieceLoc != null) {
+                    Pawn pawn = pawnFromPieceLocXml(currentPieceLoc);
+                    pawn.bc = Board.BoardComponent.HOMEROW;
+                    pawns.get(pawn.color)[pawn.id] = pawn;
+                    b.homeRows.get(pawn.color)[pawn.id] = pawn;
+                    currentPieceLoc = currentPieceLoc.getNextSibling();
+                }
+            } else if (bc == Board.BoardComponent.HOME) {
+                Node currentPawn = currentBoardComponent.getFirstChild();
+                while (currentPawn != null) {
+                    Pawn pawn = pawnParser.fromXml((Document) currentPawn);
+                    pawn.bc = bc;
+                    pawns.get(pawn.color)[pawn.id] = pawn;
+                    b.homes.get(pawn.color)[pawn.id] = pawn;
+                    currentPawn = currentPawn.getNextSibling();
+                }
+            } else {
+                throw new Exception("Invalid Board Component");
             }
+
+            currentBoardComponent = currentBoardComponent.getNextSibling();
         }
-
-
-        Node homeRows = nodes.item(3);
-        NodeList homeRowPawns=homeRows.getChildNodes();
-        length = homeRowPawns.getLength();
-        for (int i=0;i<length;i++){
-            Node piece_loc = startPawns.item(i);
-            String name = piece_loc.getNodeName();
-            if (name=="piece-loc"){
-                //copied from pawnParser
-                Node pawn= piece_loc.getFirstChild();
-                Node loc = pawn.getNextSibling();
-
-                if (pawn == null || loc == null
-                        || !pawn.getNodeName().equals("pawn")
-                        || !loc.getNodeName().equals("number")) {
-                    throw new Exception("Invalid Pawn XML Document");
-                }
-
-                Node color = pawn.getFirstChild();
-                Node id = color.getNextSibling();
-
-                if (color == null || id == null
-                        || !color.getNodeName().equals("color")
-                        || !id.getNodeName().equals("id")) {
-                    throw new Exception("Invalid Pawn XML Document");
-                }
-
-                String _color = color.getTextContent();
-                int _id = Integer.parseInt(id.getTextContent());
-                Pawn insertMe = new Pawn(_id, _color);
-                insertMe.location=Integer.parseInt(loc.getTextContent());
-                // TODO: modify board component bc and insert
-
-            }
-        }
-
-        Node home = nodes.item(4);
-        NodeList homePawns = home.getChildNodes();
-        length = homePawns.getLength();
-        for (int i=0;i<length;i++){
-            Node pawn = startPawns.item(i);
-            String name = pawn.getNodeName();
-            if (name=="pawn"){
-                //copied from pawnParser
-                Node color = pawn.getFirstChild();
-                Node id = color.getNextSibling();
-
-                if (color == null || id == null
-                        || !color.getNodeName().equals("color")
-                        || !id.getNodeName().equals("id")) {
-                    throw new Exception("Invalid Pawn XML Document");
-                }
-
-                String _color = color.getTextContent();
-                int _id = Integer.parseInt(id.getTextContent());
-                Pawn insertMe = new Pawn(_id, _color);
-                // TODO: insert
-            }
-        }
-
-        return board;
+        return b;
     }
 
     public Document toXml(Board board) {
         Document doc = db.newDocument();
 
-        Element newBoard = doc.createElement("board");
+        Element boardRoot = doc.createElement("board");
         Element start = doc.createElement("start");
         Element main = doc.createElement("main");
-        Element home_rows = doc.createElement("home-rows");
+        Element homeRows = doc.createElement("home-rows");
         Element home = doc.createElement("home");
-        // TODO : read from board and insert
+
+        for (String color : Board.COLORS) {
+            for (Pawn p : board.pawns.get(color)) {
+                if (p.bc == Board.BoardComponent.NEST) {
+                    start.appendChild(pawnParser.toXml(p));
+                } else if (p.bc == Board.BoardComponent.RING) {
+                    main.appendChild(pawnToPieceLocXml(p));
+                } else if (p.bc == Board.BoardComponent.HOMEROW) {
+                    homeRows.appendChild(pawnToPieceLocXml(p));
+                } else if (p.bc == Board.BoardComponent.HOME) {
+                    home.appendChild(pawnParser.toXml(p));
+                }
+            }
+        }
+
+        doc.appendChild(boardRoot);
+
+        return doc;
+    }
+
+    private Pawn pawnFromPieceLocXml(Node pieceLoc) throws Exception{
+        if (!pieceLoc.getNodeName().equals("piece-loc")) {
+            throw new Exception("Expected <piece-loc>");
+        }
+        Node pawnNode = pieceLoc.getFirstChild();
+        Pawn pawn = pawnParser.fromXml((Document) pawnNode);
+
+        Node locNode = pawnNode.getNextSibling();
+        if (!locNode.getNodeName().equals("loc")) {
+            throw new Exception("Expected <loc>");
+        }
+        int location = Integer.parseInt(locNode.getTextContent());
+        pawn.location = location;
+
+        return pawn;
+    }
+
+    private Node pawnToPieceLocXml(Pawn pawn) {
+        Document doc = db.newDocument();
+        Element pieceLoc = doc.createElement("piece-loc");
+        pieceLoc.appendChild(pawnParser.toXml(pawn));
+        Element loc = doc.createElement("loc");
+        loc.appendChild(doc.createTextNode(Integer.toString(pawn.location)));
+        pieceLoc.appendChild(loc);
+
         return doc;
     }
 }
