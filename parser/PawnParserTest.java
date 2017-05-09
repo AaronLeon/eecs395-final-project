@@ -71,7 +71,6 @@ public class PawnParserTest {
         Pawn pawn = null;
         try {
             doc = db.parse(is);
-            System.out.println(doc.getNodeName());
             pawn = parser.fromXml(doc);
         }
         catch (Exception e) {
@@ -79,24 +78,6 @@ public class PawnParserTest {
         }
         Pawn expected = new Pawn(3, "red");
         Assert.assertEquals("Parsing pawn XML should return correct pawn", expected, pawn);
-    }
-
-    @Test
-    public void pawnFromXmlShouldReturnOriginalXml() {
-        String buffer = "<pawn><color>red</color><id>3</id></pawn>";
-        InputStream is = new ByteArrayInputStream(buffer.getBytes());
-        Document expected = null;
-        Document doc = null;
-        Pawn pawn;
-        try {
-            expected = db.parse(is);
-            pawn = parser.fromXml(expected);
-            doc = parser.toXml(pawn);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        Assert.assertTrue("Pawn from XML should return original XML", expected.isEqualNode(doc));
     }
 
     @Test

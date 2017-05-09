@@ -60,6 +60,14 @@ public class Board {
         }
     }
 
+    public void initPawns() {
+        for (String color: COLORS) {
+            for (int i = 0; i < NEST_SIZE; ++i) {
+                nests.get(color)[i] = new Pawn(i, color);
+            }
+        }
+    }
+
     public boolean isSafe(int location) {
         for (int safe: SAFE_LOCATIONS) {
             if (location == safe) {
@@ -250,9 +258,9 @@ public class Board {
             return false;
         }
         for (String color : COLORS) {
-            if (Arrays.equals(nests.get(color), b.nests.get(color))
-                || Arrays.equals(homeRows.get(color), b.homeRows.get(color))
-                || Arrays.equals(homes.get(color), b.homes.get(color))) {
+            if (!Arrays.equals(nests.get(color), b.nests.get(color))
+                || !Arrays.equals(homeRows.get(color), b.homeRows.get(color))
+                || !Arrays.equals(homes.get(color), b.homes.get(color))) {
                 return false;
             }
         }

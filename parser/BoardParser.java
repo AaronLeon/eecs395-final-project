@@ -54,10 +54,16 @@ public class BoardParser extends AbstractParser<Board> {
             if (bc == Board.BoardComponent.NEST) {
                 Node currentPawn = currentBoardComponent.getFirstChild();
                 while (currentPawn != null) {
-                    Pawn pawn = pawnParser.fromXml((Document) currentPawn);
+                    Document pawnDoc = db.newDocument();
+                    Node temp = pawnDoc.importNode(currentPawn, true);
+                    pawnDoc.appendChild(temp);
+
+                    Pawn pawn = pawnParser.fromXml(pawnDoc);
                     pawn.bc = bc;
                     pawns.get(pawn.color)[pawn.id] = pawn;
                     b.nests.get(pawn.color)[pawn.id] = pawn;
+
+                    currentPawn = currentPawn.getNextSibling();
                 }
 
             } else if (bc == Board.BoardComponent.RING) {
@@ -81,10 +87,15 @@ public class BoardParser extends AbstractParser<Board> {
             } else if (bc == Board.BoardComponent.HOME) {
                 Node currentPawn = currentBoardComponent.getFirstChild();
                 while (currentPawn != null) {
-                    Pawn pawn = pawnParser.fromXml((Document) currentPawn);
+                    Document pawnDoc = db.newDocument();
+                    Node temp = pawnDoc.importNode(currentPawn, true);
+                    pawnDoc.appendChild(temp);
+
+                    Pawn pawn = pawnParser.fromXml(pawnDoc);
                     pawn.bc = bc;
                     pawns.get(pawn.color)[pawn.id] = pawn;
                     b.homes.get(pawn.color)[pawn.id] = pawn;
+
                     currentPawn = currentPawn.getNextSibling();
                 }
             } else {
@@ -108,17 +119,23 @@ public class BoardParser extends AbstractParser<Board> {
         for (String color : Board.COLORS) {
             for (Pawn p : board.pawns.get(color)) {
                 if (p.bc == Board.BoardComponent.NEST) {
-                    start.appendChild(pawnParser.toXml(p));
+                    Node importedPawn = doc.importNode(pawnParser.toXml(p).getFirstChild(), true);
+                    start.appendChild(importedPawn);
                 } else if (p.bc == Board.BoardComponent.RING) {
-                    main.appendChild(pawnToPieceLocXml(p));
+                    main.appendChild(pawnToPieceLocXml(p).getFirstChild());
                 } else if (p.bc == Board.BoardComponent.HOMEROW) {
-                    homeRows.appendChild(pawnToPieceLocXml(p));
+                    homeRows.appendChild(pawnToPieceLocXml(p).getFirstChild());
                 } else if (p.bc == Board.BoardComponent.HOME) {
-                    home.appendChild(pawnParser.toXml(p));
+                    Node importedPawn = doc.importNode(pawnParser.toXml(p).getFirstChild(), true);
+                    home.appendChild(importedPawn);
                 }
             }
         }
 
+        boardRoot.appendChild(start);
+        boardRoot.appendChild(main);
+        boardRoot.appendChild(homeRows);
+        boardRoot.appendChild(home);
         doc.appendChild(boardRoot);
 
         return doc;

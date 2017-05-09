@@ -12,7 +12,7 @@ public class Pawn {
     this.id = id;
     this.color = color;
     this.bc = Board.BoardComponent.NEST;
-    this.location = -1;
+    this.location = id;
   }
 
   public Pawn (int id, String color, Board.BoardComponent bc, int location) {
