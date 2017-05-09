@@ -2,9 +2,9 @@ package parcheesi;
 
 // represents a move that starts on one of the home rows
 public class MoveHome implements Move {
-  Pawn pawn;
-  int start;
-  int distance;
+  public Pawn pawn;
+  public int start;
+  public int distance;
 
   public MoveHome(Pawn pawn, int distance) {
     this.pawn=pawn;

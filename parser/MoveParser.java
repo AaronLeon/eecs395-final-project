@@ -15,7 +15,7 @@ import parser.PawnParser;
 import javax.xml.parsers.DocumentBuilder;
 
 
-public class MoveParser extends AbstractParser<Board> {
+public class MoveParser extends AbstractParser<Move> {
     public MoveParser(DocumentBuilder db) {
         super(db);
     }
@@ -24,9 +24,7 @@ public class MoveParser extends AbstractParser<Board> {
 
         Node root = xml.getFirstChild();
 
-
-
-        Node pawn = xml.getFirstChild();
+        Node pawn = root.getFirstChild();
         if (!pawn.getNodeName().equals("pawn")) {
             throw new Exception("Tried to parse XML Document that is not <pawn></pawn>");
         }
@@ -70,19 +68,67 @@ public class MoveParser extends AbstractParser<Board> {
             return move;
 
         } else {
-            throw new Exception("Invalid Pawn XML Document");
+            return null;
         }
     }
 
     public Document toXml(Move move) {
         Document doc = db.newDocument();
+        if (move instanceof MoveMain){
+            Element root=doc.createElement("move-main");
+            Element pawn=doc.createElement("pawn");
+            Element color = doc.createElement("color");
+            color.appendChild(doc.createTextNode(((MoveMain) move).pawn.color));
+            Element id = doc.createElement("id");
+            color.appendChild(doc.createTextNode(Integer.toString(((MoveMain) move).pawn.id)));
+            Element start = doc.createElement("start");
+            start.appendChild(doc.createTextNode(Integer.toString(((MoveMain) move).pawn.location)));
+            Element distance = doc.createElement("distance");
+            distance.appendChild(doc.createTextNode(Integer.toString(((MoveMain) move).distance)));
 
-        Element newBoard = doc.createElement("board");
-        Element start = doc.createElement("start");
-        Element main = doc.createElement("main");
-        Element home_rows = doc.createElement("home-rows");
-        Element home = doc.createElement("home");
-        // TODO : read from board and insert
-        return doc;
+            pawn.appendChild(color);
+            pawn.appendChild(id);
+            root.appendChild(pawn);
+            root.appendChild(start);
+            root.appendChild(distance);
+            doc.appendChild(root);
+            return doc;
+
+
+        } else if(move instanceof MoveHome) {
+            Element root=doc.createElement("move-home");
+            Element pawn=doc.createElement("pawn");
+            Element color = doc.createElement("color");
+            color.appendChild(doc.createTextNode(((MoveHome) move).pawn.color));
+            Element id = doc.createElement("id");
+            color.appendChild(doc.createTextNode(Integer.toString(((MoveHome) move).pawn.id)));
+            Element start = doc.createElement("start");
+            start.appendChild(doc.createTextNode(Integer.toString(((MoveHome) move).start)));
+            Element distance = doc.createElement("distance");
+            distance.appendChild(doc.createTextNode(Integer.toString(((MoveHome) move).distance)));
+
+            pawn.appendChild(color);
+            pawn.appendChild(id);
+            root.appendChild(pawn);
+            root.appendChild(start);
+            root.appendChild(distance);
+            doc.appendChild(root);
+            return doc;
+
+        } else if(move instanceof EnterPiece){
+            Element root=doc.createElement("enter-piece");
+            Element pawn=doc.createElement("pawn");
+            Element color = doc.createElement("color");
+            color.appendChild(doc.createTextNode(((EnterPiece) move).pawn.color));
+            Element id = doc.createElement("id");
+            color.appendChild(doc.createTextNode(Integer.toString(((EnterPiece) move).pawn.id)));
+            pawn.appendChild(color);
+            pawn.appendChild(id);
+            root.appendChild(pawn);
+            doc.appendChild(root);
+            return doc;
+        }else {
+            return null;
+        }
     }
 }
