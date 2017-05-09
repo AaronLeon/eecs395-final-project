@@ -1,3 +1,3 @@
 package parcheesi;
 
-interface Move {}
+public interface Move {}

@@ -6,7 +6,7 @@ public class MoveHome implements Move {
   int start;
   int distance;
 
-  MoveHome(Pawn pawn, int distance) {
+  public MoveHome(Pawn pawn, int distance) {
     this.pawn=pawn;
     this.distance=distance;
   }
