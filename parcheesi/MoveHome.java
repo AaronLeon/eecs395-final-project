@@ -14,5 +14,15 @@ public class MoveHome implements Move {
   public void makeMove(){
     return;
   }
+
+
+
+  public boolean equals(Object other) {
+    if (!(other instanceof MoveHome)) {
+      return false;
+    }
+    return this.pawn.equals(((MoveHome) other).pawn);
+  }
+
 }
 

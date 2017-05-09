@@ -53,7 +53,7 @@ public class MoveParser extends AbstractParser<Move> {
             int start = Integer.parseInt(pawn.getNextSibling().getTextContent());
             int distance = Integer.parseInt(pawn.getNextSibling().getTextContent());
             _pawn.location = start;
-            _pawn.bc = Board.BoardComponent.HOME;
+            _pawn.bc = Board.BoardComponent.HOMEROW;
             MoveHome move = new MoveHome(_pawn, distance);
             return move;
         } else {
@@ -97,7 +97,7 @@ public class MoveParser extends AbstractParser<Move> {
         Document doc = db.newDocument();
 
         // TODO: Refactor to use PawnParser
-        Element root = doc.createElement("move-main");
+        Element root = doc.createElement("move-piece-main");
         Element pawn = doc.createElement("pawn");
         Element color = doc.createElement("color");
         color.appendChild(doc.createTextNode(move.pawn.color));
@@ -121,14 +121,14 @@ public class MoveParser extends AbstractParser<Move> {
         Document doc = db.newDocument();
 
         // TODO: Refactor to use PawnParser
-        Element root = doc.createElement("move-home");
+        Element root = doc.createElement("move-piece-home");
         Element pawn = doc.createElement("pawn");
         Element color = doc.createElement("color");
         color.appendChild(doc.createTextNode(move.pawn.color));
         Element id = doc.createElement("id");
         id.appendChild(doc.createTextNode(Integer.toString(move.pawn.id)));
         Element start = doc.createElement("start");
-        start.appendChild(doc.createTextNode(Integer.toString(move.start)));
+        start.appendChild(doc.createTextNode(Integer.toString(move.pawn.location)));
         Element distance = doc.createElement("distance");
         distance.appendChild(doc.createTextNode(Integer.toString(move.distance)));
 

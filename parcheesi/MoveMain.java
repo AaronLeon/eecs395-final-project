@@ -10,4 +10,12 @@ public class MoveMain implements Move {
     this.pawn=pawn;
     this.distance=distance;
   }
+
+
+  public boolean equals(Object other) {
+    if (!(other instanceof MoveMain)) {
+      return false;
+    }
+    return this.pawn.equals(((MoveMain) other).pawn);
+  }
 }

@@ -2,7 +2,7 @@ package parser;
 
 import org.junit.*;
 import org.w3c.dom.Document;
-import parcheesi.EnterPiece;
+import parcheesi.*;
 import parcheesi.Pawn;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -81,28 +81,95 @@ public class MoveParserTest {
         EnterPiece expected = new EnterPiece(new Pawn (3, "red"));
         Assert.assertTrue("Parsing pawn XML should return correct pawn", expected.equals(move));
     }
-/*
+
+
     @Test
-    public void pawnFromXmlShouldReturnOriginalXml() {
-        String buffer = "<pawn><color>red</color><id>3</id></pawn>";
+    public void constructXmlFromMoveMainTest() {
+        String buffer = "<move-piece-main><pawn><color>green</color><id>0</id></pawn><start>5</start><distance>3</distance></move-piece-main>";
         InputStream is = new ByteArrayInputStream(buffer.getBytes());
         Document expected = null;
         Document doc = null;
-        Pawn pawn;
+        Pawn pawn = new Pawn(0, "green");
+        pawn.location=5;
+        pawn.bc=Board.BoardComponent.RING;
+        MoveMain move = new MoveMain(pawn,3);
         try {
             expected = db.parse(is);
-            pawn = parser.fromXml(expected);
-            doc = parser.toXml(pawn);
+            doc = parser.toXml(move);
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-        Assert.assertTrue("Pawn from XML should return original XML", expected.isEqualNode(doc));
+        Assert.assertTrue("Parsing pawn should return correct pawn XML", expected.isEqualNode(doc));
+
     }
+
     @Test
-    public void invalidXmlThrowsExceptionTest() {
+    public void constructMoveMainFromXmlTest() {
+        String buffer = "<move-piece-main><pawn><color>green</color><id>0</id></pawn><start>5</start><distance>3</distance></move-piece-main>";
+        InputStream is = new ByteArrayInputStream(buffer.getBytes());
+        Document doc;
+        Pawn pawn = new Pawn(0, "green");
+        pawn.location=5;
+        pawn.bc=Board.BoardComponent.RING;
+        MoveMain move = null;
+        try {
+            doc = db.parse(is);
+            move = (MoveMain) parser.fromXml(doc);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        MoveMain expected = new MoveMain(pawn,5);
+        Assert.assertTrue("Parsing pawn XML should return correct pawn", expected.equals(move));
+    }
+
+
+
+
+
+
+
+
+    @Test
+    public void constructXmlFromMoveHomeTest() {
+        String buffer = "<move-piece-home><pawn><color>green</color><id>0</id></pawn><start>5</start><distance>1</distance></move-piece-home>";
+        InputStream is = new ByteArrayInputStream(buffer.getBytes());
+        Document expected = null;
+        Document doc = null;
+        Pawn pawn = new Pawn(0, "green");
+        pawn.location=5;
+        pawn.bc=Board.BoardComponent.HOMEROW;
+        MoveHome move = new MoveHome(pawn,1);
+        try {
+            expected = db.parse(is);
+            doc = parser.toXml(move);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        Assert.assertTrue("Parsing pawn should return correct pawn XML", expected.isEqualNode(doc));
 
     }
-*/
 
+
+    @Test
+    public void constructMoveHomeFromXmlTest() {
+        String buffer = "<move-piece-home><pawn><color>green</color><id>0</id></pawn><start>1</start><distance>2</distance></move-piece-home>";
+        InputStream is = new ByteArrayInputStream(buffer.getBytes());
+        Document doc;
+        Pawn pawn = new Pawn(0, "green");
+        pawn.location=1;
+        pawn.bc=Board.BoardComponent.HOMEROW;
+        MoveHome move = null;
+        try {
+            doc = db.parse(is);
+            move = (MoveHome) parser.fromXml(doc);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        MoveHome expected = new MoveHome(pawn,2);
+        Assert.assertTrue("Parsing pawn XML should return correct pawn", expected.equals(move));
+    }
 }
