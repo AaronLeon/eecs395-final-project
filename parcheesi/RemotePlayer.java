@@ -26,7 +26,7 @@ public class RemotePlayer extends SPlayer {
     @Override
     public Move[] doMove(Board board, int[] rolls) {
         try {
-            String promptMove = Parser.documentToString(Parser.doMoveToXml(db));
+            String promptMove = Parser.documentToString(Parser.generateDoMoveXml(db, board, rolls));
             out.write(promptMove);
             System.out.println("SERVER SAYS TO USER: HI");
             String input = in.readLine();

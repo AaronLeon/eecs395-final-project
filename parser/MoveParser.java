@@ -18,6 +18,8 @@ public class MoveParser extends AbstractParser<Move> {
         Node root = xml.getFirstChild();
 
         Node pawn = root.getFirstChild();
+
+        // TODO: Refactor to use PawnParser
         if (!pawn.getNodeName().equals("pawn")) {
             throw new Exception("Tried to parse XML Document that is not <pawn></pawn>");
         }
@@ -33,27 +35,26 @@ public class MoveParser extends AbstractParser<Move> {
 
         String _color = color.getTextContent();
         int _id = Integer.parseInt(id.getTextContent());
-        Pawn myPawn = new Pawn(_id, _color);
-
+        Pawn _pawn = new Pawn(_id, _color);
 
         if (root.getNodeName().equals("enter-piece")) {
-            EnterPiece move = new EnterPiece(myPawn);
+            EnterPiece move = new EnterPiece(_pawn);
             return move;
 
         } else if (root.getNodeName().equals("move-piece-main")) {
             int start = Integer.parseInt(pawn.getNextSibling().getTextContent());
             int distance = Integer.parseInt(pawn.getNextSibling().getTextContent());
-            myPawn.location = start;
-            myPawn.bc = Board.BoardComponent.RING;
-            MoveMain move = new MoveMain(myPawn, distance);
+            _pawn.location = start;
+            _pawn.bc = Board.BoardComponent.RING;
+            MoveMain move = new MoveMain(_pawn, distance);
             return move;
 
         } else if (root.getNodeName().equals("move-piece-home")) {
             int start = Integer.parseInt(pawn.getNextSibling().getTextContent());
             int distance = Integer.parseInt(pawn.getNextSibling().getTextContent());
-            myPawn.location = start;
-            myPawn.bc = Board.BoardComponent.HOME;
-            MoveHome move = new MoveHome(myPawn, distance);
+            _pawn.location = start;
+            _pawn.bc = Board.BoardComponent.HOME;
+            MoveHome move = new MoveHome(_pawn, distance);
             return move;
         } else {
             throw new Exception("Invalid move type");
@@ -78,6 +79,7 @@ public class MoveParser extends AbstractParser<Move> {
     private Document enterPieceToXml(EnterPiece move) {
         Document doc = db.newDocument();
 
+        // TODO: Refactor to use PawnParser
         Element root = doc.createElement("enter-piece");
         Element pawn = doc.createElement("pawn");
         Element color = doc.createElement("color");
@@ -94,6 +96,7 @@ public class MoveParser extends AbstractParser<Move> {
     private Document moveMainToXml(MoveMain move) {
         Document doc = db.newDocument();
 
+        // TODO: Refactor to use PawnParser
         Element root = doc.createElement("move-main");
         Element pawn = doc.createElement("pawn");
         Element color = doc.createElement("color");
@@ -117,6 +120,7 @@ public class MoveParser extends AbstractParser<Move> {
     private Document moveHomeToXml(MoveHome move) {
         Document doc = db.newDocument();
 
+        // TODO: Refactor to use PawnParser
         Element root = doc.createElement("move-home");
         Element pawn = doc.createElement("pawn");
         Element color = doc.createElement("color");

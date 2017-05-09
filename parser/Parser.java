@@ -1,6 +1,10 @@
 package parser;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import parcheesi.Board;
+import parcheesi.Move;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Transformer;
@@ -10,12 +14,46 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
 
 public class Parser {
-    public static Document startGameToXml(DocumentBuilder db) {
+    public static Document generateStartGameXml(DocumentBuilder db, String color) {
+        BoardParser boardParser = new BoardParser(db);
+        Document doc = db.newDocument();
+
+        Node startGame = doc.createElement("start-game");
+        startGame.appendChild(doc.createTextNode(color));
+
+        doc.appendChild(startGame);
+
+        return doc;
+    }
+
+    public static Document generateDoMoveXml(DocumentBuilder db, Board board, int[] dice) {
+        BoardParser boardParser = new BoardParser(db);
+        Document doc = db.newDocument();
+
+        Element doMove = doc.createElement("do-move");
+
+        Node tempBoard = doc.importNode(boardParser.toXml(board).getFirstChild(), true);
+        doMove.appendChild(tempBoard);
+
+        doc.appendChild(doMove);
+
+        return doc;
+    }
+
+    public static Document generateMovesXml(DocumentBuilder db, Move[] moves) {
         return db.newDocument();
     }
 
-    public static Document doMoveToXml(DocumentBuilder db) {
-        return db.newDocument();
+    public static Document generateDoublesPenaltyXml(DocumentBuilder db) {
+        Document doc = db.newDocument();
+        doc.appendChild(doc.createElement("doubles-penalty"));
+        return doc;
+    }
+
+    public static Document generateVoidXml(DocumentBuilder db) {
+        Document doc = db.newDocument();
+        doc.appendChild(doc.createElement("void"));
+        return doc;
     }
 
     public static String documentToString(Document doc) throws Exception {
