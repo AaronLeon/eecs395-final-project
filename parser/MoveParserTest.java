@@ -56,7 +56,12 @@ public class MoveParserTest {
         EnterPiece move = new EnterPiece(pawn);
         try {
             expected = db.parse(is);
+            System.out.println(expected.getFirstChild().getNodeName());
             doc = parser.toXml(move);
+            System.out.println(expected.getNodeName());
+            System.out.println(expected.getFirstChild().getNodeName());
+            System.out.println(expected.getFirstChild().getFirstChild().getNodeName());
+
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -73,8 +78,7 @@ public class MoveParserTest {
         EnterPiece move = null;
         try {
             doc = db.parse(is);
-            System.out.println(doc.getNodeName());
-            move = (EnterPiece)parser.fromXml(doc);
+            move = (EnterPiece) parser.fromXml(doc);
         }
         catch (Exception e) {
             e.printStackTrace();
