@@ -46,39 +46,41 @@ public class DiceParserTest {
 
     }
 
-//    @Test
-//    public void constructXmlFromPawnTest() {
-//        String buffer = "<dice><die>0</die><die>1</die><die>2</die><die>3</die></dice>";
-//        InputStream is = new ByteArrayInputStream(buffer.getBytes());
-//        Document expected = null;
-//        Document doc = null;
-//        Pawn pawn = new Pawn(3, "red");
-//        try {
-//            expected = db.parse(is);
-//            doc = parser.toXml(pawn);
-//        }
-//        catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        Assert.assertTrue("Parsing pawn should return correct pawn XML", Arrays.equals(expected, dice));
-//    }
+    @Test
+    public void constructXmlFromDiceTest() {
+        String buffer = "<dice><die>0</die><die>1</die><die>2</die><die>3</die></dice>";
+        InputStream is = new ByteArrayInputStream(buffer.getBytes());
+        Document expected = null;
+        Document doc = null;
+        int[] dice = {0, 1, 2, 3};
 
-//    @Test
-//    public void constructPawnFromXmlTest() {
-//        String buffer = "<pawn><color>red</color><id>3</id></pawn>";
-//        InputStream is = new ByteArrayInputStream(buffer.getBytes());
-//        Document doc;
-//        Pawn pawn = null;
-//        try {
-//            doc = db.parse(is);
-//            pawn = parser.fromXml(doc);
-//        }
-//        catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        Pawn expected = new Pawn(3, "red");
-//        Assert.assertEquals("Parsing pawn XML should return correct pawn", expected, pawn);
-//    }
+        try {
+            expected = db.parse(is);
+            doc = parser.toXml(dice);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        Assert.assertTrue("Parsing dice should return correct dice XML", expected.isEqualNode(doc));
+    }
+
+    @Test
+    public void constructDiceFromXmlTest() {
+        String buffer = "<dice><die>0</die><die>1</die><die>2</die><die>3</die></dice>";
+        InputStream is = new ByteArrayInputStream(buffer.getBytes());
+        Document doc;
+        int[] dice = null;
+        try {
+            doc = db.parse(is);
+            dice = parser.fromXml(doc);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        int[] expected = {0, 1, 2, 3};
+        Assert.assertTrue("Parsing dice XML should return correct dice", Arrays.equals(expected, dice));
+    }
 
     @Test
     public void invalidXmlThrowsExceptionTest() {

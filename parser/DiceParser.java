@@ -40,13 +40,15 @@ public class DiceParser extends AbstractParser<int[]> {
 
     public Document toXml(int[] dice) {
         Document doc = db.newDocument();
+        Element diceRoot = doc.createElement("dice");
 
         for (int d : dice) {
             Element die = doc.createElement("die");
             die.appendChild(doc.createTextNode(String.valueOf(d)));
-            doc.appendChild(die);
+            diceRoot.appendChild(die);
         }
 
+        doc.appendChild(diceRoot);
         return doc;
     }
 }

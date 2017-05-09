@@ -16,8 +16,9 @@ import java.io.StringWriter;
 public class Parser {
     public static Document generateStartGameXml(DocumentBuilder db, String color) {
         BoardParser boardParser = new BoardParser(db);
-        Document doc = db.newDocument();
+        DiceParser diceParser = new DiceParser(db);
 
+        Document doc = db.newDocument();
         Node startGame = doc.createElement("start-game");
         startGame.appendChild(doc.createTextNode(color));
 
@@ -28,15 +29,18 @@ public class Parser {
 
     public static Document generateDoMoveXml(DocumentBuilder db, Board board, int[] dice) {
         BoardParser boardParser = new BoardParser(db);
-        Document doc = db.newDocument();
+        DiceParser diceParser = new DiceParser(db);
 
+        Document doc = db.newDocument();
         Element doMove = doc.createElement("do-move");
 
         Node tempBoard = doc.importNode(boardParser.toXml(board).getFirstChild(), true);
         doMove.appendChild(tempBoard);
 
-        doc.appendChild(doMove);
+        Node tempDice = doc.importNode(diceParser.toXml(dice).getFirstChild(), true);
+        doMove.appendChild(tempDice);
 
+        doc.appendChild(doMove);
         return doc;
     }
 
