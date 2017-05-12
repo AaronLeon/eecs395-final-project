@@ -39,7 +39,7 @@ public class Parcheesi implements Game {
             register(new MPlayer(colors.next()));
 
             if (!registeredAllPlayers()) {
-                throw new Exception("Tried to start game without registering players");
+                throw new Exception("Tried to start game without registering all players");
             }
 
             int turn = 0;
@@ -89,9 +89,8 @@ public class Parcheesi implements Game {
         }
 
         boolean doubles = dice[0] == dice[1];
-        boolean doublesBonus = doubles && RuleEngine.canEarnDoubleBonus(board, p);
 
-        dice[2] = dice[3] = doublesBonus
+        dice[2] = dice[3] = doubles && RuleEngine.canEarnDoubleBonus(board, p)
                 ? 7 - dice[0]
                 : 0;
 
@@ -264,12 +263,11 @@ public class Parcheesi implements Game {
         while (!RuleEngine.allDiceUsed(dice) && RuleEngine.canMove(player, dice, board)) {
             Move[] moves = player.doMove(board, dice);
             for (Move m:moves){
-                dice=consumeDice(dice,m);
+                dice=consumeDice(dice, m);
             }
 
             Board nextBoard = null;
             for (Move m : moves) {
-
                 Pair<Board, Integer> result = processMoves(m);
                 nextBoard = result.first;
                 int bonus = result.second;
@@ -281,6 +279,7 @@ public class Parcheesi implements Game {
                         }
                     }
                 }
+
             }
             if (RuleEngine.movedBlockadeTogether(board, nextBoard, moves, player)) {
                 cheat(player.color);

@@ -7,6 +7,7 @@ import parcheesi.Board;
 import parcheesi.Move;
 
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -54,7 +55,7 @@ public class Parser {
             Node tempMove = doc.importNode(moveParser.toXml(move).getFirstChild(), true);
             movesRoot.appendChild(tempMove);
         }
-        
+
         doc.appendChild(movesRoot);
 
         return doc;
@@ -76,6 +77,8 @@ public class Parser {
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
         StreamResult result = new StreamResult(new StringWriter());
         DOMSource source = new DOMSource(doc);
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        transformer.setOutputProperty(OutputKeys.METHOD, "html");
         transformer.transform(source, result);
         return result.getWriter().toString();
     }

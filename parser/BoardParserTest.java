@@ -49,7 +49,33 @@ public class BoardParserTest {
 
     @Test
     public void constructBoardFromXmlTest() {
-        String buffer = "<board><start><pawn><color>blue</color><id>0</id></pawn><pawn><color>blue</color><id>1</id></pawn><pawn><color>blue</color><id>2</id></pawn><pawn><color>blue</color><id>3</id></pawn><pawn><color>yellow</color><id>0</id></pawn><pawn><color>yellow</color><id>1</id></pawn><pawn><color>yellow</color><id>2</id></pawn><pawn><color>yellow</color><id>3</id></pawn><pawn><color>green</color><id>0</id></pawn><pawn><color>green</color><id>1</id></pawn><pawn><color>green</color><id>2</id></pawn><pawn><color>green</color><id>3</id></pawn><pawn><color>red</color><id>0</id></pawn><pawn><color>red</color><id>1</id></pawn><pawn><color>red</color><id>2</id></pawn><pawn><color>red</color><id>3</id></pawn></start><main></main><home-rows></home-rows><home></home></board>";
+        String buffer = "" +
+                "<board>" +
+                    "<start>" +
+                        "<pawn><color>blue</color><id>0</id></pawn>" +
+                        "<pawn><color>blue</color><id>1</id></pawn>" +
+                        "<pawn><color>blue</color><id>2</id></pawn>" +
+                        "<pawn><color>blue</color><id>3</id></pawn>" +
+                        "<pawn><color>yellow</color><id>0</id></pawn>" +
+                        "<pawn><color>yellow</color><id>1</id></pawn>" +
+                        "<pawn><color>yellow</color><id>2</id></pawn>" +
+                        "<pawn><color>yellow</color><id>3</id></pawn>" +
+                        "<pawn><color>green</color><id>0</id></pawn>" +
+                        "<pawn><color>green</color><id>1</id></pawn>" +
+                        "<pawn><color>green</color><id>2</id></pawn>" +
+                        "<pawn><color>green</color><id>3</id></pawn>" +
+                        "<pawn><color>red</color><id>0</id></pawn>" +
+                        "<pawn><color>red</color><id>1</id></pawn>" +
+                        "<pawn><color>red</color><id>2</id></pawn>" +
+                        "<pawn><color>red</color><id>3</id></pawn>" +
+                    "</start>" +
+                    "<main>" +
+                    "</main>" +
+                    "<home-rows>" +
+                    "</home-rows>" +
+                    "<home>" +
+                    "</home>" +
+                "</board>";
         InputStream is = new ByteArrayInputStream(buffer.getBytes());
         Document doc;
         Board board = null;
@@ -71,7 +97,33 @@ public class BoardParserTest {
 
     @Test
     public void constructXmlFromBoardTest() {
-        String buffer = "<board><start><pawn><color>blue</color><id>0</id></pawn><pawn><color>blue</color><id>1</id></pawn><pawn><color>blue</color><id>2</id></pawn><pawn><color>blue</color><id>3</id></pawn><pawn><color>yellow</color><id>0</id></pawn><pawn><color>yellow</color><id>1</id></pawn><pawn><color>yellow</color><id>2</id></pawn><pawn><color>yellow</color><id>3</id></pawn><pawn><color>green</color><id>0</id></pawn><pawn><color>green</color><id>1</id></pawn><pawn><color>green</color><id>2</id></pawn><pawn><color>green</color><id>3</id></pawn><pawn><color>red</color><id>0</id></pawn><pawn><color>red</color><id>1</id></pawn><pawn><color>red</color><id>2</id></pawn><pawn><color>red</color><id>3</id></pawn></start><main></main><home-rows></home-rows><home></home></board>";
+        String buffer = "" +
+                "<board>" +
+                    "<start>" +
+                        "<pawn><color>blue</color><id>0</id></pawn>" +
+                        "<pawn><color>blue</color><id>1</id></pawn>" +
+                        "<pawn><color>blue</color><id>2</id></pawn>" +
+                        "<pawn><color>blue</color><id>3</id></pawn>" +
+                        "<pawn><color>yellow</color><id>0</id></pawn>" +
+                        "<pawn><color>yellow</color><id>1</id></pawn>" +
+                        "<pawn><color>yellow</color><id>2</id></pawn>" +
+                        "<pawn><color>yellow</color><id>3</id></pawn>" +
+                        "<pawn><color>green</color><id>0</id></pawn>" +
+                        "<pawn><color>green</color><id>1</id></pawn>" +
+                        "<pawn><color>green</color><id>2</id></pawn>" +
+                        "<pawn><color>green</color><id>3</id></pawn>" +
+                        "<pawn><color>red</color><id>0</id></pawn>" +
+                        "<pawn><color>red</color><id>1</id></pawn>" +
+                        "<pawn><color>red</color><id>2</id></pawn>" +
+                        "<pawn><color>red</color><id>3</id></pawn>" +
+                    "</start>" +
+                    "<main>" +
+                    "</main>" +
+                    "<home-rows>" +
+                    "</home-rows>" +
+                    "<home>" +
+                    "</home>" +
+                "</board>";
         InputStream is = new ByteArrayInputStream(buffer.getBytes());
         Document expected = null;
         Document doc = null;

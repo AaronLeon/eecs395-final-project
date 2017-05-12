@@ -28,7 +28,7 @@ public class FrontPawnPlayer extends  MPlayer {
 
     @Override
     public Move[] doMove(Board board, int[] dice) {
-        ArrayList<Move> moves = new ArrayList<Move>(4);
+        ArrayList<Move> moves = new ArrayList<>(4);
         Pawn[] sorted = sortedPawns(board);
         for (Pawn pawn: sorted) {
             if (pawn.bc == Board.BoardComponent.NEST && RuleEngine.canEnter(dice)) {

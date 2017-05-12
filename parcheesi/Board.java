@@ -8,7 +8,7 @@ public class Board {
         NEST, RING, HOMEROW, HOME
     }
 
-    public static final String[] COLORS = {"blue", "yellow", "green", "red"};
+    public static final String[] COLORS = {"blue", "yellow", "green", "red"} ;
     public static final int RING_SIZE = 17 * 4;
     public static final int HOMEROW_SIZE =  7;
     public static final int NEST_SIZE = 4;
@@ -37,7 +37,6 @@ public class Board {
     public HashMap<String, Object[]> nests;
     public HashMap<String, Object[]> homeRows;
     public HashMap<String, Object[]> homes;
-    //map color to string of pawns
     public HashMap<String, Pawn[]> pawns;
 
     public Board() {

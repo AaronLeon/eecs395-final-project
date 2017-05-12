@@ -7,14 +7,14 @@ public abstract class SPlayer implements Player {
         startGame(c);
     }
 
-    public final String startGame(String color) {
+    public String startGame(String color) {
         this.color = color;
         return "Name";
     }
 
     public abstract Move[] doMove(Board brd, int[] rolls);
 
-    public final void doublesPenalty() {
+    public void doublesPenalty() {
         //TODO: Not implemented yet
     }
 }

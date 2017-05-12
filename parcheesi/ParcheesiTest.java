@@ -217,7 +217,7 @@ public class ParcheesiTest {
 
 
     @Test
-    public void blockadeCannotMove(){
+    public void blockadeCannotMoveTogetherTest(){
         String color1 = Board.COLORS[0];
 
         Pawn p1 = game.board.pawns.get(color1)[0];
@@ -225,7 +225,7 @@ public class ParcheesiTest {
         p1.location = 10;
         game.board.ring[p1.location] = p1;
 
-        Pawn p2 = game.board.pawns.get(color1)[0];
+        Pawn p2 = game.board.pawns.get(color1)[1];
         p2.bc = Board.BoardComponent.RING;
         p2.location = 10;
         game.board.ring[p2.location] = p2;
