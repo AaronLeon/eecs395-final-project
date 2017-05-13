@@ -3,7 +3,7 @@ package parcheesi;
 interface Player {
   // inform the player that a game has started
   // and what color the player is.
-  String startGame(String color);
+  void startGame(String color);
 
   // ask the player what move they want to make
   Move[] doMove(Board board, int[] dice);

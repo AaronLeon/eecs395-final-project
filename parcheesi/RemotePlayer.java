@@ -24,6 +24,17 @@ public class RemotePlayer extends SPlayer {
     }
 
     @Override
+    public void startGame(String color) {
+        try {
+            String startGame = Parser.documentToString(Parser.generateStartGameXml(db, color));
+            out.println(startGame);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public Move[] doMove(Board board, int[] rolls) {
         try {
             String promptMove = Parser.documentToString(Parser.generateDoMoveXml(db, board, rolls));
@@ -34,5 +45,16 @@ public class RemotePlayer extends SPlayer {
             e.printStackTrace();
         }
         return new Move[0];
+    }
+
+    @Override
+    public void doublesPenalty() {
+        try {
+            String doublesPenalty = Parser.documentToString(Parser.generateDoublesPenaltyXml(db));
+            out.println(doublesPenalty);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

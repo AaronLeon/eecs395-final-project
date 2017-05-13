@@ -3,18 +3,13 @@ package parcheesi;
 public abstract class SPlayer implements Player {
     String color;
 
-    public SPlayer(String c) {
-        startGame(c);
-    }
-
-    public String startGame(String color) {
+    public SPlayer(String color) {
         this.color = color;
-        return "Name";
     }
 
-    public abstract Move[] doMove(Board brd, int[] rolls);
+    public abstract void startGame(String color);
 
-    public void doublesPenalty() {
-        //TODO: Not implemented yet
-    }
+    public abstract Move[] doMove(Board board, int[] dice);
+
+    public abstract void doublesPenalty();
 }
