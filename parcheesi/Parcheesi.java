@@ -159,7 +159,7 @@ public class Parcheesi implements Game {
         int bonus = 0;
         Object bopped = board.get(bc, newLocation, pawn.color);
         if (bopped instanceof Pawn && !((Pawn) bopped).color.equals(pawn.color)) {
-            if (board.isSafe(newLocation)) {
+            if (Board.isSafe(newLocation)) {
                 cheat(pawn.color);
                 return null;
             }

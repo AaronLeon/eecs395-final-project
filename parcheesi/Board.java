@@ -67,7 +67,7 @@ public class Board {
         }
     }
 
-    public boolean isSafe(int location) {
+    public static boolean isSafe(int location) {
         for (int safe: SAFE_LOCATIONS) {
             if (location == safe) {
                 return true;
