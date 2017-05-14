@@ -28,7 +28,7 @@ public class UIBoard extends GridPane {
         this.getRowConstraints().add(rc);
         this.getColumnConstraints().add(cc);
 
-        Pair[] ringToGridIndex = new Pair[Board.RING_SIZE];
+        Pair[] ringToGridIndex = fillRingToGridIndex();
         HashMap<String, Pair[]> homeRowToGridIndex = new HashMap<>();
         {{
             homeRowToGridIndex.put("blue", new Pair[Board.HOMEROW_SIZE]);
@@ -59,4 +59,39 @@ public class UIBoard extends GridPane {
             }
         }
     }
+
+
+    private Pair[] fillRingToGridIndex(){
+        Pair[] indexing=new Pair[Board.RING_SIZE];
+        indexing[0]=new Pair(9,0);
+        for(int i = 1;i<=8;i++){
+            indexing[i]=new Pair(8,i-1);
+        }
+        for(int i = 9;i<=16;i++){
+            indexing[i]=new Pair(16-i,8);
+        }
+        indexing[17]=new Pair(0,9);
+        for(int i = 18;i<=25;i++){
+            indexing[i]=new Pair(18-i,10);
+        }
+        for(int i = 26;i<=33;i++){
+            indexing[i]=new Pair(8,i-15);
+        }
+        indexing[34]=new Pair(9,18);
+        for(int i = 35; i <=42;i++){
+            indexing[i]=new Pair(10,35+18-i);
+        }
+        for(int i = 43;i<=50;i++){
+            indexing[i]=new Pair(i-32,10);
+        }
+        indexing[51]=new Pair(18,9);
+        for(int i = 52;i<=59;i++){
+            indexing[i]=new Pair(52+18-i,8);
+        }
+        for(int i = 60;i<=67;i++){
+            indexing[i]=new Pair(10,67-i);
+        }
+        return indexing;
+    }
+
 }
