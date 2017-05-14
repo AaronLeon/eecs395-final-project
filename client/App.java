@@ -18,9 +18,11 @@ public class App extends Application {
         UIBoard board = new UIBoard(b);
         System.out.println(board.getChildren());
 
-        Scene scene = new Scene(board, 500, 500);
+        Scene scene = new Scene(board, 700, 700);
         stage.setScene(scene);
         stage.show();
     }
 
 }
+
+
