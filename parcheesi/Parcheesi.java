@@ -49,7 +49,16 @@ public class Parcheesi implements Game {
 
                 // We have a cheater :(
                 if (player == null) {
-                    continue;
+                    boolean allCheated=true;
+                    for(String checkColor : Board.COLORS){
+                        if (players.get(checkColor)!=null){
+                            allCheated=false;
+                        }
+
+                    }
+                    if(allCheated){
+                        gameover=true;
+                    }
                 }
 
                 Pair<Board, Boolean> turnResults = giveTurn(player);
@@ -66,6 +75,18 @@ public class Parcheesi implements Game {
                     board = turnResults.first;
                     doubles = turnResults.second;
                 }
+                boolean allHome=true;
+                for(Object p: board.homes.get(player.color)){
+                    if(p instanceof Pawn==false){
+                        allHome=false;
+                    }
+                }
+                if (allHome){
+                    System.out.print("Winner is player "+player.color);
+                    //return winner somehow
+                    gameover=true;
+                }
+
 
                 turn = (++turn) % 4;
             }
