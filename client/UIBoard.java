@@ -20,7 +20,7 @@ public class UIBoard extends GridPane {
         this.board = board;
         this.setHeight(600);
         this.setWidth(600);
-        this.setGridLinesVisible(true);
+//        this.setGridLinesVisible(true);
 
         RowConstraints rc = new RowConstraints(CELL_HEIGHT);
         rc.setFillHeight(true);
