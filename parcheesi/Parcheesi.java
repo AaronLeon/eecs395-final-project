@@ -34,9 +34,9 @@ public class Parcheesi implements Game {
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
             register(new RemotePlayer(colors.next(), listener.accept(), db));
-            register(new MPlayer(colors.next()));
-            register(new MPlayer(colors.next()));
-            register(new MPlayer(colors.next()));
+            register(new FrontPawnPlayer(colors.next()));
+            register(new FrontPawnPlayer(colors.next()));
+            register(new FrontPawnPlayer(colors.next()));
 
             if (!registeredAllPlayers()) {
                 throw new Exception("Tried to start game without registering all players");
