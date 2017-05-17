@@ -65,7 +65,6 @@ public class BoardParser extends AbstractParser<Board> {
 
                     currentPawn = currentPawn.getNextSibling();
                 }
-
             } else if (bc == Board.BoardComponent.RING) {
                 Node currentPieceLoc = currentBoardComponent.getFirstChild();
                 while (currentPieceLoc != null) {

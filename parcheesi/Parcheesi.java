@@ -34,31 +34,28 @@ public class Parcheesi implements Game {
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
             register(new RemotePlayer(colors.next(), listener.accept(), db));
-            register(new FrontPawnPlayer(colors.next()));
-            register(new FrontPawnPlayer(colors.next()));
-            register(new FrontPawnPlayer(colors.next()));
+//            register(new RemotePlayer(colors.next(), listener.accept(), db));
+//            register(new RemotePlayer(colors.next(), listener.accept(), db));
+//            register(new RemotePlayer(colors.next(), listener.accept(), db));
+
+            register(new MPlayer(colors.next()));
+            register(new MPlayer(colors.next()));
+            register(new MPlayer(colors.next()));
 
             if (!registeredAllPlayers()) {
                 throw new Exception("Tried to start game without registering all players");
             }
 
             int turn = 0;
+            String color = null;
+            game:
             while (!gameover) {
-                String color = Board.COLORS[turn];
+                color = Board.COLORS[turn];
                 SPlayer player = (SPlayer) players.get(color);
 
                 // We have a cheater :(
                 if (player == null) {
-                    boolean allCheated=true;
-                    for(String checkColor : Board.COLORS){
-                        if (players.get(checkColor)!=null){
-                            allCheated=false;
-                        }
-
-                    }
-                    if(allCheated){
-                        gameover=true;
-                    }
+                    continue;
                 }
 
                 Pair<Board, Boolean> turnResults = giveTurn(player);
@@ -70,26 +67,21 @@ public class Parcheesi implements Game {
                     consecutiveDoubles++;
                     if (consecutiveDoubles > 2) {
                         player.doublesPenalty();
+                        break;
                     }
+                    // TODO: this shouldn't be null. make a test case
                     turnResults = giveTurn(player);
+                    if (turnResults == null) {
+                        continue game;
+                    }
                     board = turnResults.first;
                     doubles = turnResults.second;
                 }
-                boolean allHome=true;
-                for(Object p: board.homes.get(player.color)){
-                    if(p instanceof Pawn==false){
-                        allHome=false;
-                    }
-                }
-                if (allHome){
-                    System.out.print("Winner is player "+player.color);
-                    //return winner somehow
-                    gameover=true;
-                }
 
-
+                gameover = gameover(color);
                 turn = (++turn) % 4;
             }
+            System.out.print("Winner is player " + color);
         }
         finally {
             listener.close();
@@ -281,8 +273,13 @@ public class Parcheesi implements Game {
         Pair<int[], Boolean> diceResults = rollDice(player);
         int[] dice = diceResults.first;
         boolean doubles = diceResults.second;
-        while (!RuleEngine.allDiceUsed(dice) && RuleEngine.canMove(player, dice, board)) {
+        while (!RuleEngine.allDiceUsed(dice)) {
             Move[] moves = player.doMove(board, dice);
+
+            if (moves == null && !RuleEngine.canMove(player, dice, board)) {
+                return null;
+            }
+
             for (Move m:moves){
                 dice=consumeDice(dice, m);
             }
@@ -320,7 +317,6 @@ public class Parcheesi implements Game {
      * @param m    parcheesi.Move that uses dice roll
      * @return The dice array once the given move has consumed its respective dice roll.
      */
-    // TODO: Abstract into a Dice utility class?
     public static int[] consumeDice(int[] dice, Move m) {
         int[] res = dice;
 
@@ -400,6 +396,28 @@ public class Parcheesi implements Game {
             board.sendBackToNest(pawns[i]);
         }
         players.put(color, null);
+    }
+
+    public boolean allPlayersCheated() {
+        for(String color : Board.COLORS){
+            if (players.get(color) != null){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean won(String color) {
+        for (Pawn pawn : board.pawns.get(color)) {
+            if (pawn.bc != Board.BoardComponent.HOME) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean gameover(String color) {
+        return allPlayersCheated() || won(color);
     }
 
 }
