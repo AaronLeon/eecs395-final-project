@@ -35,7 +35,7 @@ public class Parcheesi implements Game {
             DocumentBuilder db = dbf.newDocumentBuilder();
             register(new RemotePlayer(colors.next(), listener.accept(), db));
             register(new FrontPawnPlayer(colors.next()));
-            register(new FrontPawnPlayer(colors.next()));
+            register(new BackPawnPlayer(colors.next()));
             register(new FrontPawnPlayer(colors.next()));
 
             if (!registeredAllPlayers()) {
