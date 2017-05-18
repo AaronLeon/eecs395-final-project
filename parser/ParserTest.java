@@ -17,6 +17,7 @@ public class ParserTest {
     public static void beforeClass() {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
+//            dbf.setFeature("http://apache.org/xml/features/dom/defer-node-expansion", false );
             db = dbf.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
@@ -182,6 +183,51 @@ public class ParserTest {
         }
 
         Assert.assertTrue("Generating void XML returns correct XML", expected.isEqualNode(result));
+    }
+
+    @Test
+    public void doMoveFromXmlTest() {
+        String originalXml = "" +
+            "<do-move>" +
+                "<board>" +
+                "<start>" +
+                "<pawn><color>blue</color><id>0</id></pawn>" +
+                "<pawn><color>blue</color><id>1</id></pawn>" +
+                "<pawn><color>blue</color><id>2</id></pawn>" +
+                "<pawn><color>blue</color><id>3</id></pawn>" +
+                "<pawn><color>yellow</color><id>0</id></pawn>" +
+                "<pawn><color>yellow</color><id>1</id></pawn>" +
+                "<pawn><color>yellow</color><id>2</id></pawn>" +
+                "<pawn><color>yellow</color><id>3</id></pawn>" +
+                "<pawn><color>green</color><id>0</id></pawn>" +
+                "<pawn><color>green</color><id>1</id></pawn>" +
+                "<pawn><color>green</color><id>2</id></pawn>" +
+                "<pawn><color>green</color><id>3</id></pawn>" +
+                "<pawn><color>red</color><id>0</id></pawn>" +
+                "<pawn><color>red</color><id>1</id></pawn>" +
+                "<pawn><color>red</color><id>2</id></pawn>" +
+                "<pawn><color>red</color><id>3</id></pawn>" +
+                "</start>" +
+                "<main>" +
+                "</main>" +
+                "<home-rows>" +
+                "</home-rows>" +
+                "<home>" +
+                "</home>" +
+                "</board>" +
+                "<dice>" +
+                    "<die>2</die>" +
+                    "<die>3</die>" +
+                "</dice>" +
+            "</do-move>";
+        InputStream is = new ByteArrayInputStream(originalXml.getBytes());
+        try {
+            Document doc = db.parse(is);
+            Pair<Board, int[]> results = Parser.doMoveFromXml(db, doc);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
