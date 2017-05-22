@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class RemotePlayer extends SPlayer {
     Socket socket;
@@ -28,23 +30,66 @@ public class RemotePlayer extends SPlayer {
         try {
             String startGame = Parser.documentToString(Parser.generateStartGameXml(db, color));
             out.println(startGame);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+
+    private Pawn[] sortedPawns(Board board) {
+        //modified sorting of pawns to prioritize pawns that are behind, in unsafe places, or in the
+        Pawn[] pawns = board.pawns.get(this.color);
+        Arrays.sort(pawns, (a, b) -> {
+            if (a.bc == b.bc && a.location == b.location) {
+                return 0;
+            } else if (b.bc == Board.BoardComponent.HOME || b.bc == Board.BoardComponent.NEST
+                    || (a.bc == Board.BoardComponent.HOMEROW && b.bc == Board.BoardComponent.RING)) {
+                boolean aSafe = (Arrays.binarySearch(board.SAFE_LOCATIONS, a.location) >= 0);
+                boolean bSafe = (Arrays.binarySearch(board.SAFE_LOCATIONS, b.location) >= 0);
+                if (!aSafe && bSafe) {
+                    return 1;
+                } else if (aSafe && !bSafe) {
+                    return -1;
+                } else if ((a.bc == b.bc && a.location > b.location)) {
+                    return -1;
+                }
+            }
+            return 1;
+        });
+        return pawns;
+    }
+
+
     @Override
-    public Move[] doMove(Board board, int[] rolls) {
-        try {
-            String promptMove = Parser.documentToString(Parser.generateDoMoveXml(db, board, rolls));
-            out.println(promptMove);
-            String input = in.readLine();
+    public Move[] doMove(Board board, int[] dice) {
+        ArrayList<Move> moves = new ArrayList<Move>(4);
+        Pawn[] sorted = sortedPawns(board);
+        for (Pawn pawn : sorted) {
+            if (pawn.bc == Board.BoardComponent.NEST && RuleEngine.canEnter(dice)) {
+                EnterPiece m = new EnterPiece(pawn);
+                moves.add(m);
+                Parcheesi.consumeDice(dice, m);
+            } else if (pawn.bc == Board.BoardComponent.RING) {
+                for (int d : dice) {
+                    MoveMain testedMove = new MoveMain(pawn, d);
+                    if (!RuleEngine.isBlocked(board, testedMove)) {
+                        moves.add(testedMove);
+                        Parcheesi.consumeDice(dice, testedMove);
+                    }
+                }
+            } else if (pawn.bc == Board.BoardComponent.HOMEROW) {
+                for (int d : dice) {
+                    MoveHome testedMove = new MoveHome(pawn, d);
+                    if (!RuleEngine.isBlocked(board, testedMove)) {
+                        moves.add(testedMove);
+                        Parcheesi.consumeDice(dice, testedMove);
+                    }
+                }
+            }
         }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new Move[0];
+
+        Move[] res = (Move[]) moves.toArray();
+        return res;
     }
 
     @Override
@@ -52,8 +97,7 @@ public class RemotePlayer extends SPlayer {
         try {
             String doublesPenalty = Parser.documentToString(Parser.generateDoublesPenaltyXml(db));
             out.println(doublesPenalty);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
