@@ -3,6 +3,8 @@ package parcheesi;
 import parser.Parser;
 import org.w3c.dom.Document;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -89,7 +91,25 @@ public class RemotePlayer extends SPlayer {
         }
 
         Move[] res = (Move[]) moves.toArray();
+        executeMoves(res);
         return res;
+    }
+
+
+
+    private void executeMoves(Move[] moves){
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        try {
+            db = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+        MoveParser parser = new MoveParser(db);
+
+        Document message = parser.toXml(moves);
+
+        //send out ret
+
     }
 
     @Override
