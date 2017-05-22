@@ -1,7 +1,7 @@
 package parcheesi;
 
 import parser.Parser;
-
+import org.w3c.dom.Document;
 import javax.xml.parsers.DocumentBuilder;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import parser.*;
 
 public class RemotePlayer extends SPlayer {
     Socket socket;
@@ -58,7 +59,6 @@ public class RemotePlayer extends SPlayer {
         });
         return pawns;
     }
-
 
     @Override
     public Move[] doMove(Board board, int[] dice) {
