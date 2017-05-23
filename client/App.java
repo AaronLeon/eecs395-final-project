@@ -28,16 +28,26 @@ public class App {
 
             while (client.isConnected()) {
                 Document input = Parser.stringToDocument(db, client.readInput());
-                Pair<Board, int[]> doMove = Parser.doMoveFromXml(db, input);
+                String root = input.getFirstChild().getTextContent();
 
-                Board b = doMove.first;
-                int[] d = doMove.second;
-                Move[] moves = strategy.doMove(b, d);
+                switch (root) {
+                    case "do-move":
+                        Pair<Board, int[]> doMove = Parser.doMoveFromXml(db, input);
+                        Board b = doMove.first;
+                        int[] d = doMove.second;
+                        Move[] moves = strategy.doMove(b, d);
 
-                Document outputXml = (moves == null)
-                        ? Parser.generateVoidXml(db)
-                        : Parser.generateMovesXml(db, moves);
-                client.writeOutput(Parser.documentToString(outputXml));
+                        Document output = (moves == null)
+                                ? Parser.generateVoidXml(db)
+                                : Parser.generateMovesXml(db, moves);
+                        client.writeOutput(Parser.documentToString(output));
+                        break;
+                    case "doubles-penalty":
+                        System.out.println("You got a doubles penalty!");
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         catch (Exception e) {
