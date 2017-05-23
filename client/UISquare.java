@@ -3,10 +3,8 @@ package client;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
-import javafx.scene.Group;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import parcheesi.Blockade;
 import parcheesi.Pawn;
 

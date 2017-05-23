@@ -31,85 +31,28 @@ public class RemotePlayer extends SPlayer {
     @Override
     public void startGame(String color) {
         try {
-            String startGame = Parser.documentToString(Parser.generateStartGameXml(db, color));
-            out.println(startGame);
+            Document startGameXml = Parser.generateStartGameXml(db, color);
+            out.println(Parser.documentToString(startGameXml));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-
-    private Pawn[] sortedPawns(Board board) {
-        //modified sorting of pawns to prioritize pawns that are behind, in unsafe places, or in the
-        Pawn[] pawns = board.pawns.get(this.color);
-        Arrays.sort(pawns, (a, b) -> {
-            if (a.bc == b.bc && a.location == b.location) {
-                return 0;
-            } else if (b.bc == Board.BoardComponent.HOME || b.bc == Board.BoardComponent.NEST
-                    || (a.bc == Board.BoardComponent.HOMEROW && b.bc == Board.BoardComponent.RING)) {
-                boolean aSafe = (Arrays.binarySearch(board.SAFE_LOCATIONS, a.location) >= 0);
-                boolean bSafe = (Arrays.binarySearch(board.SAFE_LOCATIONS, b.location) >= 0);
-                if (!aSafe && bSafe) {
-                    return 1;
-                } else if (aSafe && !bSafe) {
-                    return -1;
-                } else if ((a.bc == b.bc && a.location > b.location)) {
-                    return -1;
-                }
-            }
-            return 1;
-        });
-        return pawns;
-    }
-
     @Override
     public Move[] doMove(Board board, int[] dice) {
-        ArrayList<Move> moves = new ArrayList<Move>(4);
-        Pawn[] sorted = sortedPawns(board);
-        for (Pawn pawn : sorted) {
-            if (pawn.bc == Board.BoardComponent.NEST && RuleEngine.canEnter(dice)) {
-                EnterPiece m = new EnterPiece(pawn);
-                moves.add(m);
-                Parcheesi.consumeDice(dice, m);
-            } else if (pawn.bc == Board.BoardComponent.RING) {
-                for (int d : dice) {
-                    MoveMain testedMove = new MoveMain(pawn, d);
-                    if (!RuleEngine.isBlocked(board, testedMove)) {
-                        moves.add(testedMove);
-                        Parcheesi.consumeDice(dice, testedMove);
-                    }
-                }
-            } else if (pawn.bc == Board.BoardComponent.HOMEROW) {
-                for (int d : dice) {
-                    MoveHome testedMove = new MoveHome(pawn, d);
-                    if (!RuleEngine.isBlocked(board, testedMove)) {
-                        moves.add(testedMove);
-                        Parcheesi.consumeDice(dice, testedMove);
-                    }
-                }
-            }
-        }
-
-        Move[] res = (Move[]) moves.toArray();
-        executeMoves(res);
-        return res;
-    }
-
-
-
-    private void executeMoves(Move[] moves){
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        Move[] moves = null;
         try {
-            db = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
+            String promptMoves = Parser.documentToString(Parser.generateDoMoveXml(db, board, dice));
+            out.println(promptMoves);
+
+            Document movesXml = db.parse(in.readLine());
+            moves = Parser.movesFromXml(db, movesXml);
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
-        MoveParser parser = new MoveParser(db);
 
-        Document message = parser.toXml(moves);
-
-        //send out ret
-
+        return moves;
     }
 
     @Override

@@ -13,6 +13,8 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.StringWriter;
 
 public class Parser {
@@ -71,17 +73,7 @@ public class Parser {
         return doc;
     }
 
-    public static String documentToString(Document doc) throws Exception {
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        StreamResult result = new StreamResult(new StringWriter());
-        DOMSource source = new DOMSource(doc);
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        transformer.setOutputProperty(OutputKeys.METHOD, "html");
-        transformer.transform(source, result);
-        return result.getWriter().toString();
-    }
-
-    public static Move[] moveFromXml(DocumentBuilder db, Document doc) throws Exception {
+    public static Move[] movesFromXml(DocumentBuilder db, Document doc) throws Exception {
         MoveParser moveParser = new MoveParser(db);
 
         Move[] result = new Move[4];
@@ -127,5 +119,21 @@ public class Parser {
         int[] d = diceParser.fromXml(diceDoc);
 
         return new Pair<>(b, d);
+    }
+
+    public static String documentToString(Document doc) throws Exception {
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        StreamResult result = new StreamResult(new StringWriter());
+        DOMSource source = new DOMSource(doc);
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        transformer.setOutputProperty(OutputKeys.METHOD, "html");
+        transformer.transform(source, result);
+        return result.getWriter().toString();
+    }
+
+    // TODO: replace all places where we rewrite this code with stringToDocument
+    public static Document stringToDocument(DocumentBuilder db, String string) throws Exception {
+        InputStream is = new ByteArrayInputStream(string.getBytes());
+        return db.parse(is);
     }
 }

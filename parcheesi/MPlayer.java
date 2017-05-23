@@ -1,10 +1,14 @@
 package parcheesi;
 
+import strategy.Strategy;
+
 public class MPlayer extends SPlayer {
     String color;
+    Strategy strategy;
 
-    public MPlayer(String c) {
+    public MPlayer(String c, Strategy strategy) {
         super(c);
+        this.strategy = strategy;
     }
 
     @Override
@@ -14,7 +18,7 @@ public class MPlayer extends SPlayer {
 
     @Override
     public Move[] doMove(Board board, int[] dice) {
-        return null;
+        return strategy.doMove(board, dice);
     }
 
     @Override

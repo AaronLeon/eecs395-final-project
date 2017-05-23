@@ -5,6 +5,9 @@ package parcheesi;
  * The parcheesi.Parcheesi class represents the game engine
  */
 
+import strategy.BackPawnStrategy;
+import strategy.FrontPawnStrategy;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.util.Arrays;
@@ -33,10 +36,15 @@ public class Parcheesi implements Game {
         ServerSocket listener = new ServerSocket(8000);
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
-            register(new RemotePlayer(colors.next(), listener.accept(), db));
-            register(new FrontPawnPlayer(colors.next()));
-            register(new BackPawnPlayer(colors.next()));
-            register(new FrontPawnPlayer(colors.next()));
+
+            String c = colors.next();
+            register(new RemotePlayer(c, listener.accept(), db));
+            c = colors.next();
+            register(new MPlayer(c, new FrontPawnStrategy(c)));
+            c = colors.next();
+            register(new MPlayer(c, new BackPawnStrategy(c)));
+            c = colors.next();
+            register(new MPlayer(c, new FrontPawnStrategy(c)));
 
             if (!registeredAllPlayers()) {
                 throw new Exception("Tried to start game without registering all players");
@@ -44,7 +52,6 @@ public class Parcheesi implements Game {
 
             int turn = 0;
             String color = null;
-            game:
             while (!gameover) {
                 color = Board.COLORS[turn];
                 SPlayer player = (SPlayer) players.get(color);
@@ -65,10 +72,9 @@ public class Parcheesi implements Game {
                         player.doublesPenalty();
                         break;
                     }
-                    // TODO: this shouldn't be null. make a test case
                     turnResults = giveTurn(player);
-                    if (turnResults == null) {
-                        continue game;
+                    if (turnResults == null) {  // player cheated!
+                        break;
                     }
                     board = turnResults.first;
                     doubles = turnResults.second;

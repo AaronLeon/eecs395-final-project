@@ -61,15 +61,6 @@ public class MoveParser extends AbstractParser<Move> {
         }
     }
 
-    public Document toXml(Move[] moves){
-        Document doc = db.newDocument();
-        Element root=doc.createElement("moves");
-        for (Move move : moves){
-            doc.appendChild(toXml(move));
-        }
-        return doc;
-    }
-
     public Document toXml(Move move) {
         if (move instanceof EnterPiece) {
             return enterPieceToXml((EnterPiece) move);
