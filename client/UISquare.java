@@ -22,8 +22,8 @@ public class UISquare extends FlowPane {
             this.getChildren().add(new UIPawn(UIBoard.stringToColor(((Pawn) contents).color)));
         }
         else if (contents instanceof Blockade) {
-            this.getChildren().add(new UIPawn(UIBoard.stringToColor(((Blockade) contents).first.color)));
-            this.getChildren().add(new UIPawn(UIBoard.stringToColor(((Blockade) contents).second.color)));
+            this.getChildren().add(new UIPawn(UIBoard.stringToColor(((Blockade) contents).first().color)));
+            this.getChildren().add(new UIPawn(UIBoard.stringToColor(((Blockade) contents).second().color)));
 
         }
         else if (contents instanceof Object[]) {

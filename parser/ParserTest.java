@@ -112,10 +112,10 @@ public class ParserTest {
 
     @Test
     public void generateMovesXmlTest() {
-        Pawn p0 = new Pawn(0, "red", Board.BoardComponent.NEST, 0);
-        Pawn p1 = new Pawn(1, "red", Board.BoardComponent.RING, 7);
-        Pawn p2 = new Pawn(2, "red", Board.BoardComponent.HOMEROW, 3);
-        Pawn p3 = new Pawn(3, "red", Board.BoardComponent.RING, 26);
+        Pawn p0 = new Pawn(0, "red", new Location(Board.BoardComponent.NEST, 0));
+        Pawn p1 = new Pawn(1, "red", new Location(Board.BoardComponent.RING, 7));
+        Pawn p2 = new Pawn(2, "red", new Location(Board.BoardComponent.HOMEROW, 3));
+        Pawn p3 = new Pawn(3, "red", new Location(Board.BoardComponent.RING, 26));
         Move[] moves = {
                 new EnterPiece(p0),
                 new MoveMain(p1, 3),

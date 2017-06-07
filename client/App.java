@@ -13,7 +13,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 public class App {
     public void main(String[] args) {
         try {
-
             final String host = "127.0.0.1";
             final int port = Integer.parseInt("8000");
             final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

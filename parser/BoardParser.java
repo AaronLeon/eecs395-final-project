@@ -59,7 +59,7 @@ public class BoardParser extends AbstractParser<Board> {
                     pawnDoc.appendChild(temp);
 
                     Pawn pawn = pawnParser.fromXml(pawnDoc);
-                    pawn.bc = bc;
+                    pawn.location.bc = bc;
                     pawns.get(pawn.color)[pawn.id] = pawn;
                     b.nests.get(pawn.color)[pawn.id] = pawn;
 
@@ -69,7 +69,7 @@ public class BoardParser extends AbstractParser<Board> {
                 Node currentPieceLoc = currentBoardComponent.getFirstChild();
                 while (currentPieceLoc != null) {
                     Pawn pawn = pawnFromPieceLocXml(currentPieceLoc);
-                    pawn.bc = Board.BoardComponent.RING;
+                    pawn.location.bc = Board.BoardComponent.RING;
                     pawns.get(pawn.color)[pawn.id] = pawn;
                     b.ring[pawn.id] = pawn;
                     currentPieceLoc = currentPieceLoc.getNextSibling();
@@ -78,7 +78,7 @@ public class BoardParser extends AbstractParser<Board> {
                 Node currentPieceLoc = currentBoardComponent.getFirstChild();
                 while (currentPieceLoc != null) {
                     Pawn pawn = pawnFromPieceLocXml(currentPieceLoc);
-                    pawn.bc = Board.BoardComponent.HOMEROW;
+                    pawn.location.bc = Board.BoardComponent.HOMEROW;
                     pawns.get(pawn.color)[pawn.id] = pawn;
                     b.homeRows.get(pawn.color)[pawn.id] = pawn;
                     currentPieceLoc = currentPieceLoc.getNextSibling();
@@ -91,7 +91,7 @@ public class BoardParser extends AbstractParser<Board> {
                     pawnDoc.appendChild(temp);
 
                     Pawn pawn = pawnParser.fromXml(pawnDoc);
-                    pawn.bc = bc;
+                    pawn.location.bc = bc;
                     pawns.get(pawn.color)[pawn.id] = pawn;
                     b.homes.get(pawn.color)[pawn.id] = pawn;
 
@@ -117,14 +117,14 @@ public class BoardParser extends AbstractParser<Board> {
 
         for (String color : Board.COLORS) {
             for (Pawn p : board.pawns.get(color)) {
-                if (p.bc == Board.BoardComponent.NEST) {
+                if (p.location.bc == Board.BoardComponent.NEST) {
                     Node importedPawn = doc.importNode(pawnParser.toXml(p).getFirstChild(), true);
                     start.appendChild(importedPawn);
-                } else if (p.bc == Board.BoardComponent.RING) {
+                } else if (p.location.bc == Board.BoardComponent.RING) {
                     main.appendChild(pawnToPieceLocXml(p).getFirstChild());
-                } else if (p.bc == Board.BoardComponent.HOMEROW) {
+                } else if (p.location.bc == Board.BoardComponent.HOMEROW) {
                     homeRows.appendChild(pawnToPieceLocXml(p).getFirstChild());
-                } else if (p.bc == Board.BoardComponent.HOME) {
+                } else if (p.location.bc == Board.BoardComponent.HOME) {
                     Node importedPawn = doc.importNode(pawnParser.toXml(p).getFirstChild(), true);
                     home.appendChild(importedPawn);
                 }
@@ -152,7 +152,7 @@ public class BoardParser extends AbstractParser<Board> {
             throw new Exception("Expected <loc>");
         }
         int location = Integer.parseInt(locNode.getTextContent());
-        pawn.location = location;
+        pawn.location.index = location;
 
         return pawn;
     }
@@ -162,7 +162,7 @@ public class BoardParser extends AbstractParser<Board> {
         Element pieceLoc = doc.createElement("piece-loc");
         pieceLoc.appendChild(pawnParser.toXml(pawn));
         Element loc = doc.createElement("loc");
-        loc.appendChild(doc.createTextNode(Integer.toString(pawn.location)));
+        loc.appendChild(doc.createTextNode(Integer.toString(pawn.location.index)));
         pieceLoc.appendChild(loc);
 
         return doc;

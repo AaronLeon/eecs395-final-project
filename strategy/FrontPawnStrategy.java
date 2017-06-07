@@ -13,12 +13,12 @@ public class FrontPawnStrategy extends Strategy {
     public Pawn[] prioritizePawns(Board board) {
         Pawn[] pawns = board.pawns.get(this.color);
         Arrays.sort(pawns, (a, b) -> {
-            if (a.bc == b.bc && a.location == b.location) {
+            if (a.location.equals(b.location)) {
                 return 0;
             }
-            else if (b.bc == Board.BoardComponent.HOME || b.bc == Board.BoardComponent.NEST
-                    || (a.bc == Board.BoardComponent.HOMEROW && b.bc == Board.BoardComponent.RING)
-                    || (a.bc == b.bc && a.location > b.location)) {
+            else if (b.location.bc == Board.BoardComponent.HOME || b.location.bc == Board.BoardComponent.NEST
+                    || (a.location.bc == Board.BoardComponent.HOMEROW && b.location.bc == Board.BoardComponent.RING)
+                    || (a.location.bc == b.location.bc && a.location.index > b.location.index)) {
                 return 1;
             }
             else {

@@ -44,16 +44,14 @@ public class MoveParser extends AbstractParser<Move> {
         } else if (root.getNodeName().equals("move-piece-main")) {
             int start = Integer.parseInt(pawn.getNextSibling().getTextContent());
             int distance = Integer.parseInt(pawn.getNextSibling().getTextContent());
-            _pawn.location = start;
-            _pawn.bc = Board.BoardComponent.RING;
+            _pawn.location = new Location(Board.BoardComponent.RING, start);
             MoveMain move = new MoveMain(_pawn, distance);
             return move;
 
         } else if (root.getNodeName().equals("move-piece-home")) {
             int start = Integer.parseInt(pawn.getNextSibling().getTextContent());
             int distance = Integer.parseInt(pawn.getNextSibling().getTextContent());
-            _pawn.location = start;
-            _pawn.bc = Board.BoardComponent.HOMEROW;
+            _pawn.location = new Location(Board.BoardComponent.HOMEROW, start);
             MoveHome move = new MoveHome(_pawn, distance);
             return move;
         } else {
@@ -104,7 +102,7 @@ public class MoveParser extends AbstractParser<Move> {
         Element id = doc.createElement("id");
         id.appendChild(doc.createTextNode(Integer.toString(move.pawn.id)));
         Element start = doc.createElement("start");
-        start.appendChild(doc.createTextNode(Integer.toString(move.pawn.location)));
+        start.appendChild(doc.createTextNode(Integer.toString(move.pawn.location.index)));
         Element distance = doc.createElement("distance");
         distance.appendChild(doc.createTextNode(Integer.toString(move.distance)));
 
@@ -128,7 +126,7 @@ public class MoveParser extends AbstractParser<Move> {
         Element id = doc.createElement("id");
         id.appendChild(doc.createTextNode(Integer.toString(move.pawn.id)));
         Element start = doc.createElement("start");
-        start.appendChild(doc.createTextNode(Integer.toString(move.pawn.location)));
+        start.appendChild(doc.createTextNode(Integer.toString(move.pawn.location.index)));
         Element distance = doc.createElement("distance");
         distance.appendChild(doc.createTextNode(Integer.toString(move.distance)));
 

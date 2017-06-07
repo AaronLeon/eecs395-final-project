@@ -13,7 +13,6 @@ public class MPlayer extends SPlayer {
 
     @Override
     public void startGame(String color) {
-        System.out.print("Player is " + color);
     }
 
     @Override

@@ -10,15 +10,15 @@ import strategy.FrontPawnStrategy;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.net.ServerSocket;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.net.ServerSocket;
 import java.util.Iterator;
 
 public class Parcheesi implements Game {
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     Board board;
-    HashMap<String, Player> players;
+    HashMap<String, SPlayer> players;
 
     public Parcheesi() {
         board = new Board();
@@ -54,14 +54,14 @@ public class Parcheesi implements Game {
             String color = null;
             while (!gameover) {
                 color = Board.COLORS[turn];
-                SPlayer player = (SPlayer) players.get(color);
+                SPlayer player = players.get(color);
 
                 // We have a cheater :(
                 if (player == null) {
                     continue;
                 }
 
-                Pair<Board, Boolean> turnResults = giveTurn(player);
+                Pair<Board, Boolean> turnResults = giveTurn(board, player);
                 board = turnResults.first;
                 boolean doubles = turnResults.second;
 
@@ -70,9 +70,10 @@ public class Parcheesi implements Game {
                     consecutiveDoubles++;
                     if (consecutiveDoubles > 2) {
                         player.doublesPenalty();
+                        doublesPenalty(player);
                         break;
                     }
-                    turnResults = giveTurn(player);
+                    turnResults = giveTurn(board, player);
                     if (turnResults == null) {  // player cheated!
                         break;
                     }
@@ -84,8 +85,7 @@ public class Parcheesi implements Game {
                 turn = (++turn) % 4;
             }
             System.out.print("Winner is player " + color);
-        }
-        finally {
+        } finally {
             listener.close();
         }
     }
@@ -119,18 +119,18 @@ public class Parcheesi implements Game {
      * @return parcheesi.Pair containing the board state after the parcheesi.EnterPiece move has taken place and
      * a bonus for bopping (0 if no bonus is earned)
      */
-    public Pair<Board, Integer> processMove(EnterPiece m) {
+    public Pair<Board, Integer> processMove(Board board, EnterPiece m) {
         int bonus = 0;
         Pawn pawn = m.pawn;
         int nestLocation = Board.NEST_LOCATIONS.get(pawn.color);
 
-        if (pawn.bc != Board.BoardComponent.NEST
+        if (pawn.location.bc != Board.BoardComponent.NEST
                 || RuleEngine.isBlocked(board, m)) {
             cheat(pawn.color);
             return null;
         }
 
-        Object bopped = board.get(Board.BoardComponent.RING, nestLocation, null);
+        BoardObject bopped = board.get(new Location(Board.BoardComponent.RING, nestLocation), null);
         if (bopped != null && bopped instanceof Pawn) {
             board.sendBackToNest((Pawn) bopped);
             bonus = 20;
@@ -155,26 +155,27 @@ public class Parcheesi implements Game {
      * @return parcheesi.Pair containing the board state after the parcheesi.MoveMain move has taken place and
      * a bonus for bopping or entering home (0 if no bonus is earned)
      */
-    public Pair<Board, Integer> processMove(MoveMain m) {
+    public Pair<Board, Integer> processMove(Board board, MoveMain m) {
         MoveMain move = m;
         Pawn pawn = move.pawn;
-        if (pawn.bc != Board.BoardComponent.RING || RuleEngine.isBlocked(board, move)) {
+        if (pawn.location.bc != Board.BoardComponent.RING || RuleEngine.isBlocked(board, move)) {
             cheat(pawn.color);
             return null;
         }
 
         int homeRowLocation = Board.HOMEROW_LOCATIONS.get(pawn.color);
-        Board.BoardComponent bc = pawn.bc;
-        int newLocation = pawn.location + m.distance;
-        if (newLocation > homeRowLocation) {
-            newLocation = (newLocation % homeRowLocation) - 1;
+        Board.BoardComponent bc = pawn.location.bc;
+        int newIndex = pawn.location.index + m.distance;
+        if (newIndex > homeRowLocation) {
+            newIndex = (newIndex % homeRowLocation) - 1;
             bc = Board.BoardComponent.HOMEROW;
         }
 
+        Location newLocation = new Location(bc, newIndex);
         int bonus = 0;
-        Object bopped = board.get(bc, newLocation, pawn.color);
+        BoardObject bopped = board.get(newLocation, pawn.color);
         if (bopped instanceof Pawn && !((Pawn) bopped).color.equals(pawn.color)) {
-            if (Board.isSafe(newLocation)) {
+            if (Board.isSafe(newLocation.index)) {
                 cheat(pawn.color);
                 return null;
             }
@@ -200,11 +201,11 @@ public class Parcheesi implements Game {
      * @return parcheesi.Pair containing the board state after the parcheesi.MoveHome move has taken place and
      * a bonus for bopping or entering home (0 if no bonus is earned)
      */
-    public Pair<Board, Integer> processMove(MoveHome m) {
+    public Pair<Board, Integer> processMove(Board board, MoveHome m) {
         Pawn pawn = m.pawn;
-        boolean home = false;
-        int newLocation = pawn.location + m.distance;
-        if (pawn.bc != Board.BoardComponent.HOMEROW || newLocation > Board.HOMEROW_SIZE || RuleEngine.isBlocked(board, m)) {
+        boolean home;
+        int newLocation = pawn.location.index + m.distance;
+        if (pawn.location.bc != Board.BoardComponent.HOMEROW || newLocation > Board.HOMEROW_SIZE || RuleEngine.isBlocked(board, m)) {
             cheat(pawn.color);
             return null;
         }
@@ -228,14 +229,14 @@ public class Parcheesi implements Game {
      * a bonus for bopping or entering home (0 if no bonus is earned)
      */
     // TODO: does board member need to be updated?
-    public Pair<Board, Integer> processMoves(Move m) {
+    public Pair<Board, Integer> processMoves(Board board, Move m) {
         Pair<Board, Integer> res = new Pair<>();
         if (m instanceof MoveMain) {
-            res = processMove((MoveMain) m);
+            res = processMove(board, (MoveMain) m);
         } else if (m instanceof EnterPiece) {
-            res = processMove((EnterPiece) m);
+            res = processMove(board, (EnterPiece) m);
         } else if (m instanceof MoveHome) {
-            res = processMove((MoveHome) m);
+            res = processMove(board, (MoveHome) m);
         }
         return res;
     }
@@ -266,11 +267,10 @@ public class Parcheesi implements Game {
      * Gives a turn to a player. Rolls the dice and asks the player for moves until all dice are consumed.
      * Awards dice bonus as needed
      *
-     * @param p parcheesi.Player who is taking the current turn
+     * @param player parcheesi.Player who is taking the current turn
      * @return parcheesi.Pair containing the new board state after the turn and a boolean that denotes a double roll
      */
-    public Pair<Board, Boolean> giveTurn(Player p) {
-        SPlayer player = (SPlayer) p;
+    public Pair<Board, Boolean> giveTurn(Board board, SPlayer player) {
 
         Pair<int[], Boolean> diceResults = rollDice(player);
         int[] dice = diceResults.first;
@@ -282,13 +282,13 @@ public class Parcheesi implements Game {
                 return null;
             }
 
-            for (Move m:moves){
-                dice=consumeDice(dice, m);
+            for (Move m : moves) {
+                dice = consumeDice(dice, m);
             }
 
             Board nextBoard = null;
             for (Move m : moves) {
-                Pair<Board, Integer> result = processMoves(m);
+                Pair<Board, Integer> result = processMoves(board, m);
                 nextBoard = result.first;
                 int bonus = result.second;
                 if (bonus > 0) {
@@ -299,9 +299,8 @@ public class Parcheesi implements Game {
                         }
                     }
                 }
-
             }
-            if (RuleEngine.movedBlockadeTogether(board, nextBoard, moves, player)) {
+            if (RuleEngine.movedBlockadeTogether(board, nextBoard, moves, player.color)) {
                 cheat(player.color);
                 return null;
             }
@@ -359,26 +358,26 @@ public class Parcheesi implements Game {
         int homeRowLocation = Board.HOMEROW_LOCATIONS.get(color);
         Pawn furthest = null;
         for (int i = Board.HOMEROW_SIZE - 1; i >= 0; i++) {
-            Object current = board.homeRows.get(color)[i];
+            BoardObject current = board.homeRows.get(color)[i];
             if (current == null) {
                 continue;
             }
             if (current instanceof Pawn && ((Pawn) current).color.equals(color)) {
                 furthest = ((Pawn) current);
-            } else if (current instanceof Blockade && ((Blockade) current).first.color.equals(color)) {
-                furthest = ((Blockade) current).first;
+            } else if (current instanceof Blockade && ((Blockade) current).first().color.equals(color)) {
+                furthest = ((Blockade) current).first();
             }
         }
 
         for (int i = homeRowLocation; i >= 0; i++) {
-            Object current = board.homeRows.get(color)[i];
+            BoardObject current = board.homeRows.get(color)[i];
             if (current == null) {
                 continue;
             }
             if (current instanceof Pawn && ((Pawn) current).color.equals(color)) {
                 furthest = ((Pawn) current);
-            } else if (current instanceof Blockade && ((Blockade) current).first.color.equals(color)) {
-                furthest = ((Blockade) current).first;
+            } else if (current instanceof Blockade && ((Blockade) current).first().color.equals(color)) {
+                furthest = ((Blockade) current).first();
             }
         }
 
@@ -401,8 +400,8 @@ public class Parcheesi implements Game {
     }
 
     public boolean allPlayersCheated() {
-        for(String color : Board.COLORS){
-            if (players.get(color) != null){
+        for (String color : Board.COLORS) {
+            if (players.get(color) != null) {
                 return false;
             }
         }
@@ -411,7 +410,7 @@ public class Parcheesi implements Game {
 
     public boolean won(String color) {
         for (Pawn pawn : board.pawns.get(color)) {
-            if (pawn.bc != Board.BoardComponent.HOME) {
+            if (pawn.location.bc != Board.BoardComponent.HOME) {
                 return false;
             }
         }

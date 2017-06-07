@@ -12,7 +12,7 @@ public class RuleEngine {
     public static boolean canEarnDoubleBonus(Board board, Player p) {
         SPlayer player = (SPlayer) p;
         for (Pawn pawn : board.pawns.get(player.color)) {
-            if (pawn.bc == Board.BoardComponent.NEST) {
+            if (pawn.location.bc == Board.BoardComponent.NEST) {
                 return false;
             }
         }
@@ -51,15 +51,15 @@ public class RuleEngine {
     }
 
     public static boolean canMovePawn(SPlayer player, Pawn pawn, int[] dice, Board board) {
-        if ((pawn.bc == Board.BoardComponent.NEST)) {
-            return canEnter(dice) && !board.isBlockade(Board.BoardComponent.RING, board.NEST_LOCATIONS.get(pawn.color), pawn.color);
+        if ((pawn.location.bc == Board.BoardComponent.NEST)) {
+            return canEnter(dice) && !board.isBlockade(new Location(Board.BoardComponent.RING, Board.NEST_LOCATIONS.get(pawn.color)), pawn.color);
             //check if integers in dice can sum to 5 and entryway isn't blockaded
-        } else if (pawn.bc == Board.BoardComponent.HOMEROW) {
+        } else if (pawn.location.bc == Board.BoardComponent.HOMEROW) {
             //TODO: Make isBlocked accepted parcheesi.MoveHome as well..this doesn't check all squares for blockades
             for (int d : dice) {
                 for (int i = 0; i <= d; i++) {
                     //d+1 because we check d cell as well
-                    if (board.homeRows.get(player.color)[pawn.location + i] instanceof Blockade) {
+                    if (board.homeRows.get(player.color)[pawn.location.index + i] instanceof Blockade) {
                         return false;
                     }
                 }
@@ -105,19 +105,18 @@ public class RuleEngine {
     private static boolean isBlocked(Board board, MoveMain m) {
         Pawn pawn = m.pawn;
         int homeRowLocation = Board.HOMEROW_LOCATIONS.get(pawn.color);
-        Board.BoardComponent bc = pawn.bc;
-        int location = pawn.location;
+        Location location = new Location(pawn.location.bc, pawn.location.index);
         int distance = m.distance;
         while (distance > 0) {
-            ++location;
+            ++location.index;
             --distance;
 
-            if (location > homeRowLocation) {
-                bc = Board.BoardComponent.HOMEROW;
-                location = 0;
+            if (location.index > homeRowLocation) {
+                location.bc = Board.BoardComponent.HOMEROW;
+                location.index = 0;
             }
 
-            if (board.isBlockade(bc, location, pawn.color)) {
+            if (board.isBlockade(location, pawn.color)) {
                 return true;
             }
         }
@@ -132,14 +131,13 @@ public class RuleEngine {
      */
     private static boolean isBlocked(Board board, MoveHome m) {
         Pawn pawn = m.pawn;
-        Board.BoardComponent bc = pawn.bc;
-        int location = pawn.location;
+        Location location = new Location(pawn.location.bc, pawn.location.index);
         int distance = m.distance;
-        while (distance > 0 && location < Board.HOMEROW_SIZE - 1) {
-            ++location;
+        while (distance > 0 && location.index < Board.HOMEROW_SIZE - 1) {
+            ++location.index;
             --distance;
 
-            if (board.isBlockade(bc, location, pawn.color)) {
+            if (board.isBlockade(location, pawn.color)) {
                 return true;
             }
         }
@@ -154,9 +152,8 @@ public class RuleEngine {
      */
     private static boolean isBlocked(Board board, EnterPiece m) {
         Pawn pawn = m.pawn;
-        int nestLocation = Board.NEST_LOCATIONS.get(pawn.color);
-        Board.BoardComponent bc = Board.BoardComponent.RING;
-        return board.isBlockade(bc, nestLocation, null);
+        Location location = new Location(Board.BoardComponent.RING, Board.NEST_LOCATIONS.get(pawn.color));
+        return board.isBlockade(location, null);
     }
 
     /**
@@ -183,37 +180,34 @@ public class RuleEngine {
      * @param board1 Starting board state
      * @param board2 Ending board state
      * @param moves  Array of history of moves that occurred between board states
-     * @param player parcheesi.Player that moved
+     * @param color color that moved
      * @return true if player moved a blockade together and false otherwise
      */
     //TODO: Should check using moves to see if blockade is formed in intermediary move
-    public static boolean movedBlockadeTogether(Board board1, Board board2, Move[] moves, Player player) {
+    public static boolean movedBlockadeTogether(Board board1, Board board2, Move[] moves, String color) {
         // List of blockades that formed across all moves in a turn
-        Pair<Blockade, Blockade> blockades1 = new Pair<>();
-        SPlayer p = (SPlayer) player;
+        Pair<Blockade, Blockade> blockades = new Pair<>();
 
-        Pawn[] pawns1 = board1.pawns.get(p.color);
+        Pawn[] pawns1 = board1.pawns.get(color);
         for (Pawn pawn : pawns1) {
-            if (!board1.isBlockade(pawn.bc, pawn.location, p.color)) {
-                continue;
-            }
-            Blockade b = (Blockade) board1.get(pawn.bc, pawn.location, pawn.color);
-            if (blockades1.first == null) {
-                blockades1.first = b;
-            } else if (blockades1.second == null && !blockades1.first.equals(b)) {
-                blockades1.second = b;
+            if (board1.isBlockade(pawn.location, pawn.color)) {
+                Blockade b = (Blockade) board1.get(pawn.location, pawn.color);
+                if (blockades.first == null) {
+                    blockades.first = b;
+                } else if (blockades.second == null && !blockades.first.equals(b)) {
+                    blockades.second = b;
+                }
             }
         }
 
-        Pawn[] pawns2 = board2.pawns.get(p.color);
+        Pawn[] pawns2 = board2.pawns.get(color);
         for (Pawn pawn : pawns2) {
-            if (!board2.isBlockade(pawn.bc, pawn.location, p.color)) {
-                continue;
-            }
-            Blockade b = (Blockade) board2.get(pawn.bc, pawn.location, pawn.color);
+            if (board2.isBlockade(pawn.location, color)) {
+                Blockade b = (Blockade) board2.get(pawn.location, pawn.color);
 
-            if (b.equals(blockades1.first) || b.equals(blockades1.second)) {
-                return true;
+                if (b.equals(blockades.first) || b.equals(blockades.second)) {
+                    return true;
+                }
             }
         }
 

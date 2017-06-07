@@ -1,24 +1,21 @@
 package parcheesi;
 
-public class Pawn {
+public class Pawn extends BoardObject {
   public int /* 0-3 */ id;
   public String color;
-  public Board.BoardComponent bc;
-  public int location;
+  public Location location;
 
   public Pawn() {}
 
   public Pawn (int id, String color) {
     this.id = id;
     this.color = color;
-    this.bc = Board.BoardComponent.NEST;
-    this.location = id;
+    this.location = new Location(Board.BoardComponent.NEST, id);
   }
 
-  public Pawn (int id, String color, Board.BoardComponent bc, int location) {
+  public Pawn (int id, String color, Location location) {
     this.id = id;
     this.color = color;
-    this.bc = bc;
     this.location = location;
   }
 
@@ -30,7 +27,6 @@ public class Pawn {
     Pawn p = (Pawn) other;
     return this.id == p.id
             && this.color.equals(p.color)
-            && this.bc == p.bc
-            && this.location == p.location;
+            && this.location.equals(p.location);
   }
 }

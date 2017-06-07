@@ -14,17 +14,17 @@ public class MyStrategy extends Strategy {
         //Prioritize pawns that are behind, in unsafe places, or in the nest
         Pawn[] pawns = board.pawns.get(this.color);
         Arrays.sort(pawns, (a, b) -> {
-            if (a.bc == b.bc && a.location == b.location) {
+            if (a.location.equals(b.location)) {
                 return 0;
-            } else if (b.bc == Board.BoardComponent.HOME || b.bc == Board.BoardComponent.NEST
-                    || (a.bc == Board.BoardComponent.HOMEROW && b.bc == Board.BoardComponent.RING)) {
-                boolean aSafe = Board.isSafe(a.location);
-                boolean bSafe = Board.isSafe(b.location);
+            } else if (b.location.bc == Board.BoardComponent.HOME || b.location.bc == Board.BoardComponent.NEST
+                    || (a.location.bc == Board.BoardComponent.HOMEROW && b.location.bc == Board.BoardComponent.RING)) {
+                boolean aSafe = Board.isSafe(a.location.index);
+                boolean bSafe = Board.isSafe(b.location.index);
                 if (!aSafe && bSafe) {
                     return 1;
                 } else if (aSafe && !bSafe) {
                     return -1;
-                } else if ((a.bc == b.bc && a.location > b.location)) {
+                } else if ((a.location.bc == b.location.bc && a.location.index > b.location.index)) {
                     return -1;
                 }
             }

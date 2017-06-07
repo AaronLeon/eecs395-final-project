@@ -153,14 +153,14 @@ public class UIBoard extends GridPane {
 
             for (Object pawn: board.ring) {
                 if (pawn != null && pawn instanceof Pawn) {
-                    Pair<Integer, Integer> location = ringToGridIndex[((Pawn) pawn).location];
+                    Pair<Integer, Integer> location = ringToGridIndex[((Pawn) pawn).location.index];
                     this.add(new UIPawn(color), location.first, location.second);
                 }
             }
 
             for (Object pawn: board.homeRows.get(c)) {
                 if (pawn != null && pawn instanceof Pawn) {
-                    Pair<Integer, Integer> location = homeRowToGridIndex.get(c)[((Pawn) pawn).location];
+                    Pair<Integer, Integer> location = homeRowToGridIndex.get(c)[((Pawn) pawn).location.index];
                     this.add(new UIPawn(color), location.first, location.second);
                 }
             }

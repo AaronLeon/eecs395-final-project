@@ -16,8 +16,8 @@ public class ParcheesiTest {
     @Before
     public void beforeTest() {
         game = new Parcheesi();
-        for (String color: Board.COLORS) {
-            SPlayer player = new MPlayer(color);
+        for (String color : Board.COLORS) {
+            SPlayer player = new MPlayer(color, null);
             game.register(player);
         }
     }
@@ -32,11 +32,11 @@ public class ParcheesiTest {
 
     @Test
     public void processEnterPieceTest() {
-        for (String color: Board.COLORS) {
+        for (String color : Board.COLORS) {
             int nestLocation = Board.NEST_LOCATIONS.get(color);
             Pawn pawn = game.board.pawns.get(color)[0];
             EnterPiece m = new EnterPiece(pawn);
-            game.board = (game.processMoves(m)).first;
+            game.board = (game.processMoves(game.board, m)).first;
 
             Assert.assertTrue(((Pawn) game.board.ring[nestLocation]).equals(pawn));
         }
@@ -48,14 +48,14 @@ public class ParcheesiTest {
         String color = Board.COLORS[0];
         Pawn pawn1 = game.board.pawns.get(color)[0];
         EnterPiece e1 = new EnterPiece(pawn1);
-        game.board = (game.processMoves(e1)).first;
+        game.board = (game.processMoves(game.board, e1)).first;
 
         // parcheesi.Move the pawn again
         MoveMain m1 = new MoveMain(pawn1, 4);
-        Pair<Board, Integer> result = game.processMoves(m1);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
 
         Assert.assertTrue("parcheesi.Pawn should move 3 spaces in ring", result.first.ring[8] != null);
-        Assert.assertTrue("pawn updated in pawns hash",result.first.pawns.get(Board.COLORS[0])[0].location==8);
+        Assert.assertTrue("pawn updated in pawns hash", result.first.pawns.get(Board.COLORS[0])[0].location.index == 8);
         Assert.assertTrue("parcheesi.Pawn should not be in original space in ring", result.first.ring[5] == null);
     }
 
@@ -63,19 +63,18 @@ public class ParcheesiTest {
     public void processMoveHomeTest() {
         String color = Board.COLORS[0];
         Pawn pawn = game.board.pawns.get(color)[0];
-        pawn.bc = Board.BoardComponent.HOMEROW;
-        pawn.location = 2;
-        game.board.homeRows.get(color)[pawn.location] = pawn;
+        pawn.location = new Location(Board.BoardComponent.HOMEROW, 2);
+        game.board.homeRows.get(color)[pawn.location.index] = pawn;
         MoveHome m1 = new MoveHome(pawn, 2);
 
-        Pair<Board, Integer> result = game.processMoves(m1);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
         Board board = result.first;
 
         Assert.assertEquals("parcheesi.Pawn should move 4 spaces in runway", pawn, board.homeRows.get(color)[4]);
         Assert.assertNull("parcheesi.Pawn should not be in original space in runway", board.homeRows.get(color)[2]);
 
         MoveHome m2 = new MoveHome(pawn, 3);
-        result = game.processMoves(m2);
+        result = game.processMoves(game.board, m2);
         board = result.first;
 
 
@@ -110,18 +109,16 @@ public class ParcheesiTest {
 
         // Setup bopping pawn
         Pawn p1 = game.board.pawns.get(color1)[0];
-        p1.bc = Board.BoardComponent.RING;
-        p1.location = 19;
-        game.board.ring[p1.location] = p1;
+        p1.location = new Location(Board.BoardComponent.RING, 19);
+        game.board.ring[p1.location.index] = p1;
 
         // Setup bopped pawn
         Pawn p2 = game.board.pawns.get(color2)[0];
-        p2.bc = Board.BoardComponent.RING;
-        p2.location = 20;
-        game.board.ring[p2.location] = p2;
+        p2.location = new Location(Board.BoardComponent.RING, 20);
+        game.board.ring[p2.location.index] = p2;
 
         MoveMain m = new MoveMain(p1, 1);
-        Pair<Board, Integer> result = game.processMoves(m);
+        Pair<Board, Integer> result = game.processMoves(game.board, m);
         int bonus = result.second;
 
         Assert.assertEquals("Bopping earns 20 bonus", 20, bonus);
@@ -138,13 +135,12 @@ public class ParcheesiTest {
         Pawn pawn2 = game.board.pawns.get(color2)[0];
 
         int nestLocation = Board.NEST_LOCATIONS.get(color1);
-        pawn2.bc = Board.BoardComponent.RING;
-        pawn2.location = nestLocation;
+        pawn2.location = new Location(Board.BoardComponent.RING, nestLocation);
         game.board.ring[nestLocation] = pawn2;
 
         // Enter pawn
         EnterPiece m = new EnterPiece(pawn1);
-        Pair<Board, Integer> result = game.processMoves(m);
+        Pair<Board, Integer> result = game.processMoves(game.board, m);
 
         Board board = result.first;
         int bonus = result.second;
@@ -162,18 +158,16 @@ public class ParcheesiTest {
 
         // Setup bopping pawn
         Pawn p1 = game.board.pawns.get(color1)[0];
-        p1.bc = Board.BoardComponent.RING;
-        p1.location = 20;
-        game.board.ring[p1.location] = p1;
+        p1.location = new Location(Board.BoardComponent.RING, 20);
+        game.board.ring[p1.location.index] = p1;
 
         // Setup bopped pawn
         Pawn p2 = game.board.pawns.get(color2)[0];
-        p2.bc = Board.BoardComponent.RING;
-        p2.location = 21;
-        game.board.ring[p2.location] = p2;
+        p2.location = new Location(Board.BoardComponent.RING, 21);
+        game.board.ring[p2.location.index] = p2;
 
         MoveMain m = new MoveMain(p1, 1);
-        Pair<Board, Integer> result = game.processMoves(m);
+        Pair<Board, Integer> result = game.processMoves(game.board, m);
 
 //        Assert.assertTrue("Piece should not be removed on safety", result.first.ring[21] != null);
 //        Assert.assertTrue("cheater removed from game", result.first.ring[20].first == null);
@@ -186,30 +180,26 @@ public class ParcheesiTest {
         String color2 = Board.COLORS[1];
 
         Pawn p1 = game.board.pawns.get(color1)[0];
-        p1.bc = Board.BoardComponent.RING;
-        p1.location = 0;
-        game.board.ring[p1.location] = p1;
+        p1.location = new Location(Board.BoardComponent.RING, 0);
+        game.board.ring[p1.location.index] = p1;
 
         Pawn p2 = game.board.pawns.get(color1)[1];
-        p2.bc = Board.BoardComponent.RING;
-        p2.location = 1;
-        game.board.ring[p2.location] = p2;
+        p2.location = new Location(Board.BoardComponent.RING, 1);
+        game.board.ring[p2.location.index] = p2;
 
 
         Pawn p3 = game.board.pawns.get(color2)[0];
-        p3.bc = Board.BoardComponent.RING;
-        p3.location = 3;
-        game.board.ring[p3.location] = p3;
+        p3.location = new Location(Board.BoardComponent.RING, 3);
+        game.board.ring[p3.location.index] = p3;
 
         Pawn p4 = game.board.pawns.get(color2)[1];
-        p4.bc = Board.BoardComponent.RING;
-        p4.location = 7;
-        game.board.ring[p4.location] = p4;
+        p4.location = new Location(Board.BoardComponent.RING, 7);
+        game.board.ring[p4.location.index] = p4;
 
         MoveMain m1 = new MoveMain(p1, 3);
         MoveMain m2 = new MoveMain(p2, 6);
-        Pair<Board, Integer> result1 = game.processMoves(m1);
-        Pair<Board, Integer> result2 = game.processMoves(m2);
+        Pair<Board, Integer> result1 = game.processMoves(game.board, m1);
+        Pair<Board, Integer> result2 = game.processMoves(game.board, m2);
 
         Assert.assertEquals("First bop earns 20 bonus", result1.second, 20);
         Assert.assertEquals("Second bop earns 20 bonus", result2.second, 20);
@@ -217,18 +207,14 @@ public class ParcheesiTest {
 
 
     @Test
-    public void blockadeCannotMoveTogetherTest(){
-        String color1 = Board.COLORS[0];
+    public void blockadeCannotMoveTogetherTest() {
+        String color = Board.COLORS[0];
 
-        Pawn p1 = game.board.pawns.get(color1)[0];
-        p1.bc = Board.BoardComponent.RING;
-        p1.location = 10;
-        game.board.ring[p1.location] = p1;
-
-        Pawn p2 = game.board.pawns.get(color1)[1];
-        p2.bc = Board.BoardComponent.RING;
-        p2.location = 10;
-        game.board.ring[p2.location] = p2;
+        Pawn p1 = game.board.pawns.get(color)[0];
+        Pawn p2 = game.board.pawns.get(color)[1];
+        p1.location = new Location(Board.BoardComponent.RING, 10);
+        p2.location = new Location(Board.BoardComponent.RING, 10);
+        game.board.ring[p2.location.index] = new Blockade(p1, p2);
 
 
         MoveMain m1 = new MoveMain(p1, 3);
@@ -236,18 +222,17 @@ public class ParcheesiTest {
 
         Board startState = game.board;
 
-        Move[] singleMove={m1};
+        Move[] singleMove = {m1};
+        Move[] moves = {m1, m2};
 
-        Move[] moves = {m1,m2};
-
-        Pair<Board, Integer> result1 = game.processMoves(m1);
-        Pair<Board, Integer> result2 = game.processMoves(m2);
-        Assert.assertFalse("player did not cheat by moving blockade",RuleEngine.movedBlockadeTogether(startState,result1.first,singleMove,game.players.get(color1)));
-
-        Assert.assertTrue("player cheated by moving blockade",RuleEngine.movedBlockadeTogether(startState,result2.first,moves,game.players.get(color1)));
+        Pair<Board, Integer> result1 = game.processMoves(game.board, m1);
+        Assert.assertFalse("player did not cheat by moving blockade", RuleEngine.movedBlockadeTogether(startState, result1.first, singleMove, color));
+        Pair<Board, Integer> result2 = game.processMoves(result1.first, m2);
+        Assert.assertTrue("player cheated by moving blockade", RuleEngine.movedBlockadeTogether(startState, result2.first, moves, color));
 
     }
-//
+
+    //
 //    @Test
 //    public void blockadeCannotMoveTogetherWithBopBonusTest() {
 //        parcheesi.Parcheesi game = new parcheesi.Parcheesi();
@@ -265,8 +250,8 @@ public class ParcheesiTest {
 //
 //        parcheesi.MoveMain m1 = new parcheesi.MoveMain(p1, 3);
 //        parcheesi.MoveMain m2 = new parcheesi.MoveMain(p2, 6);
-//        parcheesi.Pair<parcheesi.Board, Integer> result1 = game.processMoves(m1);
-//        parcheesi.Pair<parcheesi.Board, Integer> result2 = game.processMoves(m2);
+//        parcheesi.Pair<parcheesi.Board, Integer> result1 = game.processMoves(game.board, m1);
+//        parcheesi.Pair<parcheesi.Board, Integer> result2 = game.processMoves(game.board, m2);
 //
 //        //TODO: Check that bonus moves cant move blockade together
 //    }
@@ -286,12 +271,11 @@ public class ParcheesiTest {
         // Setup blockade
         Pawn b1 = game.board.pawns.get(color2)[0];
         Pawn b2 = game.board.pawns.get(color2)[1];
-        b1.bc = b2.bc = Board.BoardComponent.RING;
-        b1.location = b2.location = nestLocation;
+        b1.location = b2.location = new Location(Board.BoardComponent.RING, nestLocation);
         game.board.ring[nestLocation] = new Blockade(b1, b2);
 
         EnterPiece m1 = new EnterPiece(p1);
-        Pair<Board, Integer> result = game.processMoves(m1);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
 
         Assert.assertNull("Entering piece on blockaded entry is flagged as cheating", result);
     }
@@ -302,19 +286,17 @@ public class ParcheesiTest {
 
         // Setup moving pawn
         Pawn p1 = game.board.pawns.get(color1)[0];
-        p1.bc = Board.BoardComponent.RING;
-        p1.location = 1;
-        game.board.ring[p1.location] = p1;
+        p1.location = new Location(Board.BoardComponent.RING, 1);
+        game.board.ring[p1.location.index] = p1;
 
         // Setup blockade
         Pawn b1 = game.board.pawns.get(color1)[1];
         Pawn b2 = game.board.pawns.get(color1)[2];
-        b1.bc = b2.bc = Board.BoardComponent.RING;
-        b1.location = b2.location = 6;
-        game.board.ring[b1.location] = new Blockade(b1, b2);
+        b1.location = b2.location = new Location(Board.BoardComponent.RING,6);
+        game.board.ring[b1.location.index] = new Blockade(b1, b2);
 
         MoveMain m1 = new MoveMain(p1, 5);
-        Pair<Board, Integer> result = game.processMoves(m1);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
 
         Assert.assertNull("Moving to your own blockade is flagged as cheating", result);
     }
@@ -325,19 +307,17 @@ public class ParcheesiTest {
 
         // Setup moving pawn
         Pawn p1 = game.board.pawns.get(color1)[0];
-        p1.bc = Board.BoardComponent.RING;
-        p1.location = 1;
-        game.board.ring[p1.location] = p1;
+        p1.location = new Location(Board.BoardComponent.RING, 1);
+        game.board.ring[p1.location.index] = p1;
 
         // Setup blockade
         Pawn b1 = game.board.pawns.get(color1)[1];
         Pawn b2 = game.board.pawns.get(color1)[2];
-        b1.bc = b2.bc = Board.BoardComponent.RING;
-        b1.location = b2.location = 3;
-        game.board.ring[b1.location] = new Blockade(b1, b2);
+        b1.location = b2.location = new Location(Board.BoardComponent.RING, 3);
+        game.board.ring[b1.location.index] = new Blockade(b1, b2);
 
         MoveMain m1 = new MoveMain(p1, 5);
-        Pair<Board, Integer> result = game.processMoves(m1);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
 
         Assert.assertNull("Moving to your own blockade is flagged as cheating", result);
     }
@@ -346,23 +326,20 @@ public class ParcheesiTest {
     public void cannotMoveToOpponentBlockadeTest() {
         String color1 = Board.COLORS[0];
         String color2 = Board.COLORS[1];
-        int nestLocation = Board.NEST_LOCATIONS.get(color1);
 
         // Setup moving pawn
         Pawn p1 = game.board.pawns.get(color1)[0];
-        p1.bc = Board.BoardComponent.RING;
-        p1.location = 1;
-        game.board.ring[p1.location] = p1;
+        p1.location = new Location(Board.BoardComponent.RING, 1);
+        game.board.ring[p1.location.index] = p1;
 
         // Setup blockade
         Pawn b1 = game.board.pawns.get(color2)[0];
         Pawn b2 = game.board.pawns.get(color2)[1];
-        b1.bc = b2.bc = Board.BoardComponent.RING;
-        b1.location = b2.location = 6;
-        game.board.ring[b1.location] = new Blockade(b1, b2);
+        b1.location = b2.location = new Location(Board.BoardComponent.RING, 6);
+        game.board.ring[b1.location.index] = new Blockade(b1, b2);
 
         MoveMain m1 = new MoveMain(p1, 5);
-        Pair<Board, Integer> result = game.processMoves(m1);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
 
         Assert.assertNull("Moving to your own blockade is flagged as cheating", result);
     }
@@ -374,19 +351,17 @@ public class ParcheesiTest {
 
         // Setup moving pawn
         Pawn p1 = game.board.pawns.get(color1)[0];
-        p1.bc = Board.BoardComponent.RING;
-        p1.location = 1;
-        game.board.ring[p1.location] = p1;
+        p1.location = new Location(Board.BoardComponent.RING, 1);
+        game.board.ring[p1.location.index] = p1;
 
         // Setup blockade
         Pawn b1 = game.board.pawns.get(color2)[0];
         Pawn b2 = game.board.pawns.get(color2)[1];
-        b1.bc = b2.bc = Board.BoardComponent.RING;
-        b1.location = b2.location = 3;
-        game.board.ring[b1.location] = new Blockade(b1, b2);
+        b1.location = b2.location = new Location(Board.BoardComponent.RING, 3);
+        game.board.ring[b1.location.index] = new Blockade(b1, b2);
 
         MoveMain m1 = new MoveMain(p1, 5);
-        Pair<Board, Integer> result = game.processMoves(m1);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
 
         Assert.assertNull("Moving to your own blockade is flagged as cheating", result);
     }
@@ -398,18 +373,16 @@ public class ParcheesiTest {
 
         Pawn b1 = pawns[0];
         Pawn b2 = pawns[1];
-        b1.bc = b2.bc = Board.BoardComponent.HOMEROW;
-        b1.location = b2.location = 2;
+        b1.location = b2.location = new Location(Board.BoardComponent.HOMEROW, 2);
         Blockade blockade = new Blockade(b1, b2);
         game.board.homeRows.get(color)[2] = blockade;
 
         Pawn p1 = pawns[2];
-        p1.bc = Board.BoardComponent.HOMEROW;
-        p1.location = 0;
+        p1.location = new Location(Board.BoardComponent.HOMEROW, 0);
         game.board.homeRows.get(color)[0] = p1;
 
         MoveHome m1 = new MoveHome(p1, 4);
-        Pair<Board, Integer> result = game.processMoves(m1);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
 
         Assert.assertNull("Passing your own blockade in the home row is flagged as cheating", result);
     }
@@ -421,18 +394,18 @@ public class ParcheesiTest {
 
         Pawn b1 = pawns[0];
         Pawn b2 = pawns[1];
-        b1.bc = b2.bc = Board.BoardComponent.RING;
-        b1.location = b2.location = 7;
+        b1.location = b2.location = new Location (Board.BoardComponent.RING, 7);
         Blockade blockade = new Blockade(b1, b2);
         game.board.ring[7] = blockade;
 
         MoveMain m1 = new MoveMain(b1, 4);
-        Pair<Board, Integer> result = game.processMoves(m1);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
 
         Assert.assertEquals("Blockading pawn can move out of blockade", b1, result.first.ring[11]);
         Assert.assertEquals("Remaining blockading pawn stays in original location", b2, result.first.ring[7]);
     }
-//
+
+    //
 //    @Test
 //    public void cannotMoveBlockadeTogetherInMultipleMovesTest() {
 //        parcheesi.Parcheesi game = new parcheesi.Parcheesi();
@@ -461,20 +434,17 @@ public class ParcheesiTest {
         Pawn[] pawns = game.board.pawns.get(color);
 
         Pawn b1 = pawns[0];
-        b1.bc = Board.BoardComponent.RING;
-        b1.location = 3;
+        b1.location = new Location(Board.BoardComponent.RING, 3);
         game.board.ring[3] = b1;
 
         Pawn b2 = pawns[1];
-        b2.bc = Board.BoardComponent.RING;
-        b2.location = 7;
+        b2.location = new Location(Board.BoardComponent.RING, 7);
         game.board.ring[7] = b2;
 
 
         MoveMain m1 = new MoveMain(b1, 4);
-        Pair<Board, Integer> result = game.processMoves(m1);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
 
-        boolean boo = (new Blockade(b1, b2)).equals(result.first.ring[7]);
         Assert.assertEquals("parcheesi.Blockade is formed at new location", new Blockade(b1, b2), result.first.ring[7]);
     }
 
@@ -490,21 +460,19 @@ public class ParcheesiTest {
         int homeRowLocation = Board.HOMEROW_LOCATIONS.get(color1);
         int startLocation = homeRowLocation - 3;
         Pawn p1 = pawns1[0];
-        p1.bc = Board.BoardComponent.RING;
-        p1.location = startLocation;
+        p1.location = new Location(Board.BoardComponent.RING, startLocation);
         game.board.ring[startLocation] = p1;
 
         // Set up blockade
         Pawn b1 = pawns2[0];
         Pawn b2 = pawns2[1];
-        b1.bc = b2.bc = Board.BoardComponent.RING;
-        b1.location = b2.location = homeRowLocation;
+        b1.location = b2.location = new Location(Board.BoardComponent.RING, homeRowLocation);
         Blockade blockade = new Blockade(b1, b2);
         game.board.ring[homeRowLocation] = blockade;
 
         MoveMain m1 = new MoveMain(p1, 5);
 
-        Pair<Board, Integer> result = game.processMoves(m1);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
 
         Assert.assertNull("Moving blockade past blockade on home row is flagged as cheating", result);
     }
@@ -523,13 +491,12 @@ public class ParcheesiTest {
         int homeRowLocation = Board.HOMEROW_LOCATIONS.get(color);
         int startLocation = homeRowLocation - 3;
         Pawn p = pawns[0];
-        p.bc = Board.BoardComponent.RING;
-        p.location = startLocation;
+        p.location = new Location(Board.BoardComponent.RING, startLocation);
         game.board.ring[startLocation] = p;
         Parcheesi game = new Parcheesi();
 
         MoveMain m1 = new MoveMain(p, 5);
-        Pair<Board, Integer> result = game.processMoves(m1);
+        Pair<Board, Integer> result = game.processMoves(game.board, m1);
 
         Assert.assertEquals("parcheesi.Pawn can move from ring into home row", p, result.first.homeRows.get(color)[1]);
     }
