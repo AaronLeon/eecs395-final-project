@@ -50,6 +50,14 @@ public class RuleEngine {
         return false;
     }
 
+    /**
+     * Checks if a player can move the specified pawn with the current board state and dice rolls.
+     * @param player
+     * @param pawn
+     * @param dice
+     * @param board
+     * @return true if the pawn can be moved with one of the dice rolls and false otherwise
+     */
     public static boolean canMovePawn(SPlayer player, Pawn pawn, int[] dice, Board board) {
         if ((pawn.location.bc == Board.BoardComponent.NEST)) {
             return canEnter(dice) && !board.isBlockade(new Location(Board.BoardComponent.RING, Board.NEST_LOCATIONS.get(pawn.color)), pawn.color);
@@ -66,8 +74,7 @@ public class RuleEngine {
             }
         } else {
             for (int d : dice) {
-                MoveMain testMove = new MoveMain(pawn, d);
-                if (!isBlocked(board, testMove)) {
+                if (d != 0 && !isBlocked(board, new MoveMain(pawn, d))) {
                     return true;
                 }
             }
@@ -78,15 +85,13 @@ public class RuleEngine {
     /**
      * Checks if player still has moves possible given dice roll and current board state
      *
-     * @param p     parcheesi.Player that is being checked
+     * @param player     SPlayer that is being checked
      * @param dice  Array of dice roll values
      * @param board Current board state
-     * @return
+     * @return true if the player can make a move with the current dice rolls and board state and false otherwise
      */
-    public static boolean canMove(Player p, int[] dice, Board board) {
+    public static boolean canMove(SPlayer player, int[] dice, Board board) {
         sort(dice);
-        //iterate over pawns in player p,
-        SPlayer player = (SPlayer) p;
         Pawn[] pawns = board.pawns.get(player.color);
         for (Pawn pawn : pawns) {
             if (canMovePawn(player, pawn, dice, board)) {
@@ -99,8 +104,8 @@ public class RuleEngine {
     /**
      * Helper function that checks if a parcheesi.MoveMain is blockaded
      *
-     * @param m parcheesi.MoveMain that is being checked
-     * @return true if the parcheesi.MoveMain is blockaded, false otherwise
+     * @param m MoveMain that is being checked
+     * @return true if the MoveMain is blockaded, false otherwise
      */
     private static boolean isBlocked(Board board, MoveMain m) {
         Pawn pawn = m.pawn;
@@ -124,9 +129,9 @@ public class RuleEngine {
     }
 
     /**
-     * Helper function that checks if a parcheesi.MoveHome is blockaded
+     * Helper function that checks if a MoveHome is blockaded
      *
-     * @param m parcheesi.MoveHome that is being checked
+     * @param m MoveHome that is being checked
      * @return true if the parcheesi.MoveHome is blockaded, false otherwise
      */
     private static boolean isBlocked(Board board, MoveHome m) {
@@ -145,9 +150,9 @@ public class RuleEngine {
     }
 
     /**
-     * Helper function that checks if an parcheesi.EnterPiece is blockaded
+     * Helper function that checks if an EnterPiece is blockaded
      *
-     * @param m parcheesi.EnterPiece that is being checked
+     * @param m EnterPiece that is being checked
      * @return true if the parcheesi.EnterPiece is blockaded, false otherwise
      */
     private static boolean isBlocked(Board board, EnterPiece m) {
@@ -159,8 +164,8 @@ public class RuleEngine {
     /**
      * Checks if a move is blockaded
      *
-     * @param m parcheesi.Move that is being checked
-     * @return true if the parcheesi.Move is blockaded, false otherwise
+     * @param m Move that is being checked
+     * @return true if the Move is blockaded, false otherwise
      */
     public static boolean isBlocked(Board board, Move m) {
         if (m instanceof EnterPiece) {

@@ -501,70 +501,73 @@ public class ParcheesiTest {
         Assert.assertEquals("parcheesi.Pawn can move from ring into home row", p, result.first.homeRows.get(color)[1]);
     }
 
-//    /*
-//     * Complete parcheesi.Move
-//     */
-//
-//
-//    @Test
-//    public void noMovesLeftDueToBlockadeTest() {
-//        parcheesi.Parcheesi game = new parcheesi.Parcheesi();
-//        parcheesi.Pawn blockade1 = new parcheesi.Pawn(0, "green");
-//        parcheesi.Pawn blockade2 = new parcheesi.Pawn(1, "green");
-//        parcheesi.Pawn p1 = new parcheesi.Pawn(0, "red");
-//
-//        game.board.ring[3].first = blockade1;
-//        game.board.ring[3].second = blockade2;
-//        game.board.ring[0].first = p1;
-//
-//        int[] dice = {4, 6};
-//        boolean movesPossible = game.movesPossible(game.players[0], dice, game.board);
-//
-//        Assert.assertFalse("No moves left due to blockade", movesPossible);
-//    }
-//
-//    @Test
-//    public void canOnlyUseFirstDiceDueToBlockadeTest() {
-//        parcheesi.Parcheesi game = new parcheesi.Parcheesi();
-//
-//        parcheesi.Pawn p1 = new parcheesi.Pawn(0, "red");
-//        parcheesi.Pawn blockade1 = new parcheesi.Pawn(1, "green");
-//        parcheesi.Pawn blockade2 = new parcheesi.Pawn(2, "green");
-//
-//        game.board.ring[0].first = p1;
-//        game.board.ring[4].first = blockade1;
-//        game.board.ring[4].second = blockade2;
-//
-//        parcheesi.MoveMain m1 = new parcheesi.MoveMain(p1, 3);
-//        parcheesi.Pair<parcheesi.Board, Integer> result = game.processMoves(m1);
-//        int[] dice = {2, 5, 0, 0};
-//
-//        boolean movesPossible = game.movesPossible(game.players[0], dice, game.board);
-//
-//        Assert.assertTrue("One move possible with due to blockade", movesPossible);
-//    }
-//
-//    @Test
-//    public void canOnlyUseSecondDiceDueToBlockadeTest() {
-//        parcheesi.Parcheesi game = new parcheesi.Parcheesi();
-//
-//        parcheesi.Pawn p1 = new parcheesi.Pawn(0, "red");
-//        parcheesi.Pawn blockade1 = new parcheesi.Pawn(1, "green");
-//        parcheesi.Pawn blockade2 = new parcheesi.Pawn(2, "green");
-//
-//        game.board.ring[0].first = p1;
-//        game.board.ring[4].first = blockade1;
-//        game.board.ring[4].second = blockade2;
-//
-//        parcheesi.MoveMain m1 = new parcheesi.MoveMain(p1, 3);
-//        parcheesi.Pair<parcheesi.Board, Integer> result = game.processMoves(m1);
-//        int[] dice = {5, 2, 0, 0};
-//
-//        boolean movesPossible = game.movesPossible(game.players[0], dice, game.board);
-//
-//        Assert.assertTrue("One move possible with due to blockade", movesPossible);
-//    }
-//
+    /*
+     * Complete parcheesi
+     */
+
+    @Test
+    public void noMovesLeftDueToBlockadeTest() {
+        Pawn[] pawns1 = game.board.pawns.get("green");
+        Pawn b1 = pawns1[0];
+        Pawn b2 = pawns1[1];
+        b1.location = new Location(Board.BoardComponent.RING, 3);
+        b2.location = new Location(Board.BoardComponent.RING, 3);
+
+        Pawn p1 = game.board.pawns.get("red")[0];
+        p1.location = new Location(Board.BoardComponent.RING, 0);
+
+        Blockade blockade = new Blockade(b1, b2);
+        game.board.ring[3] = blockade;
+        game.board.ring[0] = p1;
+
+        int[] dice = {4, 6, 0, 0};
+        boolean result = RuleEngine.canMove(game.players.get("red"), dice, game.board);
+
+        Assert.assertFalse("No moves left due to blockade", result);
+    }
+
+    @Test
+    public void canOneDiceDueToBlockadeTest() {
+        Pawn[] pawns1 = game.board.pawns.get("green");
+        Pawn b1 = pawns1[0];
+        Pawn b2 = pawns1[1];
+        b1.location = new Location(Board.BoardComponent.RING, 5);
+        b2.location = new Location(Board.BoardComponent.RING, 5);
+
+        Pawn p1 = game.board.pawns.get("red")[0];
+        p1.location = new Location(Board.BoardComponent.RING, 1);
+
+        Blockade blockade = new Blockade(b1, b2);
+        game.board.ring[5] = blockade;
+        game.board.ring[1] = p1;
+
+        int[] dice = {2, 5, 0, 0};
+        boolean result = RuleEngine.canMove(game.players.get("red"), dice, game.board);
+
+        Assert.assertTrue("Only one move possible due to blockade", result);
+    }
+
+    @Test
+    public void canOnlyUseSecondDiceDueToBlockadeTest() {
+        Pawn[] pawns1 = game.board.pawns.get("green");
+        Pawn b1 = pawns1[0];
+        Pawn b2 = pawns1[1];
+        b1.location = new Location(Board.BoardComponent.RING, 4);
+        b2.location = new Location(Board.BoardComponent.RING, 4);
+
+        Pawn p1 = game.board.pawns.get("red")[0];
+        p1.location = new Location(Board.BoardComponent.RING, 0);
+
+        Blockade blockade = new Blockade(b1, b2);
+        game.board.ring[4] = blockade;
+        game.board.ring[0] = p1;
+
+        int[] dice = {5, 2, 0, 0};
+        boolean result = RuleEngine.canMove(game.players.get("red"), dice, game.board);
+
+        Assert.assertTrue("Only one move possible due to blockade", result);
+    }
+
 //    @Test
 //    public void cannotUseBopBonusTest() {
 //        parcheesi.Parcheesi game = new parcheesi.Parcheesi();
